@@ -47,8 +47,8 @@
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   transition: transform 0.22s ease, box-shadow 0.22s ease;
-  width: 270px;
-  min-height: 420px;
+  width: 340px;
+  min-height: 350px;
   display: flex;
   flex-direction: column;
 }
