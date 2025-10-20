@@ -1,6 +1,6 @@
 import styles from './LandingPage.module.css'
-import SearchSection from "../Components/SearchSection/SearchSection"
-import DealsSection from '../Components/DealSection/DealSection'
+import SearchSection from "../../Components/SearchSection/SearchSection"
+import DealsSection from '../../Components/DealSection/DealSection'
 
 export const LandingPage = () => {
   return (

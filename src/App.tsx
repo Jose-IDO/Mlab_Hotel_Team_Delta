@@ -1,5 +1,5 @@
 import { Navbar } from './Components/Navbar/Navbar'
-import { LandingPage } from './Landing_Page/LandingPage'
+import { LandingPage } from './Pages/Landing_Page/LandingPage'
 
 const App = () => {
   return (
