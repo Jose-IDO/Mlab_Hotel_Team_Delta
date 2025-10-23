@@ -77,7 +77,7 @@ const baseDeals: Deal[] = [
     nights: "1 night",
     rating: 3,
     views: 777,
-   oldPrice: 'R1100',
+    oldPrice: 'R1100',
     newPrice: 'R700',
   },
 ];

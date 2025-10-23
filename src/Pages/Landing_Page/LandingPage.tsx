@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import styles from './LandingPage.module.css'
 import SearchSection from "../../Components/SearchSection/SearchSection"
 import DealsSection from '../../Components/DealSection/DealSection'
-
 import santorini1 from '../../assets/Santorini_1.jpg'
 import santorini2 from '../../assets/Santorini_2.jpg'
 import santorini3 from '../../assets/Santorini_3.jpg'
@@ -10,6 +9,10 @@ import santorini4 from '../../assets/Santorini_4.jpg'
 import santorini5 from '../../assets/Santorini_5.jpg'
 import santorini6 from '../../assets/Santorini_6.jpg'
 import santorini7 from '../../assets/Santorini_7.jpg'
+import coffeecup from '../../assets/coffee_cup.png'
+import sofa from '../../assets/sofa.png'
+import wifi from '../../assets/wifi-signal.png'
+// import blackheart from '../../assets/heart-black.png'
 
 export const LandingPage = () => {
   const [currentImage, setCurrentImage] = useState(0)
@@ -53,6 +56,32 @@ export const LandingPage = () => {
         <SearchSection />
       </div>
       <DealsSection/>
+      <div className = {styles.section2}>
+        <div className = {styles.Head1}> why choose us? </div>
+        <div className = {styles.offerings}>
+
+          <div className={styles.offerings1}>
+            <img src={coffeecup} alt={'coffee cup image'} style={{height:'150px', width:'150px'}}/>
+            <p className={styles.paragraph1}>Enjoy free freshly brewed coffee and a cozy atmosphere all day long. Whether you’re relaxing or working, our coffee shop is the perfect spot to recharge.</p>
+          </div>
+
+          <div className={styles.offerings1}>
+            <img src={wifi} alt={'wifi icon image'} style={{height:'150px', width:'150px'}}/>
+            <p className={styles.paragraph1}>Stay connected wherever you are in the hotel with our fast, free Wi-Fi. Stream, work, or chat without interruptions.</p>
+          </div>
+
+
+          <div className={styles.offerings1}>
+            <img src={sofa} alt={'sofa icon image'} style={{height:'150px', width:'150px'}}/>
+            <p className={styles.paragraph1}>Experience comfort at its best with fully air-conditioned rooms. Adjust the temperature to your liking and relax in cool comfort.</p>
+          </div>
+
+        </div>
+        <button className={styles.viewAllBtn}>
+          View All
+        </button>
+
+      </div>
     </div>
   )
 }
