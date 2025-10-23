@@ -1,14 +1,86 @@
 .sectionone {
+<<<<<<< HEAD
     background-image: url('../../assets/Santorini_1.jpg');
 
+=======
+>>>>>>> development-release
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - 30px);
+    position: relative;
+    overflow: hidden;
     background-size: cover;
     background-position: center;
+    transition: background-image 0.5s ease-in-out;
 }
 
 .searchsection{
 
   margin-top: -40px;
 
+}
+
+.sliderButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 84px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.leftButton {
+    left: 20px;
+}
+
+.rightButton {
+    right: 20px;
+}
+
+.slideContainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.slide {
+    min-width: 100%;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.textContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 40px 60px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.textContent div {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.textContent div:first-child {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
