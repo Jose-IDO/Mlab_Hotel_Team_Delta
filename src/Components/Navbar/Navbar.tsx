@@ -1,13 +1,29 @@
 import React, { useState } from "react";
 import styles from "./Navbar.module.css";
+import Logo from '../../assets/Logo.png'
+
+
+
+
+
 
 export const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className={styles.navbar}>
+
       <div className={styles.navContainer}>
-        <span>Delta Hotel Booking</span>
+        <div className={styles.SubnavContainer1}>
+          <div className={styles.LogoCard}>
+          <img src={Logo} alt="Logo" style={{width: '50px', height: '50px'}} />
+          </div>
+          <div className = {styles.logo}> elta Hotel </div>
+
+
+          
+          </div>
+        <div className={styles.SubnavContainer2}>
         <ul className={`${styles.navLinks} ${menuOpen ? styles.showMenu : ""}`}>
           <li>Home</li>
           <li>Rooms</li>
@@ -23,6 +39,8 @@ export const Navbar: React.FC = () => {
           <span className={styles.bar}></span>
           <span className={styles.bar}></span>
         </button>
+        </div>
+
       </div>
     </nav>
   );

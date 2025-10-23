@@ -10,7 +10,7 @@
 }
 
 .navContainer {
-  max-width: 1200px;
+  max-width: 90%;
   margin: 0 auto;
   padding: 12px 16px;
   display: flex;
@@ -18,13 +18,38 @@
   justify-content: space-between;
 }
 
+.SubnavContainer1{
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  gap: 5px
+
+}
+
+.LogoCard{
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  height: 20px;
+  width: 20px;
+  
+}
+
+
+.LogoCard{
+  background-color: #D9D9D9;
+  height: 50px;
+  width: 50px;
+  border-radius: 50px;
+}
+
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: white;
-  font-size: 18px;
-  font-weight: 600;
+  color: #fbefef;
+  font-size: 40px;
+  font-weight: 550;
 }
 
 .logoIcon {
