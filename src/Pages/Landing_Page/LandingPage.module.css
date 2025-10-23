@@ -1,9 +1,4 @@
 .sectionone {
-<<<<<<< HEAD
-    background-image: url('../../assets/Santorini_1.jpg');
-
-=======
->>>>>>> development-release
     width: 100%;
     height: calc(100vh - 30px);
     position: relative;
