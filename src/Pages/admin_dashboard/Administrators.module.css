@@ -1,0 +1,162 @@
+.container {
+    padding: 20px;
+}
+
+.headerBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.title {
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.addButton {
+    padding: 8px 16px;
+    background-color: #0000FF;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.addButton:hover {
+    background-color: #0000cc;
+}
+
+.adminSection {
+    margin-bottom: 40px;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 15px;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: rgba(0, 0, 255, 0.7);
+    color: white;
+}
+
+.table thead th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody td {
+    padding: 15px;
+    color: #333;
+    font-size: 14px;
+}
+
+.table tbody td:first-child {
+    font-weight: 600;
+    color: #0000FF;
+}
+
+/* Admin Type badges */
+.typeBadge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.superAdmin {
+    background-color: #E1BEE7;
+    color: #4A148C;
+}
+
+.admin {
+    background-color: #BBDEFB;
+    color: #0D47A1;
+}
+
+.moderator {
+    background-color: #C8E6C9;
+    color: #1B5E20;
+}
+
+/* Buttons */
+button {
+    padding: 6px 12px;
+    margin-right: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.editBtn {
+    background-color: #FF9800;
+    color: white;
+}
+
+.editBtn:hover {
+    background-color: #e68900;
+}
+
+.deactivateBtn {
+    background-color: #f44336;
+    color: white;
+}
+
+.deactivateBtn:hover {
+    background-color: #da190b;
+}
+
+.approveBtn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.approveBtn:hover {
+    background-color: #45a049;
+}
+
+.rejectBtn {
+    background-color: #f44336;
+    color: white;
+}
+
+.rejectBtn:hover {
+    background-color: #da190b;
+}

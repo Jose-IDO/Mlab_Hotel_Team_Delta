@@ -1,13 +1,13 @@
-import { Navbar } from './Components/Navbar/Navbar'
-import { LandingPage } from './Pages/Landing_Page/LandingPage'
+import { BrowserRouter } from 'react-router-dom';
+import { AdminDashboard } from "./Pages/admin_dashboard/AdminDashboard"
 
 const App = () => {
   return (
-    <div>
-      <Navbar />
-      <LandingPage/>
-      <div>Hotel App</div>
-    </div>
+    <BrowserRouter>
+      <div>
+        <AdminDashboard />
+      </div>
+    </BrowserRouter>
   )
 }
 
