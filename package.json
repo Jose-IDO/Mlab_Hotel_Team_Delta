@@ -1,6 +1,7 @@
 {
-  "name": "hotel_app",
+"name": "hotel_app",
   "version": "0.0.1",
+  "homepage": "https://Jose-IDO.github.io/Mlab_Hotel_Team_Delta",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "react": "^19.1.1",
@@ -28,3 +29,5 @@
     "vite": "^7.1.7"
   }
 }
+
+
