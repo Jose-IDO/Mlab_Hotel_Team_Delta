@@ -2,6 +2,7 @@ export const seedAdminUser = () => {
   const users = JSON.parse(localStorage.getItem('hotel_users') || '[]');
   
   const adminExists = users.find((u: any) => u.role === 'admin');
+  const customerExists = users.find((u: any) => u.email === 'customer@deltahotel.com');
   
   if (!adminExists) {
     const adminUser = {
@@ -13,7 +14,21 @@ export const seedAdminUser = () => {
     };
     
     users.push(adminUser);
-    localStorage.setItem('hotel_users', JSON.stringify(users));
     console.log('Admin user created: admin@deltahotel.com / admin123');
   }
+
+  if (!customerExists) {
+    const customerUser = {
+      id: 'customer-001',
+      email: 'customer@deltahotel.com',
+      password: 'customer123',
+      name: 'Test Customer',
+      role: 'customer'
+    };
+    
+    users.push(customerUser);
+    console.log('Customer user created: customer@deltahotel.com / customer123');
+  }
+  
+  localStorage.setItem('hotel_users', JSON.stringify(users));
 };
