@@ -6,9 +6,11 @@ import { AdminDashboard } from "./Pages/admin_dashboard/AdminDashboard"
 import { ProtectedRoute } from "./Components/ProtectedRoute"
 
 const App = () => {
+  const basename = import.meta.env.PROD ? '/Mlab_Hotel_Team_Delta' : ''
+  
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <div>
           <Navbar />
           <Routes>
