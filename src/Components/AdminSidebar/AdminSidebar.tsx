@@ -14,7 +14,7 @@ export const AdminSidebar = () => {
       <li>
         <Link to="/admin/accommodations">
           <span></span>
-          Manage Accommodations
+          Manage Accommodation
         </Link>
       </li>
       <li>

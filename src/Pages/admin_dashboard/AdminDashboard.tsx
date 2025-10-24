@@ -20,10 +20,28 @@ export const AdminDashboard = () => {
             <div className={styles.mainContent}>
                 <Routes>
                     <Route path="/" element={
-                        <>
-                            <h1>Welcome to the Admin Dashboard</h1>
-                            <p>Select an option from the sidebar to get started.</p>
-                        </>
+                        <div style={{
+                            background: 'white',
+                            borderRadius: '16px',
+                            padding: '40px',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                            textAlign: 'center'
+                        }}>
+                            <h1 style={{
+                                fontSize: '32px',
+                                fontWeight: '700',
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                marginBottom: '16px'
+                            }}>Welcome to the Admin Dashboard</h1>
+                            <p style={{
+                                color: '#718096',
+                                fontSize: '16px',
+                                maxWidth: '500px',
+                                margin: '0 auto'
+                            }}>Select an option from the sidebar to get started managing your hotel.</p>
+                        </div>
                     } />
                     <Route path="/admin/bookings" element={<ManageBooking />} />
                     <Route path="/admin/accommodations" element={<ManageAccom />} />
