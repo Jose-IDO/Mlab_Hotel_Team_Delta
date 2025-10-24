@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./AdminNavbar.module.css";
+import profileicon from "../../Assets/profile-icon.png";
 
 export const AdminNavbar: React.FC = () => {
   return (
@@ -16,7 +17,7 @@ export const AdminNavbar: React.FC = () => {
         </div>
         <div className={styles.profileSection}>
           <img 
-            src="https://via.placeholder.com/40" 
+            src={profileicon} 
             alt="Admin Profile" 
             className={styles.profilePicture}
           />  

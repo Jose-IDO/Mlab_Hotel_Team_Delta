@@ -4,12 +4,13 @@ import styles from "./ManageAccom.module.css";
 export const ManageAccom: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    address: "",
+    roomName: "",
     roomType: "",
+    newRoomType: "",
     numberOfRooms: "",
     price: "",
-    starRating: "",
+    maxGuests: "",
+    bedType: "",
     amenities: [] as string[],
     photos: [] as File[]
   });
@@ -42,20 +43,31 @@ export const ManageAccom: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form data:", formData);
-    // Add your submission logic here
+    const payload = {
+      roomName: formData.roomName,
+      roomType: formData.roomType === "__new" ? formData.newRoomType : formData.roomType,
+      numberOfRooms: formData.numberOfRooms,
+      price: formData.price,
+      maxGuests: formData.maxGuests,
+      bedType: formData.bedType,
+      amenities: formData.amenities,
+      photos: formData.photos
+    };
+    console.log("New room payload:", payload);
+    // TODO: submit payload to API
     setShowForm(false);
   };
 
   const handleCancel = () => {
     setShowForm(false);
     setFormData({
-      name: "",
-      address: "",
+      roomName: "",
       roomType: "",
+      newRoomType: "",
       numberOfRooms: "",
       price: "",
-      starRating: "",
+      maxGuests: "",
+      bedType: "",
       amenities: [],
       photos: []
     });
@@ -64,15 +76,15 @@ export const ManageAccom: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.headerBar}>
-        <h1 className={styles.title}>Manage Accommodations</h1>
-        <button className={styles.addButton} onClick={() => setShowForm(true)}>+ Add New</button>
+        <h1 className={styles.title}>Manage Rooms</h1>
+        <button className={styles.addButton} onClick={() => setShowForm(true)}>+ Add Room</button>
       </div>
 
       {/* Overlay Form */}
       {showForm && (
         <div className={styles.overlay}>
           <div className={styles.formContainer}>
-            <h2 className={styles.formTitle}>Add New Accommodation</h2>
+            <h2 className={styles.formTitle}>Add New Room</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
               
               {/* Photo Upload */}
@@ -94,33 +106,19 @@ export const ManageAccom: React.FC = () => {
                 </div>
               </div>
 
-              {/* Name */}
+              {/* Room Name/Label */}
               <div className={styles.formGroup}>
-                <label>Accommodation Name *</label>
+                <label>Room Name/Label</label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="roomName"
+                  value={formData.roomName}
                   onChange={handleInputChange}
-                  required
-                  placeholder="e.g., Ocean View Suite"
+                  placeholder="e.g., Deluxe King Sea View"
                 />
               </div>
 
-              {/* Address */}
-              <div className={styles.formGroup}>
-                <label>Address *</label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="Enter full address"
-                  rows={3}
-                />
-              </div>
-
-              {/* Room Type */}
+              {/* Room Type + Add New */}
               <div className={styles.formGroup}>
                 <label>Room Type *</label>
                 <select
@@ -134,8 +132,23 @@ export const ManageAccom: React.FC = () => {
                   <option value="deluxe">Deluxe</option>
                   <option value="suite">Suite</option>
                   <option value="presidential">Presidential Suite</option>
+                  <option value="__new">+ Add new type...</option>
                 </select>
               </div>
+
+              {formData.roomType === "__new" && (
+                <div className={styles.formGroup}>
+                  <label>New Room Type *</label>
+                  <input
+                    type="text"
+                    name="newRoomType"
+                    value={formData.newRoomType}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., Family Suite"
+                  />
+                </div>
+              )}
 
               {/* Number of Rooms */}
               <div className={styles.formGroup}>
@@ -147,7 +160,7 @@ export const ManageAccom: React.FC = () => {
                   onChange={handleInputChange}
                   required
                   min="1"
-                  placeholder="e.g., 10"
+                  placeholder="e.g., 5"
                 />
               </div>
 
@@ -162,25 +175,40 @@ export const ManageAccom: React.FC = () => {
                   required
                   min="0"
                   step="0.01"
-                  placeholder="e.g., 220.00"
+                  placeholder="e.g., 180.00"
                 />
               </div>
 
-              {/* Star Rating */}
+              {/* Max Guests */}
               <div className={styles.formGroup}>
-                <label>Star Rating *</label>
+                <label>Max Guests *</label>
+                <input
+                  type="number"
+                  name="maxGuests"
+                  value={formData.maxGuests}
+                  onChange={handleInputChange}
+                  required
+                  min="1"
+                  placeholder="e.g., 2"
+                />
+              </div>
+
+              {/* Bed Type */}
+              <div className={styles.formGroup}>
+                <label>Bed Type *</label>
                 <select
-                  name="starRating"
-                  value={formData.starRating}
+                  name="bedType"
+                  value={formData.bedType}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">Select Rating</option>
-                  <option value="1">⭐ 1 Star</option>
-                  <option value="2">⭐⭐ 2 Stars</option>
-                  <option value="3">⭐⭐⭐ 3 Stars</option>
-                  <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-                  <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+                  <option value="">Select Bed Type</option>
+                  <option value="single">Single</option>
+                  <option value="double">Double</option>
+                  <option value="queen">Queen</option>
+                  <option value="king">King</option>
+                  <option value="twin">Twin</option>
+                  <option value="bunk">Bunk</option>
                 </select>
               </div>
 
@@ -207,7 +235,7 @@ export const ManageAccom: React.FC = () => {
                   Cancel
                 </button>
                 <button type="submit" className={styles.submitBtn}>
-                  Add Accommodation
+                  Add Room
                 </button>
               </div>
             </form>
@@ -215,16 +243,16 @@ export const ManageAccom: React.FC = () => {
         </div>
       )}
 
-      {/* Published Accommodations */}
+      {/* Published Rooms */}
       <section className={styles.section}>
-        <h3 className={styles.subtitle}>Published</h3>
+        <h3 className={styles.subtitle}>Published Rooms</h3>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Accommodation ID</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Rooms</th>
+              <th>Room ID</th>
+              <th>Room Name</th>
+              <th>Room Type</th>
+              <th>Units</th>
               <th>Price/Night</th>
               <th>Status</th>
               <th>Actions</th>
@@ -232,7 +260,7 @@ export const ManageAccom: React.FC = () => {
           </thead>
           <tbody>
             <tr>
-              <td>#A2001</td>
+              <td>#R2001</td>
               <td>Ocean View Suite</td>
               <td>Suite</td>
               <td>10</td>
@@ -244,7 +272,7 @@ export const ManageAccom: React.FC = () => {
               </td>
             </tr>
             <tr>
-              <td>#A2002</td>
+              <td>#R2002</td>
               <td>Deluxe King</td>
               <td>Deluxe</td>
               <td>8</td>
@@ -259,16 +287,16 @@ export const ManageAccom: React.FC = () => {
         </table>
       </section>
 
-      {/* Archived Accommodations */}
+      {/* Archived Rooms */}
       <section className={styles.section}>
-        <h3 className={styles.subtitle}>Archived</h3>
+        <h3 className={styles.subtitle}>Archived Rooms</h3>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Accommodation ID</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Rooms</th>
+              <th>Room ID</th>
+              <th>Room Name</th>
+              <th>Room Type</th>
+              <th>Units</th>
               <th>Price/Night</th>
               <th>Status</th>
               <th>Actions</th>
@@ -276,7 +304,7 @@ export const ManageAccom: React.FC = () => {
           </thead>
           <tbody>
             <tr>
-              <td>#A1991</td>
+              <td>#R1991</td>
               <td>Standard Single</td>
               <td>Standard</td>
               <td>15</td>
@@ -288,7 +316,7 @@ export const ManageAccom: React.FC = () => {
               </td>
             </tr>
             <tr>
-              <td>#A1988</td>
+              <td>#R1988</td>
               <td>Economy Twin</td>
               <td>Economy</td>
               <td>12</td>

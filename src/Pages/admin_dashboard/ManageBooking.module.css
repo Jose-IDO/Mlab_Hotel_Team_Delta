@@ -17,30 +17,44 @@ h3 {
     color: #333;
     margin-bottom: 30px;
     font-size: 28px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .bookingSection {
     margin-bottom: 40px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 8px 32px 0 rgba(31, 38, 135, 0.10),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
 }
 
 .subtitle {
     color: #666;
     margin-bottom: 15px;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 18px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.1);
 }
 
 thead {
-    background-color: rgba(0, 0, 255, 0.7); /* 70% opacity */
+    background: rgba(102, 126, 234, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: white;
 }
 
@@ -54,12 +68,13 @@ thead th {
 }
 
 tbody tr {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
     transition: background-color 0.2s;
+    backdrop-filter: blur(6px);
 }
 
 tbody tr:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(102, 126, 234, 0.04);
 }
 
 tbody tr:last-child {
@@ -74,7 +89,7 @@ tbody td {
 
 tbody td:first-child {
     font-weight: 600;
-    color: #0000FF;
+    color: #667eea;
 }
 
 /* Status badges */
@@ -86,20 +101,23 @@ tbody td:first-child {
     font-size: 12px;
     font-weight: 600;
     display: inline-block;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .statusPending {
-    background-color: #FFF3CD;
+    background: rgba(255, 243, 205, 0.6);
     color: #856404;
 }
 
 .statusConfirmed {
-    background-color: #D1ECF1;
+    background: rgba(209, 236, 241, 0.6);
     color: #0C5460;
 }
 
 .statusCheckedIn {
-    background-color: #D4EDDA;
+    background: rgba(212, 237, 218, 0.6);
     color: #155724;
 }
 
@@ -108,47 +126,73 @@ button {
     padding: 6px 12px;
     margin-right: 8px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
     transition: all 0.3s;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .approveBtn {
-    background-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.80);
     color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
 .approveBtn:hover {
-    background-color: #45a049;
+    background: rgba(69, 160, 73, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
 .cancelBtn {
-    background-color: #f44336;
+    background: rgba(244, 67, 54, 0.80);
     color: white;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
 }
 
 .cancelBtn:hover {
-    background-color: #da190b;
+    background: rgba(218, 25, 11, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
 }
 
 .viewBtn {
-    background-color: #2196F3;
+    background: rgba(33, 150, 243, 0.80);
     color: white;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
 }
 
 .viewBtn:hover {
-    background-color: #0b7dda;
+    background: rgba(11, 125, 218, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.editBtn {
+    background: rgba(255, 152, 0, 0.85);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.editBtn:hover {
+    background: rgba(230, 137, 0, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
 }
 
 .checkoutBtn {
-    background-color: #9C27B0;
+    background: rgba(156, 39, 176, 0.85);
     color: white;
+    box-shadow: 0 2px 8px rgba(156, 39, 176, 0.3);
 }
 
 .checkoutBtn:hover {
-    background-color: #7B1FA2;
+    background: rgba(123, 31, 162, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
 }
 
 /* Status styling */

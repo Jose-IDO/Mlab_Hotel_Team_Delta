@@ -122,6 +122,42 @@ export const ManageBooking = () => {
                   <button type="button" className={styles.checkoutBtn}>Checkout</button>
                 </td>
               </tr>
+              <tr>
+                <td>#B1004</td>
+                <td>Lisa Green</td>
+                <td>Suite 203</td>
+                <td>2025-11-02</td>
+                <td>2025-11-04</td>
+                <td><span className={styles.statusCheckedIn}>Checked-in</span></td>
+                <td>
+                  <button type="button" className={styles.viewBtn}>View</button>
+                  <button type="button" className={styles.checkoutBtn}>Checkout</button>
+                </td>
+              </tr>
+              <tr>
+                <td>#B1004</td>
+                <td>Lisa Green</td>
+                <td>Suite 203</td>
+                <td>2025-11-02</td>
+                <td>2025-11-04</td>
+                <td><span className={styles.statusCheckedIn}>Checked-in</span></td>
+                <td>
+                  <button type="button" className={styles.viewBtn}>View</button>
+                  <button type="button" className={styles.checkoutBtn}>Checkout</button>
+                </td>
+              </tr>
+              <tr>
+                <td>#B1004</td>
+                <td>Lisa Green</td>
+                <td>Suite 203</td>
+                <td>2025-11-02</td>
+                <td>2025-11-04</td>
+                <td><span className={styles.statusCheckedIn}>Checked-in</span></td>
+                <td>
+                  <button type="button" className={styles.viewBtn}>View</button>
+                  <button type="button" className={styles.checkoutBtn}>Checkout</button>
+                </td>
+              </tr>
             </tbody>
           </table>
         </section>
