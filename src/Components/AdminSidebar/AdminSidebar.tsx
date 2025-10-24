@@ -1,0 +1,34 @@
+import React from 'react'
+import { Link } from 'react-router-dom';
+import styles from './AdminSidebar.module.css';
+
+export const AdminSidebar = () => {
+  return (
+    <ul>
+      <li>
+        <Link to="/admin/bookings">
+          <span></span>
+          Manage Bookings
+        </Link>
+      </li>
+      <li>
+        <Link to="/admin/accommodations">
+          <span></span>
+          Manage Accommodations
+        </Link>
+      </li>
+      <li>
+        <Link to="/admin/stats">
+          <span></span>
+          View Stats/Reports
+        </Link>
+      </li>
+      <li>
+        <Link to="/admin/administrators">
+          <span></span>
+          Administrators
+        </Link>
+      </li>
+    </ul>
+  )
+}

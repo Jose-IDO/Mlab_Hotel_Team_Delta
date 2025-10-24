@@ -1,0 +1,14 @@
+@import url(../../Components/AdminSidebar/AdminSidebar.module.css);
+.pageContent {
+    display: flex;
+    padding: 12px;
+    padding-top: 72px;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+.mainContent {
+    flex: 1;
+    padding: 15px;
+    overflow-x: auto;
+}
