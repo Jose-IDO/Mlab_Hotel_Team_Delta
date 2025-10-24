@@ -1,4 +1,3 @@
-import React from 'react'
 import { Routes, Route } from 'react-router-dom';
 import styles from "./AdminDashboard.module.css";
 import { AdminNavbar } from '../../Components/AdminNavbar/AdminNavbar';

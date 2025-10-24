@@ -1,4 +1,3 @@
-import React from 'react'
 import styles from "./ManageBooking.module.css";
 
 export const ManageBooking = () => {
