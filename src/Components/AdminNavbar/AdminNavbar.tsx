@@ -1,8 +1,18 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./AdminNavbar.module.css";
+import { useAuth } from "../../contexts/AuthContext";
 import profileicon from "../../Assets/profile-icon.png";
 
 export const AdminNavbar: React.FC = () => {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.navContainer}>
@@ -13,8 +23,8 @@ export const AdminNavbar: React.FC = () => {
             alt="Admin Profile" 
             className={styles.profilePicture}
           />  
-          <span>Admin</span>
-          <button className={styles.logoutButton}>Logout</button>
+          <span>{user?.name || 'Admin'}</span>
+          <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
         </div>
       </div>
     </nav>
