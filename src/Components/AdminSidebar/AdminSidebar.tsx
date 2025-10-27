@@ -10,9 +10,15 @@ export const AdminSidebar = () => {
         </Link>
       </li>
       <li>
-        <Link to="/admin/accommodations">
+        <Link to="/admin/rooms">
           <span></span>
-          Manage Accommodation
+          Manage Rooms
+        </Link>
+      </li>
+      <li>
+        <Link to="/admin/guests">
+          <span></span>
+          Manage Guests
         </Link>
       </li>
       <li>
@@ -22,10 +28,22 @@ export const AdminSidebar = () => {
         </Link>
       </li>
       <li>
+        <Link to="/admin/calendar">
+          <span></span>
+          Availability Calendar
+        </Link>
+      </li>
+      <li>
         <Link to="/admin/administrators">
           <span></span>
           Administrators
         </Link>
+        <li>
+        <Link to="/admin/settings">
+          <span></span>
+          Settings
+        </Link>
+        </li>
       </li>
     </ul>
   )

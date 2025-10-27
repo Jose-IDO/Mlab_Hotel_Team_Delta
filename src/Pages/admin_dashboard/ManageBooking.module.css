@@ -14,10 +14,10 @@ h3 {
 }
 
 .title {
-    color: #333;
-    margin-bottom: 30px;
-    font-size: 28px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .bookingSection {
@@ -195,8 +195,75 @@ button {
     box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
 }
 
+.checkinBtn {
+  background: rgba(156, 39, 176, 0.85);
+  box-shadow: 0 2px 8px rgba(156, 39, 176, 0.25);
+}
+
+.checkinBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.35);
+}
+
 /* Status styling */
 tbody td:nth-child(6) {
     font-weight: 600;
+}
+
+.headerBar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchInput,
+.filterSelect {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 147, 233, 0.2);
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0; /* stays under the navbar inside sections */
+  z-index: 1;
+}
+
+.emptyCell {
+  padding: 18px;
+  text-align: center;
+  color: #4a5568;
+  background: rgba(255,255,255,0.3);
+  border-radius: 0 0 12px 12px;
 }
 

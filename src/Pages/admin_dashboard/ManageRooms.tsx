@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import styles from "./ManageAccom.module.css";
+import styles from "./ManageRooms.module.css";
 
-export const ManageAccom: React.FC = () => {
+export const ManageRooms: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     roomName: "",

@@ -4,8 +4,11 @@ import styles from "./AdminDashboard.module.css";
 import { AdminNavbar } from '../../Components/AdminNavbar/AdminNavbar';
 import { AdminSidebar } from '../../Components/AdminSidebar/AdminSidebar';
 import { ManageBooking } from './ManageBooking';
-import { ManageAccom } from './ManageAccom';
+import { ManageRooms } from './ManageRooms';
 import { Administrators } from './Administrators';
+import { Settings } from './Settings';
+import { ManageGuests } from './ManageGuests';
+import { AvailabilityCalendar } from './AvailabilityCalendar';
 
 export const AdminDashboard = () => {
   return (
@@ -47,9 +50,9 @@ export const AdminDashboard = () => {
                         </div>
                     } />
                     <Route path="/bookings" element={<ManageBooking />} />
-                    <Route path="/accommodations" element={<ManageAccom />} />
-                    {/* <Route path="/guests" element={<h1>Manage Guests</h1>} />
-                    <Route path="/payments" element={<h1>Payments & Invoices</h1>} />
+                    <Route path="/rooms" element={<ManageRooms />} />
+                    <Route path="/guests" element={<ManageGuests />} />
+                    {/* <Route path="/payments" element={<h1>Payments & Invoices</h1>} />
                     <Route path="/reviews" element={<h1>Reviews & Ratings</h1>} />
                     <Route path="/staff" element={<h1>Staff Management</h1>} />
                     <Route path="/housekeeping" element={<h1>Housekeeping</h1>} />
@@ -57,9 +60,10 @@ export const AdminDashboard = () => {
                     <Route path="/promotions" element={<h1>Promotions & Discounts</h1>} />
                     <Route path="/calendar" element={<h1>Availability Calendar</h1>} />
                     <Route path="/stats" element={<h1>View Stats/Reports</h1>} />
-                    <Route path="/notifications" element={<h1>Notifications</h1>} />
-                    <Route path="/settings" element={<h1>Settings</h1>} /> */}
+                    <Route path="/notifications" element={<h1>Notifications</h1>} /> */}
                     <Route path="/administrators" element={<Administrators />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/calendar" element={<AvailabilityCalendar />} />
                 </Routes>
             </div>
         </div>

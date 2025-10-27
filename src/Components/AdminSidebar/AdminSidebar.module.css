@@ -18,6 +18,8 @@
 
 .sidebar ul li a {
     padding: 12px 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     cursor: pointer;
     color: #2d3748;
     display: flex;

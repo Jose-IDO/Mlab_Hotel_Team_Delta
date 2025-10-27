@@ -7,14 +7,6 @@ export const AdminNavbar: React.FC = () => {
     <nav className={styles.navbar}>
       <div className={styles.navContainer}>
         <span>Delta Hotel Booking</span>
-        <div className={styles.currencySection}>
-          <span>Currency:</span>
-          <select className={styles.currencySelect}>
-            <option value="usd">USD</option>
-            <option value="eur">EUR</option>
-            <option value="gbp">GBP</option>
-          </select>
-        </div>
         <div className={styles.profileSection}>
           <img 
             src={profileicon} 
