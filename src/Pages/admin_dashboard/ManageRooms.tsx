@@ -11,9 +11,23 @@ export const ManageRooms: React.FC = () => {
     price: "",
     maxGuests: "",
     bedType: "",
+    unitPrefix: "",
+    startNumber: "1",
     amenities: [] as string[],
-    photos: [] as File[]
+    photos: [] as File[],
+    numberOfBeds: "1",        // NEW
+    roomSizeSqm: ""           // NEW
   });
+
+  // Bed type defaults and constraints
+  const bedTypeDefaults: Record<string, { defaultBeds: number; min: number; max: number }> = {
+    single: { defaultBeds: 1, min: 1, max: 2 },
+    double: { defaultBeds: 1, min: 1, max: 2 },
+    queen: { defaultBeds: 1, min: 1, max: 2 },
+    king: { defaultBeds: 1, min: 1, max: 2 },
+    twin: { defaultBeds: 2, min: 2, max: 4 },
+    bunk: { defaultBeds: 2, min: 2, max: 4 }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -43,18 +57,28 @@ export const ManageRooms: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const count = parseInt(formData.numberOfRooms || "0", 10);
+    const start = parseInt(formData.startNumber || "1", 10);
+
+    const units = Array.from({ length: Math.max(count, 0) }, (_, i) => ({
+      unitNumber: `${formData.unitPrefix}${start + i}`
+    }));
+
     const payload = {
       roomName: formData.roomName,
       roomType: formData.roomType === "__new" ? formData.newRoomType : formData.roomType,
-      numberOfRooms: formData.numberOfRooms,
-      price: formData.price,
-      maxGuests: formData.maxGuests,
+      price: Number(formData.price),
+      maxGuests: Number(formData.maxGuests),
       bedType: formData.bedType,
+      numberOfBeds: Number(formData.numberOfBeds),   // NEW
+      roomSizeSqm: Number(formData.roomSizeSqm || 0),// NEW
       amenities: formData.amenities,
-      photos: formData.photos
+      photos: formData.photos,
+      units
     };
-    console.log("New room payload:", payload);
-    // TODO: submit payload to API
+
+    console.log("Create room type + units payload:", payload);
+    // POST /admin/rooms
     setShowForm(false);
   };
 
@@ -68,8 +92,12 @@ export const ManageRooms: React.FC = () => {
       price: "",
       maxGuests: "",
       bedType: "",
-      amenities: [],
-      photos: []
+      unitPrefix: "",
+      startNumber: "1",
+      amenities: [] as string[],
+      photos: [] as File[],
+      numberOfBeds: "1",
+      roomSizeSqm: ""
     });
   };
 
@@ -150,20 +178,6 @@ export const ManageRooms: React.FC = () => {
                 </div>
               )}
 
-              {/* Number of Rooms */}
-              <div className={styles.formGroup}>
-                <label>Number of Rooms *</label>
-                <input
-                  type="number"
-                  name="numberOfRooms"
-                  value={formData.numberOfRooms}
-                  onChange={handleInputChange}
-                  required
-                  min="1"
-                  placeholder="e.g., 5"
-                />
-              </div>
-
               {/* Price */}
               <div className={styles.formGroup}>
                 <label>Price per Night (USD) *</label>
@@ -199,7 +213,12 @@ export const ManageRooms: React.FC = () => {
                 <select
                   name="bedType"
                   value={formData.bedType}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    const bt = e.target.value;
+                    const defaults = bedTypeDefaults[bt] || { defaultBeds: 1, min: 1, max: 4 };
+                    setFormData(prev => ({ ...prev, numberOfBeds: String(defaults.defaultBeds) }));
+                  }}
                   required
                 >
                   <option value="">Select Bed Type</option>
@@ -212,11 +231,46 @@ export const ManageRooms: React.FC = () => {
                 </select>
               </div>
 
+              {/* Number of Beds (correlates with bed type) */}
+              <div className={styles.formGroup}>
+                <label>Beds per Unit *</label>
+                <input
+                  type="number"
+                  name="numberOfBeds"
+                  value={formData.numberOfBeds}
+                  onChange={handleInputChange}
+                  required
+                  min={(bedTypeDefaults[formData.bedType]?.min ?? 1)}
+                  max={(bedTypeDefaults[formData.bedType]?.max ?? 4)}
+                  step="1"
+                  placeholder="e.g., 1"
+                />
+                <small>
+                  Suggested for {formData.bedType || 'selected type'}:{" "}
+                  {(bedTypeDefaults[formData.bedType]?.defaultBeds ?? 1)} bed(s)
+                </small>
+              </div>
+
+              {/* Room Size */}
+              <div className={styles.formGroup}>
+                <label>Room Size (sqm) *</label>
+                <input
+                  type="number"
+                  name="roomSizeSqm"
+                  value={formData.roomSizeSqm}
+                  onChange={handleInputChange}
+                  required
+                  min="1"
+                  step="0.1"
+                  placeholder="e.g., 28.5"
+                />
+              </div>
+
               {/* Amenities */}
               <div className={styles.formGroup}>
                 <label>Amenities</label>
                 <div className={styles.amenitiesGrid}>
-                  {["WiFi", "Pool", "Gym", "Parking", "Restaurant", "Room Service", "Spa", "Bar", "Air Conditioning", "TV"].map(amenity => (
+                  {["WiFi", "Bathtub", "Hairdrier", "Electric Kettle", "Mini Bar", "Room Service", "Toiletries", "Air Conditioning", "Smart TV"].map(amenity => (
                     <label key={amenity} className={styles.checkboxLabel}>
                       <input
                         type="checkbox"
@@ -227,6 +281,43 @@ export const ManageRooms: React.FC = () => {
                     </label>
                   ))}
                 </div>
+              </div>
+
+              {/* Number of Units */}
+              <div className={styles.formGroup}>
+                <label>Number of Units to Create *</label>
+                <input
+                  type="number"
+                  name="numberOfRooms"
+                  value={formData.numberOfRooms}
+                  onChange={handleInputChange}
+                  required
+                  min="1"
+                  placeholder="e.g., 10"
+                />
+              </div>
+
+              {/* Unit numbering helper */}
+              <div className={styles.formGroup}>
+                <label>Unit Numbering (optional)</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <input
+                    type="text"
+                    name="unitPrefix"
+                    value={formData.unitPrefix}
+                    onChange={handleInputChange}
+                    placeholder="Prefix (e.g., 10 for 101,102...)"
+                  />
+                  <input
+                    type="number"
+                    name="startNumber"
+                    value={formData.startNumber}
+                    onChange={handleInputChange}
+                    min="1"
+                    placeholder="Start number (e.g., 1)"
+                  />
+                </div>
+                <small>Example result: {formData.unitPrefix || "10"}{formData.startNumber || "1"}, {formData.unitPrefix || "10"}{(parseInt(formData.startNumber || "1",10)+1)}</small>
               </div>
 
               {/* Form Actions */}
