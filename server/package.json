@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "node dist/server.js",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "migrate": "ts-node src/scripts/migrate.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
