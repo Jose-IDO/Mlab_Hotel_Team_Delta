@@ -6,7 +6,6 @@ const SearchSection: React.FC = () => {
     <section className={styles.section}>
       <div className={styles.container}>
         <form className={styles.form}>
-          <input type="text" placeholder="City" />
           <select>
             <option>Room Type</option>
             <option>Single</option>
