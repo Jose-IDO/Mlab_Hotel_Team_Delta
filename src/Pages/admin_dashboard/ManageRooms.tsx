@@ -1,8 +1,16 @@
-import React, { useState } from "react";
-import styles from "./ManageRooms.module.css";
+import React, { useState, useEffect } from "react";
+import styles from "./ManageRooms.module.css"
 
 export const ManageRooms: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [archivedRooms, setArchivedRooms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterBedType, setFilterBedType] = useState("all");
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [formData, setFormData] = useState({
     roomName: "",
     roomType: "",
@@ -18,6 +26,7 @@ export const ManageRooms: React.FC = () => {
     numberOfBeds: "1",        // NEW
     roomSizeSqm: ""           // NEW
   });
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // Bed type defaults and constraints
   const bedTypeDefaults: Record<string, { defaultBeds: number; min: number; max: number }> = {
@@ -27,6 +36,38 @@ export const ManageRooms: React.FC = () => {
     king: { defaultBeds: 1, min: 1, max: 2 },
     twin: { defaultBeds: 2, min: 2, max: 4 },
     bunk: { defaultBeds: 2, min: 2, max: 4 }
+  };
+
+  // Fetch rooms on mount
+  useEffect(() => {
+    fetchRooms();
+    fetchArchivedRooms();
+  }, []);
+
+  const fetchRooms = async () => {
+    try {
+      const res = await fetch(`${API_URL}/admin/rooms?status=active`);
+      const data = await res.json();
+      if (data.ok) {
+        setRooms(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch rooms:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchArchivedRooms = async () => {
+    try {
+      const res = await fetch(`${API_URL}/admin/rooms?status=archived`);
+      const data = await res.json();
+      if (data.ok) {
+        setArchivedRooms(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch archived rooms:', err);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -55,7 +96,7 @@ export const ManageRooms: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const count = parseInt(formData.numberOfRooms || "0", 10);
     const start = parseInt(formData.startNumber || "1", 10);
@@ -70,20 +111,39 @@ export const ManageRooms: React.FC = () => {
       price: Number(formData.price),
       maxGuests: Number(formData.maxGuests),
       bedType: formData.bedType,
-      numberOfBeds: Number(formData.numberOfBeds),   // NEW
-      roomSizeSqm: Number(formData.roomSizeSqm || 0),// NEW
+      numberOfBeds: Number(formData.numberOfBeds),
+      roomSizeSqm: Number(formData.roomSizeSqm || 0),
       amenities: formData.amenities,
-      photos: formData.photos,
       units
     };
 
-    console.log("Create room type + units payload:", payload);
-    // POST /admin/rooms
-    setShowForm(false);
+    try {
+      const url = editingRoomId 
+        ? `${API_URL}/admin/rooms/${editingRoomId}`
+        : `${API_URL}/admin/rooms`;
+      const method = editingRoomId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || `Failed to ${editingRoomId ? 'update' : 'create'} room`);
+      
+      setShowForm(false);
+      setEditingRoomId(null);
+      alert(`Room ${editingRoomId ? 'updated' : 'created'} successfully!`);
+      fetchRooms(); // ← Refresh list
+    } catch (err) {
+      console.error(err);
+      alert('Error creating room. See console for details.');
+    }
   };
 
   const handleCancel = () => {
     setShowForm(false);
+    setEditingRoomId(null);
     setFormData({
       roomName: "",
       roomType: "",
@@ -101,6 +161,132 @@ export const ManageRooms: React.FC = () => {
     });
   };
 
+  const handleEditRoom = (room: any) => {
+    setEditingRoomId(room.id);
+    setFormData({
+      roomName: room.roomName,
+      roomType: room.roomType,
+      newRoomType: "",
+      numberOfRooms: String(room.units?.length || 0),
+      price: String(room.price),
+      maxGuests: String(room.maxGuests),
+      bedType: room.bedType,
+      unitPrefix: "",
+      startNumber: "1",
+      amenities: room.amenities || [],
+      photos: [],
+      numberOfBeds: String(room.numberOfBeds || 1),
+      roomSizeSqm: String(room.roomSizeSqm || 0)
+    });
+    setShowForm(true);
+  };
+
+  const handleArchiveRoom = async (roomId: string) => {
+    if (!confirm('Are you sure you want to archive this room? It will be moved to the archived section.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/admin/rooms/${roomId}/archive`, {
+        method: 'PATCH'
+      });
+      const data = await res.json();
+      
+      if (data.ok) {
+        alert('Room archived successfully!');
+        fetchRooms();
+        fetchArchivedRooms();
+      } else {
+        alert('Failed to archive room: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Archive error:', err);
+      alert('Failed to archive room. Please try again.');
+    }
+  };
+
+  const handleRestoreRoom = async (roomId: string) => {
+    if (!confirm('Are you sure you want to restore this room?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/admin/rooms/${roomId}/restore`, {
+        method: 'PATCH'
+      });
+      const data = await res.json();
+      
+      if (data.ok) {
+        alert('Room restored successfully!');
+        fetchRooms();
+        fetchArchivedRooms();
+      } else {
+        alert('Failed to restore room: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Restore error:', err);
+      alert('Failed to restore room. Please try again.');
+    }
+  };
+
+  const handleDeleteRoom = async (roomId: string) => {
+    if (!confirm('⚠️ WARNING: This will permanently delete the room and all its units. This action cannot be undone. Are you absolutely sure?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/admin/rooms/${roomId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      
+      if (data.ok) {
+        alert('Room permanently deleted!');
+        fetchRooms();
+        fetchArchivedRooms();
+      } else {
+        alert('Failed to delete room: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Failed to delete room. Please try again.');
+    }
+  };
+
+  // Get unique room types and bed types for filters
+  const uniqueRoomTypes = Array.from(new Set(rooms.map(r => r.roomType)));
+  const uniqueBedTypes = Array.from(new Set(rooms.map(r => r.bedType)));
+
+  // Filter rooms based on search and filters
+  const filteredRooms = rooms.filter((room) => {
+    // Search filter
+    const matchesSearch = searchTerm === "" || 
+      room.roomName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.roomType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.id?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Room type filter
+    const matchesType = filterType === "all" || room.roomType === filterType;
+
+    // Bed type filter
+    const matchesBedType = filterBedType === "all" || room.bedType === filterBedType;
+
+    // Price range filter
+    const minPrice = priceRange.min === "" ? 0 : Number(priceRange.min);
+    const maxPrice = priceRange.max === "" ? Infinity : Number(priceRange.max);
+    const matchesPrice = room.price >= minPrice && room.price <= maxPrice;
+
+    return matchesSearch && matchesType && matchesBedType && matchesPrice;
+  });
+
+  // Filter archived rooms
+  const filteredArchivedRooms = archivedRooms.filter((room) => {
+    return searchTerm === "" || 
+      room.roomName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.roomType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.id?.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
   return (
     <div className={styles.container}>
       <div className={styles.headerBar}>
@@ -112,7 +298,9 @@ export const ManageRooms: React.FC = () => {
       {showForm && (
         <div className={styles.overlay}>
           <div className={styles.formContainer}>
-            <h2 className={styles.formTitle}>Add New Room</h2>
+            <h2 className={styles.formTitle}>
+              {editingRoomId ? 'Edit Room' : 'Add New Room'}
+            </h2>
             <form onSubmit={handleSubmit} className={styles.form}>
               
               {/* Photo Upload */}
@@ -326,7 +514,7 @@ export const ManageRooms: React.FC = () => {
                   Cancel
                 </button>
                 <button type="submit" className={styles.submitBtn}>
-                  Add Room
+                  {editingRoomId ? 'Update Room' : 'Add Room'}
                 </button>
               </div>
             </form>
@@ -334,92 +522,161 @@ export const ManageRooms: React.FC = () => {
         </div>
       )}
 
+      {/* Search and Filter Section */}
+      <section className={styles.filterSection}>
+        <div className={styles.filterRow}>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles.searchInput}
+          />
+          
+          <select 
+            value={filterType} 
+            onChange={(e) => setFilterType(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="all">All Types</option>
+            {uniqueRoomTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+
+          <select 
+            value={filterBedType} 
+            onChange={(e) => setFilterBedType(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="all">All Bed Types</option>
+            {uniqueBedTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+
+          <div className={styles.priceRange}>
+            <input
+              type="number"
+              placeholder="Min"
+              value={priceRange.min}
+              onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
+              className={styles.priceInput}
+            />
+            <span>-</span>
+            <input
+              type="number"
+              placeholder="Max"
+              value={priceRange.max}
+              onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
+              className={styles.priceInput}
+            />
+          </div>
+
+          <button 
+            className={styles.clearFilters}
+            onClick={() => {
+              setSearchTerm("");
+              setFilterType("all");
+              setFilterBedType("all");
+              setPriceRange({ min: "", max: "" });
+            }}
+          >
+            Clear
+          </button>
+
+          <div className={styles.resultCount}>
+            {filteredRooms.length} of {rooms.length}
+          </div>
+        </div>
+      </section>
+
       {/* Published Rooms */}
       <section className={styles.section}>
         <h3 className={styles.subtitle}>Published Rooms</h3>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Room ID</th>
-              <th>Room Name</th>
-              <th>Room Type</th>
-              <th>Units</th>
-              <th>Price/Night</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>#R2001</td>
-              <td>Ocean View Suite</td>
-              <td>Suite</td>
-              <td>10</td>
-              <td>$220</td>
-              <td><span className={`${styles.statusBadge} ${styles.published}`}>Published</span></td>
-              <td>
-                <button className={styles.editBtn}>Edit</button>
-                <button className={styles.archiveBtn}>Archive</button>
-              </td>
-            </tr>
-            <tr>
-              <td>#R2002</td>
-              <td>Deluxe King</td>
-              <td>Deluxe</td>
-              <td>8</td>
-              <td>$160</td>
-              <td><span className={`${styles.statusBadge} ${styles.published}`}>Published</span></td>
-              <td>
-                <button className={styles.editBtn}>Edit</button>
-                <button className={styles.archiveBtn}>Archive</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {loading ? (
+          <p>Loading rooms...</p>
+        ) : filteredRooms.length === 0 ? (
+          <p>{rooms.length === 0 ? 'No rooms yet. Click "Add Room" to create one.' : 'No rooms match your filters.'}</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Room ID</th>
+                <th>Room Name</th>
+                <th>Room Type</th>
+                <th>Units</th>
+                <th>Price/Night</th>
+                <th>Max Guests</th>
+                <th>Size (sqm)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredRooms.map((room) => (
+                <tr key={room.id}>
+                  <td>#{room.id.slice(0, 8)}</td>
+                  <td>{room.roomName}</td>
+                  <td>{room.roomType}</td>
+                  <td>{room.units?.length || 0}</td>
+                  <td>${room.price}</td>
+                  <td>{room.maxGuests}</td>
+                  <td>{room.roomSizeSqm}</td>
+                  <td>
+                    <button className={styles.editBtn} onClick={() => handleEditRoom(room)}>
+                      Edit
+                    </button>
+                    <button className={styles.archiveBtn} onClick={() => handleArchiveRoom(room.id)}>
+                      Archive
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
 
       {/* Archived Rooms */}
       <section className={styles.section}>
         <h3 className={styles.subtitle}>Archived Rooms</h3>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Room ID</th>
-              <th>Room Name</th>
-              <th>Room Type</th>
-              <th>Units</th>
-              <th>Price/Night</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>#R1991</td>
-              <td>Standard Single</td>
-              <td>Standard</td>
-              <td>15</td>
-              <td>$90</td>
-              <td><span className={`${styles.statusBadge} ${styles.archived}`}>Archived</span></td>
-              <td>
-                <button className={styles.restoreBtn}>Restore</button>
-                <button className={styles.deleteBtn}>Delete</button>
-              </td>
-            </tr>
-            <tr>
-              <td>#R1988</td>
-              <td>Economy Twin</td>
-              <td>Economy</td>
-              <td>12</td>
-              <td>$75</td>
-              <td><span className={`${styles.statusBadge} ${styles.archived}`}>Archived</span></td>
-              <td>
-                <button className={styles.restoreBtn}>Restore</button>
-                <button className={styles.deleteBtn}>Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {filteredArchivedRooms.length === 0 ? (
+          <p>{archivedRooms.length === 0 ? 'No archived rooms.' : 'No archived rooms match your search.'}</p>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Room ID</th>
+                <th>Room Name</th>
+                <th>Room Type</th>
+                <th>Units</th>
+                <th>Price/Night</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredArchivedRooms.map((room) => (
+                <tr key={room.id}>
+                  <td>#{room.id.slice(0, 8)}</td>
+                  <td>{room.roomName}</td>
+                  <td>{room.roomType}</td>
+                  <td>{room.units?.length || 0}</td>
+                  <td>${room.price}</td>
+                  <td><span className={`${styles.statusBadge} ${styles.archived}`}>Archived</span></td>
+                  <td>
+                    <button className={styles.restoreBtn} onClick={() => handleRestoreRoom(room.id)}>
+                      Restore
+                    </button>
+                    <button className={styles.deleteBtn} onClick={() => handleDeleteRoom(room.id)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
     </div>
   );

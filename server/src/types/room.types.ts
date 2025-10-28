@@ -16,6 +16,7 @@ export interface RoomPayload {
 
 export interface Room extends RoomPayload {
   id: string;
+  status?: 'active' | 'archived';
 }
 
 export interface ApiResponse<T = any> {

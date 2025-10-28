@@ -4,9 +4,10 @@ import { validateRoomPayload } from '../utils/validators';
 import { RoomPayload } from '../types/room.types';
 
 export class RoomController {
-  async getAllRooms(_req: Request, res: Response): Promise<void> {
+  async getAllRooms(req: Request, res: Response): Promise<void> {
     try {
-      const rooms = await roomService.getAllRooms();
+      const status = req.query.status as 'active' | 'archived' | undefined;
+      const rooms = await roomService.getAllRooms(status);
       res.json({ ok: true, data: rooms });
     } catch (error) {
       res.status(500).json({ ok: false, error: 'Failed to fetch rooms' });
@@ -79,6 +80,38 @@ export class RoomController {
       res.json({ ok: true, data: { message: 'Room deleted successfully' } });
     } catch (error) {
       res.status(500).json({ ok: false, error: 'Failed to delete room' });
+    }
+  }
+
+  async archiveRoom(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const archived = await roomService.archiveRoom(id);
+
+      if (!archived) {
+        res.status(404).json({ ok: false, error: 'Room not found' });
+        return;
+      }
+
+      res.json({ ok: true, data: archived });
+    } catch (error) {
+      res.status(500).json({ ok: false, error: 'Failed to archive room' });
+    }
+  }
+
+  async restoreRoom(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const restored = await roomService.restoreRoom(id);
+
+      if (!restored) {
+        res.status(404).json({ ok: false, error: 'Room not found' });
+        return;
+      }
+
+      res.json({ ok: true, data: restored });
+    } catch (error) {
+      res.status(500).json({ ok: false, error: 'Failed to restore room' });
     }
   }
 }
