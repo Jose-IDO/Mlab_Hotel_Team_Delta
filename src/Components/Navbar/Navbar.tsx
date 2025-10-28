@@ -24,6 +24,14 @@ export const Navbar: React.FC = () => {
   };
 
   const handleHomeClick = () => {
+    if (user?.role === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
+  const handleRoomsClick = () => {
     navigate('/dashboard');
   };
 
@@ -49,7 +57,7 @@ export const Navbar: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <li>Rooms</li>
+                  <li onClick={handleRoomsClick}>Rooms</li>
                   <li className={styles.redButton} onClick={handleLoginClick}>Sign In</li>
                   <li className={styles.redButton} onClick={handleSignupClick}>Sign Up</li>
                 </>

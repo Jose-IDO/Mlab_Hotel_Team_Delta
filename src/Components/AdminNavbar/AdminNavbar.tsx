@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./AdminNavbar.module.css";
 import { useAuth } from "../../contexts/AuthContext";
 import profileicon from "../../Assets/profile-icon.png";
+import HomeIcon from "../../assets/home-icon-silhouette-svgrepo-com.svg";
 
 export const AdminNavbar: React.FC = () => {
   const { logout, user } = useAuth();
@@ -13,10 +14,19 @@ export const AdminNavbar: React.FC = () => {
     navigate('/');
   };
 
+  const handleHomeClick = () => {
+    navigate('/');
+  };
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.navContainer}>
-        <span>Delta Hotel Booking</span>
+        <div className={styles.leftSection}>
+          <div className={styles.homeIconWrapper} onClick={handleHomeClick}>
+            <img src={HomeIcon} alt="Home" className={styles.homeIcon} />
+          </div>
+          <span>Delta Hotel Booking</span>
+        </div>
         <div className={styles.profileSection}>
           <img 
             src={profileicon} 

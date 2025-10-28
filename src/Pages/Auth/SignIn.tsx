@@ -37,8 +37,19 @@ const SignIn: React.FC = () => {
     setLoading(true);
 
     setTimeout(() => {
-      if (login(email, password)) {
-        navigate('/dashboard');
+      const loginSuccess = login(email, password);
+      if (loginSuccess) {
+        // Get the logged-in user to check their role
+        const savedUser = localStorage.getItem('hotel_user');
+        if (savedUser) {
+          const userData = JSON.parse(savedUser);
+          // Redirect based on user role
+          if (userData.role === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/dashboard');
+          }
+        }
       } else {
         setPasswordError('Invalid email or password');
         setLoading(false);
