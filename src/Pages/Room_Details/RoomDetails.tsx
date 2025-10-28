@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./RoomDetails.module.css";
 import { useParams } from "react-router-dom";
-import { Navbar } from "../../Components/Navbar/Navbar";
+import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 
 import room1 from "../../assets/room1.jpg";
 import room2 from "../../assets/room1B.jpg";
@@ -40,6 +40,11 @@ const RoomDetails: React.FC = () => {
 
   const { id } = useParams<{ id: string }>();
   const roomId = Number(id);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   const rooms: Room[] = [
     { id: 1, name: "Double Room", image: room1, price: "R1200 PN", adults: 3, kids: 0 },
@@ -52,62 +57,20 @@ const RoomDetails: React.FC = () => {
   const selectedRoom = rooms.find(room => room.id === roomId) || rooms[0];
 
   return (
-    <div className={styles.container}>
-      {<div className={styles.filterContainer}>
-        <select className={styles.filterSelect}>
-          <option value="all">All</option>
-          <option value="single">Single Room</option>
-          <option value="double">Double Room</option>
-          <option value="suite">Suite</option>
-        </select>
-
-        <select className={styles.filterSelect}>
-          <option value="all">Room Type</option>
-          <option value="single">Single</option>
-          <option value="double">Double</option>
-          <option value="family">Family</option>
-        </select>
-
-        <select className={styles.filterSelect}>
-          <option value="all">Price Range</option>
-          <option value="0-1000">R0 - R1000</option>
-          <option value="1001-2000">R1001 - R2000</option>
-          <option value="2001-3000">R2001+</option>
-        </select>
-
-        <select className={styles.filterSelect}>
-          <option value="all">Amenities</option>
-          <option value="wifi">WiFi</option>
-          <option value="pool">Pool</option>
-          <option value="parking">Parking</option>
-          <option value="spa">Spa</option>
-        </select>
-
-        <select className={styles.filterSelect}>
-          <option value="all">Rating</option>
-          <option value="5">5 Stars</option>
-          <option value="4">4 Stars</option>
-          <option value="3">3 Stars</option>
-        </select>
-
-        <select className={styles.filterSelect}>
-          <option value="all">Availability</option>
-          <option value="available">Available</option>
-          <option value="booked">Booked</option>
-        </select>
-      </div>}
-      <Navbar />
+    <>
+      <LoggedInNavbar />
+      <div className={styles.container}>
 
       {}
       <div className={styles.gallery}>
-        <div className={styles.mainImage}>
+        <div className={styles.mainImage} onClick={() => setSelectedImage(selectedRoom.image)}>
           <img src={selectedRoom.image} alt={selectedRoom.name} />
         </div>
         <div className={styles.sideImages}>
-          <img src={room1} alt="Room 1" />
-          <img src={room2} alt="Room 2" />
-          <img src={room3} alt="Room 3" />
-          <img src={room4} alt="Room 4" />
+          <img src={room1} alt="Room 1" onClick={() => setSelectedImage(room1)} />
+          <img src={room2} alt="Room 2" onClick={() => setSelectedImage(room2)} />
+          <img src={room3} alt="Room 3" onClick={() => setSelectedImage(room3)} />
+          <img src={room4} alt="Room 4" onClick={() => setSelectedImage(room4)} />
 
         </div>
       </div>
@@ -164,7 +127,24 @@ const RoomDetails: React.FC = () => {
   </div>
 </div>
 
-    </div>
+        {/* ---------- IMAGE OVERLAY MODAL ---------- */}
+        {selectedImage && (
+          <div className={styles.imageOverlay} onClick={() => setSelectedImage(null)}>
+            <div className={styles.overlayContent} onClick={(e) => e.stopPropagation()}>
+              <button 
+                className={styles.closeButton} 
+                onClick={() => setSelectedImage(null)}
+                aria-label="Close image"
+              >
+                ✕
+              </button>
+              <img src={selectedImage} alt="Full size view" className={styles.fullImage} />
+            </div>
+          </div>
+        )}
+
+      </div>
+    </>
   );
 };
 

@@ -4,7 +4,7 @@ DELTA HOTEL APP - CURRENT STATUS REPORT
 This document provides a comprehensive overview of what is currently working
 and what is not working in the Delta Hotel Booking & Management System.
 
-LAST UPDATED: Current as of authentication system implementation
+LAST UPDATED: October 28, 2025 - Hotel Details page with filters and Room Details integration
 
 CURRENT WORKING FEATURES
 ========================
@@ -16,28 +16,49 @@ CURRENT WORKING FEATURES
 - User logout functionality
 - Session persistence across page reloads
 - Role-based access control (Customer vs Admin)
+- Role-based routing (admins → /admin, customers → /dashboard)
 - Default admin user auto-created on startup
-- Modal login/signup forms with proper styling
+- Full-page login/signup forms with modern styling
+- Background image with overlay for auth pages
 - Form validation and error handling
 - Protected routes for admin dashboard
+- Protected routes for customer dashboard
+- Public /rooms route accessible to all users
 
 ✅ USER INTERFACE
 -----------------
 - Responsive navigation bar with authentication state
-- Welcome message for logged-in users
-- Admin link visible only to admin users
-- Modal overlays for authentication forms
-- Clean, modern form styling
-- Mobile-responsive design
+- Welcome message for logged-in users with username display
+- Home icon button with red glow hover effect
+- South African flag icon next to username on dashboard navbar
+- Admin home icon in navbar navigates to landing page
+- Landing page navbar shows role-based navigation
+- Dashboard navbar shows Sign In/Sign Up for non-logged-in users
+- Full-page authentication forms with background image
+- Clean, modern form styling with glass morphism effects
+- Mobile-responsive design with hamburger menu
 - Proper error messages and user feedback
+- Hotel room cards with bedroom, bathroom, and guest count icons
+- Weekend deals cards with matching styling
+- Underline hover effects on navbar items
 
 ✅ ROUTING & NAVIGATION
 -----------------------
 - React Router integration working
-- Home page accessible to all users
-- Admin dashboard protected and accessible to admin users only
+- Landing page (/) accessible to all users
+- /signin and /signup routes for authentication
+- /dashboard protected route for authenticated customers
+- /admin protected route for admin users only
+- /rooms public route for browsing rooms (non-logged-in users)
+- /hotel-details/:id route for viewing hotel information with filters
+- /room-details/:id route for viewing specific room details
+- Role-based redirection after login (admin → /admin, customer → /dashboard)
+- Home icon navigation based on user role
+- Rooms button on landing page navigates to /rooms
+- Delta Hotel logo clickable on all navbars, navigates to landing page
 - Proper route protection with access denied messages
 - Navigation between customer and admin interfaces
+- Scroll-to-top on page navigation
 
 ✅ DATA PERSISTENCE
 -------------------
@@ -54,6 +75,38 @@ CURRENT WORKING FEATURES
 - CSS Modules working correctly
 - Build process successful
 - Code structure follows React best practices
+
+✅ HOTEL DETAILS PAGE
+---------------------
+- Hotel information display (name, address, location)
+- Image gallery with main image and 3 thumbnails
+- Available rooms grid (5 rooms with details)
+- Functional filters:
+  * Room Type filter (Double, Suite, Family)
+  * Price Range filter (R0-R1500, R1501-R2000, R2001+)
+  * Rating filter (3, 4, 5 stars)
+  * Amenities dropdown with checkboxes (8 amenities)
+- Immediate filtering on selection
+- Room cards clickable, navigate to room details
+- Results counter showing filtered rooms
+- "No results" message when no rooms match filters
+- FAQ section with 12 expandable questions
+- Arrow toggle buttons (white circle, black border, red glow)
+- 2-column FAQ layout (responsive to 1 column on mobile)
+- View Map and Add to Favorites buttons
+
+✅ ROOM DETAILS PAGE
+--------------------
+- Room-specific information display
+- Image gallery with main image and side images
+- Room type, pricing, and capacity details
+- Amenities display with icons
+- Room policies section
+- Booking information with calendar and guest count
+- Book Now button
+- Navbar integration (LoggedInNavbar)
+- Proper spacing from navbar
+- Scroll-to-top on page load
 
 CURRENT NON-WORKING FEATURES
 ============================

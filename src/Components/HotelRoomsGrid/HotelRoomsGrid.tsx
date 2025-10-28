@@ -74,7 +74,7 @@ export const HotelRoomsGrid = () => {
     key={index}
     className={styles.hotelCard}
     style={{ cursor: 'pointer' }}
-    onClick={() => navigate(`/room-details/${index + 1}`)}
+    onClick={() => navigate(`/hotel-details/${index + 1}`)}
   >
     <img 
       src={roomImages[index]} 

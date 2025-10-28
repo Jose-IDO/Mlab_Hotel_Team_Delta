@@ -1,0 +1,415 @@
+import React, { useState } from "react";
+import styles from "./HotelDetails.module.css";
+import { useNavigate } from "react-router-dom";
+import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
+
+// Star rating component
+const STAR_SVG = ({ filled }: { filled: boolean }) => (
+  <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+    <rect width="25" height="25" fill={filled ? "url(#pattern0_280_19)" : "none"}/>
+    <defs>
+      <pattern id="pattern0_280_19" patternContentUnits="objectBoundingBox" width="1" height="1">
+        <use xlinkHref="#image0_280_19" transform="scale(0.0078125)"/>
+      </pattern>
+      <image id="image0_280_19" width="128" height="128" preserveAspectRatio="none" xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACxgAAAsYBJG9eggAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAt7SURBVHic7Z1rjB1lGcd/z5w9l70ILWy3F6CVoARoG1sosKXbc/bQCsglROWuNEaMglyLUbEfhGoCwZgaMBFEYxRJ/EDQxNRKxbLdbVFj6qW2oHJJabG7vUErdHfPnLNnHj/sFkvb3T3n7LzvzJmdX7JftjPP8+/7PPvMe5t3ICYmZvIiQQsICt1CE4PJj6KiNBRfk0sYDFpTEEy6BNDuTBZ0FXAZ////K8J6PHlYOgubApRnnUmVANqdvhdYAzijXQLyLckVHrKnKlgmTQJoT3olypqKLhbul6z7PcOSQsGkSADtaZqJlt8AGiu8ZRBJnCXZgT6TusLAaKUwYnh3UXnwARrxvLtNqQkTka8Auo40zeldQFuVtx7Ac8+QPAUTusJC9CtAS+Zmqg8+QCuSudlvOWEj+gmg3FnzvaL3+KgklEQ6AbSncQnoogmYWKBdjR2+CQohkU4AVCfekXN8sBFiItsJ1M1NsyiX3wSSEzQ1hOecKfnB//ggK3REtwKUvTuYePABGnD0Sz7YCSWRrAAjQ7+dwHSfTO7Hc2dHcUgYzQrQnLkR/4IPMA0nc6OP9kJDNBMA7vLfpN7rv83giVwC6MbGxaAXGjC9cNh2tIhcAhgdtkVwSBipTuDIqt+bQMqQixJDzpmybHC3IfvWiVgF8G7HXPABkiT1iwbtWycyFUBfJsWB9E5ghmFX+/DcOVEZEkanAryduQHzwQdoI5G5zoIfK0QnARR7HTTlPmu+DBOJBNBNyQtAL7Lo8QLd1HixPX/miEQC4MlK+z7LkRgS1n0nUF9qaWOotAtIW3YdiSFh/VeAoeId2A8+QJKG8hcC8OsrdV0BdAtJ+tM7gNMCktBHq/thmUsxIP8Tpr4rQH/qeoILPsBMDqTqekhY3wmAxaHf6IRBQ83U7SNAe5Lno85fgtYBgHgXS7b056Bl1EIdVwAJ0WSMGNh/YIe6rADa0zINLe0CMkFrGaFIqWG2LO/fG7SQaqnTClC8nfAEHyBFqlSXq4R1VwG0iwac9A7g9KC1HEMfze4cWUQpaCHVUH8VIJG6jvAFH2AmA6lPBy2iWuovAWyu+lVLmLWNQl09ArQ7uRCcvwatY0w870LJl7YELaNS6qsCqIT/bV2R2t9GDoBQVAD9EycxlJ7JkLTheNNBZuBJG47OQJkO2obITJTTgUTQesehDOwG7QXZh7AXT/bg6D7QPXjOXhp0Hw1un7TzbtBijSWA/oFGvKapaGkmZWcWIjOBWaBTh4Ops4CpDHfoTjKlI+S4wDvAQYRe0D5UDg4nj9OHRy9Jrw8aDrJkoE8E9VtAVQkQBzVQjCTLcQmg3alzUcnjsABlBkgryCxgGuGafIkZnQKwH3Q3yH6EPXj6Oqq/k3zp70df+H4C6ObG2ZS9NUDdjWVjquI5Es790jG4C0YSQLsbzwBvMzA7UGkxtugF6ZBcYYeMTK1uBc4LWlWMVf5Fv7vAwcncQhz8ycg5NKVvcxC9NWglMQHh8EkHZX7QOmICQpnrAE1B64gJjCYH2Bm0ipiAUN50gOeD1hETECLPi27IzKFBX8OfM/Vi6ociOB9xZFlhJ8oDQauJsc7XJDf4lgMgne4aRFeB/6tNMaFDEV0lOfcxOGYxSDemrkfkaeJFn6hSROQ2yRaeOfKL41cDN2byiP4SmGJVWoxp3sPjBsm7H+j0n3A/gG5OzaUs64gXh6JCL5531bFLwTDKnkDpKL6MJNqBcG/AjKmEbeC0nyj4MMamUMkO9OG5OWCdMWkxZhF+T9FdKrnBt0a7ZMxdwZLnMJ57LfBD38XFmEX1pzS5V8rH+e9Yl1W8J1C7U18HeaSae2KCQh4lW/hGJfsCq9sU2p1ZAfpj4lnDsDIEcqfkCk9VekPVf83ak1mG6nPAydXeG2OUwyg3SKf722puqqmca1dqHo6sA86o5f4Y3+kD7yrJlf5W7Y01vRom+eJ2Eol24IRDixirbCfhtNcSfJjAu4HSMdCL5y5F4uXkAHmRottxZIt3LUzo5VDJc5iyew3CjyZiJ6YW9Gla3U+MN8wbD1+GdKoIPZkHQR/0w17MuDxO1r3Pj3cFfR3Ta0/mc6g+RTxMNEUZ4S7Juk/6ZdD3SR3tyizH0eeIXw71m8MIN0nW/Y2fRo3M6ml3aj7IOsJ5lk890od4V0u25PvinJETQiRX3MaQ046y1YT9ScYrDMliE8EHw/P62sUUEulfoXSa9BNhuvDcT0meQ6YcGD0jSPIc4lT3clSfGf/qmA8g8iyee6XJ4IOllb14mFg1j5N1V4rgmXZkdWlXuzOfB32SeJg4GmWUu6XTfcKWQ+tr+9qdvgx4lniYeCz9ONwkS921Np0GsrlDu5KLcBLrQU8Jwn/4kHdwypfJ0pL17x8EtrtHu9N92PnSZz2wV3JuIG0RyEmhuiF9FnHwj2a6dmfODMJxMEfFJuSSQPyGGi+QNgkmARxdHIjfUCOBtEkwCeARV4DjCaRN7A8DN/MhyumDhP/QZ9uUSbun2D5A2n4FGEq3Ewf/RCQoZi607dR+AojG5X9U7HcEA+gDxCOA0bHfNlYTQBUHuNimz7pCaR9pI2vYrQCbUvOI3ygaiylsTFk9ttfyIyAu/+PiOFbbyG4CaDwBNC7qWW2juAKEDbHbRtYmgvSlljaGSnX3ceUAUCQ5XbKH99twZq8ClIvxX39lCFqy9hiwlwBeXP4rx15b2UsAiReAKsfebKmdXcHrSNOcPkR8AmmlFGh1T5a5FE07slMBmhrPJw5+NWR4p3GhDUd2EkCC2e1S16idNrPVB4gngKrGzg4hWwnQbslPdFBdYsON8QQY2e16mmk/EWSWbsjMMe3EQgWwO7ddJb8e+QknCfP9AAsJIFZKWVUIbyBcLTn3Wsm51yKyHPhn0LKOw8K6gI0+QJhGAIMgqym7844+akWyhQ00ux8D7gMOByfvOIy3nekDIlpw0geBBpN+KhPDWkTukVxhx5iXbWg8jWT5EVTC8EndMp47RfLmktJwBci0E3zwXweukk73mvGCDyDLBndLtrgCZBnwinl5Y5LAyVxk0oHZBAh2AmgAZDX97jzJuVV/9EJyhRdpdhcw/Fh4z395lWK2Dc0mgBPM604oa/FkruQKD8mVuLWakUWUJOc+xpBzLqI/91NiFSqMtqGxPsDIsTBvg0415eMEvIbHPcd+GcsvdGMmD/p9hLkm7I/CIbLuqaaOizFXATam5loM/pFyP99U8AGks9BFi7sQu4+FKWxKnWPKuLkEsLW7VVnLkJw30XJfKe8/FhKJc0YeCxa+tmquLQ32AYx3AF9FuEI63WtkWWGnYV/HIR0DvZItrsCTS4HtZr2Za0uDCWBsFqsfZDWt7nzJuusN+agYyRc20uyez/BjwcybvQa305k5K3gLSfrTrs/2FeQXJJyvSsdAr492fUM3N83C876L6s1+m8ZzU5JnyGe7hirAQFMrfgZf+TfK5ZIrfCaswYcjj4XCLSA5YJufpkm0GOlQm0mA1EA/+DJseRdhJerOk073BR/sWUFyhR6a3QtQvoI/j4Uy5cODPtg5DnPzAN3pbcC82g2wFnG+PNZnT+sB7WqeQaL0HVQ+S63trWyVTneBv8qGMdcJFH5S033KVjxn6fDcfX0HH0Dy/XskW1yBSg74R41mamvLCjBXAV4mxYH0NuDsCm85hPJN1H3CRGcnDGgXDTjpO4DVVP6a/Cu0ugtNbRE3uxy8KX02Hi8As8e6DNWfMZR8QJb3T4p3B7WreQZO6VGQWxk7Bq8y5FwqywZ3m9Ji/MUQ7WmZhld6GOFWIH3UP3nAetT5tnQO/tG0jjCiPY1LUG8VcAUffBwPAj+glHpElr/3tkkN9t4O3sRUvPRiRGah2kvC2T6RDx5GCe1qPB3x5oO0orKD5OBW6QhyCTomJmZy8D/ZC3o0eoxtdgAAAABJRU5ErkJggg=="/>
+    </defs>
+  </svg>
+);
+
+// Import room images - matching RoomDetails page images
+import room1 from "../../assets/room1.jpg";
+import room2 from "../../assets/room1B.jpg";
+import room3 from "../../assets/room1c.jpg";
+import room4 from "../../assets/room1d.jpg";
+import room5 from "../../assets/room1E.jpg";
+
+// Import hotel images for gallery
+import hotelMain from "../../assets/Hotel-Room-1.jpg";
+import hotelImage1 from "../../assets/Hotel-Room-2.jpg";
+import hotelImage2 from "../../assets/Hotel-Room-3.jpg";
+import hotelImage3 from "../../assets/Santorini_1.jpg";
+
+const HotelDetails: React.FC = () => {
+  // const { id } = useParams<{ id: string }>();
+  // const hotelId = Number(id); // Will be used for API calls later
+
+  const navigate = useNavigate();
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [selectedRoomType, setSelectedRoomType] = useState<string>("all");
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string>("all");
+  const [selectedRating, setSelectedRating] = useState<string>("all");
+  const [amenitiesOpen, setAmenitiesOpen] = useState(false);
+  const [checkedAmenities, setCheckedAmenities] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setExpandedFaq(expandedFaq === index ? null : index);
+  };
+
+  const handleRoomClick = (roomId: number) => {
+    navigate(`/room-details/${roomId}`);
+    window.scrollTo(0, 0);
+  };
+
+  const handleAmenityToggle = (amenity: string) => {
+    setCheckedAmenities(prev => {
+      if (prev.includes(amenity)) {
+        return prev.filter(a => a !== amenity);
+      } else {
+        return [...prev, amenity];
+      }
+    });
+  };
+
+  // Hotel data - this can be replaced with API call later
+  const hotelData = {
+    name: "Delta Hotel",
+    address: "123 Main Street, Sandton, GP, 2196",
+    mainImage: hotelMain,
+    galleryImages: [hotelImage1, hotelImage2, hotelImage3],
+  };
+
+  // Rooms data with amenities and ratings (this can be replaced with API call later)
+  const allRoomsData = [
+    { 
+      id: 1, 
+      name: "Double Room", 
+      type: "Double",
+      image: room1, 
+      adults: 3, 
+      kids: 0, 
+      price: 1200,
+      rating: 3,
+      amenities: ["WiFi", "Air Conditioning"]
+    },
+    { 
+      id: 2, 
+      name: "Superior Double Room", 
+      type: "Double",
+      image: room2, 
+      adults: 2, 
+      kids: 0, 
+      price: 1470,
+      rating: 4,
+      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar"]
+    },
+    { 
+      id: 3, 
+      name: "Continental Room", 
+      type: "Suite",
+      image: room3, 
+      adults: 3, 
+      kids: 0, 
+      price: 1720,
+      rating: 4,
+      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar", "Balcony"]
+    },
+    { 
+      id: 4, 
+      name: "Family Room", 
+      type: "Family",
+      image: room4, 
+      adults: 3, 
+      kids: 3, 
+      price: 1950,
+      rating: 4,
+      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar", "Room Service"]
+    },
+    { 
+      id: 5, 
+      name: "Presidential Suite", 
+      type: "Suite",
+      image: room5, 
+      adults: 3, 
+      kids: 0, 
+      price: 2600,
+      rating: 5,
+      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar", "Balcony", "Room Service", "Spa Access", "Pool"]
+    },
+  ];
+
+  // List of all amenities
+  const allAmenities = ["WiFi", "Air Conditioning", "TV", "Minibar", "Balcony", "Room Service", "Spa Access", "Pool"];
+
+  // Filter rooms based on selected criteria
+  const filteredRooms = allRoomsData.filter(room => {
+    // Room Type filter
+    if (selectedRoomType !== "all" && room.type !== selectedRoomType) {
+      return false;
+    }
+
+    // Price Range filter
+    if (selectedPriceRange !== "all") {
+      const [min, max] = selectedPriceRange.split("-").map(Number);
+      if (max) {
+        if (room.price < min || room.price > max) return false;
+      } else {
+        if (room.price < min) return false;
+      }
+    }
+
+    // Rating filter
+    if (selectedRating !== "all" && room.rating !== Number(selectedRating)) {
+      return false;
+    }
+
+    // Amenities filter - room must have ALL checked amenities
+    if (checkedAmenities.length > 0) {
+      const hasAllCheckedAmenities = checkedAmenities.every(amenity => 
+        room.amenities.includes(amenity)
+      );
+      if (!hasAllCheckedAmenities) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  // FAQ data - this can be replaced with API call later
+  const faqData = [
+    {
+      question: "What time is check-in and check-out?",
+      answer: "Check-in starts at 2:00 PM and check-out is before 10:00 AM. Early check-in and late check-out may be available upon request, subject to availability."
+    },
+    {
+      question: "Is the swimming pool heated?",
+      answer: "We only heat our pools in the winter when temperatures are low. The pool is heated from May to September to ensure year-round comfort for our guests."
+    },
+    {
+      question: "Is parking available?",
+      answer: "Yes, secure on-site parking is available for all guests. We offer complimentary valet parking service, and our parking area is monitored 24/7 for your security."
+    },
+    {
+      question: "Is breakfast included in the price?",
+      answer: "Yes, a complimentary breakfast is included for all guests. We serve a buffet-style breakfast with continental and hot meal options from 6:30 AM to 10:30 AM daily."
+    },
+    {
+      question: "Do you offer airport shuttle service?",
+      answer: "Yes, we provide airport shuttle service for a nominal fee. Please contact our concierge at least 24 hours in advance to arrange pickup and drop-off times."
+    },
+    {
+      question: "Are pets allowed at the hotel?",
+      answer: "Unfortunately, we do not allow pets in our hotel rooms, with the exception of registered service animals. We can recommend nearby pet-friendly accommodations if needed."
+    },
+    {
+      question: "Is there a gym or fitness center?",
+      answer: "Yes, our fully equipped fitness center is open 24/7 for all guests. It features cardio equipment, free weights, and yoga mats. Personal training sessions can be arranged upon request."
+    },
+    {
+      question: "Do you have conference or meeting rooms?",
+      answer: "Yes, we have three conference rooms that can accommodate 10 to 100 people. All rooms are equipped with projectors, whiteboards, and high-speed WiFi. Catering services are also available."
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept all major credit cards (Visa, Mastercard, American Express), debit cards, and cash payments. Payment is required at check-in or can be processed online when booking."
+    },
+    {
+      question: "Is WiFi available throughout the hotel?",
+      answer: "Yes, complimentary high-speed WiFi is available in all rooms, public areas, and conference facilities. The network name and password will be provided upon check-in."
+    },
+    {
+      question: "Do you offer room service?",
+      answer: "Yes, 24-hour room service is available. Our menu offers a variety of meals, snacks, and beverages. Please call the front desk or use the in-room phone to place your order."
+    },
+    {
+      question: "Can I cancel or modify my reservation?",
+      answer: "Cancellations made at least 48 hours before check-in are eligible for a full refund. Modifications can be made up to 24 hours before arrival, subject to availability."
+    }
+  ];
+
+  return (
+    <>
+      <LoggedInNavbar />
+      <div className={styles.detailsPage}>
+        {/* ---------- FILTERS SECTION ---------- */}
+        <div className={styles.filterContainer}>
+          {/* New Amenities Filter */}
+          <div className={styles.newAmenitiesFilter}>
+            <button 
+              className={styles.amenitiesButton}
+              onClick={() => setAmenitiesOpen(!amenitiesOpen)}
+              type="button"
+            >
+              <span className={styles.amenitiesLabel}>Amenities</span>
+              {checkedAmenities.length > 0 && (
+                <span className={styles.amenitiesCount}>({checkedAmenities.length})</span>
+              )}
+              <span className={styles.dropdownArrow}>{amenitiesOpen ? '▲' : '▼'}</span>
+            </button>
+            
+            {amenitiesOpen && (
+              <div className={styles.amenitiesDropdownMenu}>
+                {allAmenities.map((amenity) => (
+                  <label key={amenity} className={styles.amenityOption}>
+                    <input
+                      type="checkbox"
+                      checked={checkedAmenities.includes(amenity)}
+                      onChange={() => handleAmenityToggle(amenity)}
+                      className={styles.amenityCheckboxInput}
+                    />
+                    <span className={styles.amenityText}>{amenity}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <select 
+            className={styles.filterSelect}
+            value={selectedRoomType}
+            onChange={(e) => setSelectedRoomType(e.target.value)}
+          >
+            <option value="all">All Room Types</option>
+            <option value="Double">Double Room</option>
+            <option value="Suite">Suite</option>
+            <option value="Family">Family Room</option>
+          </select>
+
+          <select 
+            className={styles.filterSelect}
+            value={selectedPriceRange}
+            onChange={(e) => setSelectedPriceRange(e.target.value)}
+          >
+            <option value="all">All Prices</option>
+            <option value="0-1500">R0 - R1500</option>
+            <option value="1501-2000">R1501 - R2000</option>
+            <option value="2001-99999">R2001+</option>
+          </select>
+
+          <select 
+            className={styles.filterSelect}
+            value={selectedRating}
+            onChange={(e) => setSelectedRating(e.target.value)}
+          >
+            <option value="all">All Ratings</option>
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+          </select>
+        </div>
+
+        {/* ---------- HEADER SECTION ---------- */}
+        <header className={styles.header}>
+          <div className={styles.headerInfo}>
+            <h1 className={styles.hotelName}>{hotelData.name}</h1>
+            <p className={styles.hotelAddress}>{hotelData.address}</p>
+          </div>
+          <div className={styles.headerActions}>
+            <button className={styles.mapBtn}>View on Map</button>
+            <button className={styles.favoriteBtn}>♡ Added to favorites</button>
+          </div>
+        </header>
+
+        {/* ---------- IMAGE GALLERY ---------- */}
+        <section className={styles.imageGallery}>
+          <div className={styles.imagePlaceholder} onClick={() => setSelectedImage(hotelData.mainImage)}>
+            <img src={hotelData.mainImage} alt="Main Hotel View" />
+          </div>
+          <div className={styles.imageRow}>
+            {hotelData.galleryImages.map((img, index) => (
+              <div key={index} className={styles.smallImagePlaceholder} onClick={() => setSelectedImage(img)}>
+                <img src={img} alt={`Hotel view ${index + 1}`} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------- ROOMS GRID ---------- */}
+        <section className={styles.roomsSection}>
+          <h2 className={styles.sectionTitle}>
+            Available Rooms {filteredRooms.length < allRoomsData.length && `(${filteredRooms.length} of ${allRoomsData.length})`}
+          </h2>
+          <div className={styles.roomsGrid}>
+            {filteredRooms.length > 0 ? filteredRooms.map((room) => (
+              <div 
+                key={room.id} 
+                className={styles.roomCard}
+                onClick={() => handleRoomClick(room.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className={styles.roomImagePlaceholder}>
+                  <img src={room.image} alt={room.name} />
+                </div>
+                <div className={styles.roomDetails}>
+                  <h3 className={styles.roomName}>{room.name}</h3>
+                  <div className={styles.starRating}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <STAR_SVG key={star} filled={star <= room.rating} />
+                    ))}
+                  </div>
+                  <p>{room.adults} adults • {room.kids} kids</p>
+                  <p className={styles.price}>Price per night: R {room.price.toLocaleString()} PN</p>
+                </div>
+              </div>
+            )) : (
+              <div className={styles.noResults}>
+                <p>No rooms match your selected filters. Try adjusting your criteria.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ---------- FAQ SECTION ---------- */}
+        <section className={styles.faqSection}>
+          <h2 className={styles.sectionTitle}>Frequently Asked Questions</h2>
+          <div className={styles.faqList}>
+            {faqData.map((faq, index) => (
+              <div key={index} className={styles.faqItem}>
+                <div 
+                  className={styles.faqHeader}
+                  onClick={() => toggleFaq(index)}
+                >
+                  <h4>{faq.question}</h4>
+                  <button 
+                    className={`${styles.faqToggle} ${expandedFaq === index ? styles.expanded : ''}`}
+                    aria-label="Toggle answer"
+                  >
+                    <svg 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 16 16" 
+                      fill="none" 
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={styles.arrow}
+                    >
+                      <path 
+                        d="M4 6L8 10L12 6" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                {expandedFaq === index && (
+                  <p className={styles.faqAnswer}>{faq.answer}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------- IMAGE OVERLAY MODAL ---------- */}
+        {selectedImage && (
+          <div className={styles.imageOverlay} onClick={() => setSelectedImage(null)}>
+            <div className={styles.overlayContent} onClick={(e) => e.stopPropagation()}>
+              <button 
+                className={styles.closeButton} 
+                onClick={() => setSelectedImage(null)}
+                aria-label="Close image"
+              >
+                ✕
+              </button>
+              <img src={selectedImage} alt="Full size view" className={styles.fullImage} />
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default HotelDetails;
+
