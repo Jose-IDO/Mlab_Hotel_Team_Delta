@@ -32,7 +32,7 @@ export const Navbar: React.FC = () => {
   };
 
   const handleRoomsClick = () => {
-    navigate('/dashboard');
+    navigate('/rooms');
   };
 
   return (

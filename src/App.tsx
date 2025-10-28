@@ -28,6 +28,7 @@ function AppContent() {
               </ProtectedRoute>
             } 
           />
+          <Route path="/rooms" element={<CustomerDashboard />} />
           <Route 
             path="/admin/*" 
             element={
