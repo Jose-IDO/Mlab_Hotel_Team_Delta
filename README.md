@@ -6,6 +6,14 @@ This dual-interface system allows customers to browse and book hotel rooms while
 ## 🏨 Customer Interface Features
 
 - **Hero Section**: Rotating image carousel showcasing Santorini hotel locations with welcoming tagline
+- **Customer Dashboard (90% Complete)**: 
+  - Hotel rooms grid with star ratings, prices, and amenities
+  - Room details display (bedrooms, bathrooms, guest capacity)
+  - Weekend deals section
+  - Destinations section with location-based filtering
+  - Search functionality in navbar
+  - User authentication and protected routes
+  - Glass effect styling on hotel cards
 - **Search Functionality**: Advanced search form with city, room type, dates, and guest count filters
 - **Deals Section**: "Deals For The Weekend" showcasing hotel packages with ratings, views, and pricing
 - **Amenities Showcase**: "Why Choose Us" section highlighting free coffee, WiFi, and air-conditioned rooms
@@ -33,18 +41,25 @@ mlcab-hotel/
 ├── src/
 │   ├── Components/
 │   │   ├── Navbar/                 # Customer navigation
+│   │   ├── LoggedInNavbar/        # Logged-in user navigation
 │   │   ├── AdminNavbar/           # Admin navigation
 │   │   ├── AdminSidebar/          # Admin sidebar menu
 │   │   ├── DealSection/           # Weekend deals display
+│   │   ├── HotelRoomsGrid/        # Hotel rooms grid for dashboard
+│   │   ├── DestinationsSection/   # Destinations display
+│   │   ├── DestinationCard/        # Individual destination card
 │   │   └── SearchSection/         # Hotel search form
 │   ├── Pages/
 │   │   ├── Landing_Page/          # Customer homepage
+│   │   ├── Customer_Dashboard/    # Customer dashboard (90% complete)
 │   │   └── admin_dashboard/       # Admin management interface
 │   │       ├── AdminDashboard.tsx
 │   │       ├── ManageBooking.tsx
 │   │       ├── ManageAccom.tsx
 │   │       └── Administrators.tsx
 │   ├── assets/                    # Images and icons
+│   ├── contexts/                  # React contexts (AuthContext)
+│   ├── utils/                     # Utility functions
 │   ├── App.tsx                    # Main app component
 │   └── main.tsx                   # App entry point
 ├── public/                        # Static assets
@@ -85,19 +100,31 @@ mlcab-hotel/
 - Admin dashboard routing and navigation
 - Room management forms with photo upload
 - Booking management tables and status tracking
+- **Customer Dashboard (90% Complete)**:
+  - Hotel rooms grid with star ratings
+  - Room details (bedrooms, bathrooms, guests)
+  - Price per day display
+  - Amenity badges with hover effects
+  - Weekend deals section
+  - Destinations section with location images
+  - Search functionality in navbar
+  - User authentication system
+  - Protected routes
 
 ### 🚧 In Development / TODO
+- Complete remaining 10% of customer dashboard:
+  - Booking functionality
+  - Filter/search functionality
+  - Date selection
+  - Cart functionality
 - **Backend Integration**: Connect forms to actual API endpoints
-- **Authentication System**: Implement user login/signup functionality
 - **Database Integration**: Connect to hotel booking database
-- **Search Functionality**: Link search form to room availability
-- **Booking Process**: Complete customer booking workflow
 - **Payment Integration**: Add payment processing
 - **Real-time Updates**: Live booking status updates
 
 ### 🐛 Known Issues
-- Search form doesn't connect to room data
-- Sign In/Sign Up buttons are non-functional
+- Customer dashboard search not fully functional (UI complete)
+- Booking functionality not yet implemented
 - No data persistence (all data is currently hardcoded)
 - Admin forms only log to console (no API integration)
 

@@ -61,7 +61,7 @@
 }
 
 .formContainer button[type="submit"] {
-  background: #007bff;
+  background: #F93448;
   color: white;
   padding: 12px;
   border: none;
@@ -72,7 +72,7 @@
 }
 
 .formContainer button[type="submit"]:hover {
-  background: #0056b3;
+  background: #d62639;
 }
 
 .formContainer p {
@@ -98,4 +98,41 @@
   text-align: center;
   font-size: 14px;
   margin-top: 5px;
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper input {
+  padding-right: 45px;
+  flex: 1;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  color: #666;
+  z-index: 1;
+}
+
+.eyeButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.eyeButton:hover {
+  color: #333;
 }

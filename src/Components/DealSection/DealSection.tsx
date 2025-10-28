@@ -53,7 +53,7 @@ const baseDeals: Deal[] = [
   {
     id: "d-1",
     hotel: "Delta Hotel",
-    location: "Pretoria, South Africa",
+    location: "Waterkloof, South Africa",
     nights: "2 nights",
     rating: 4,
     views: 1134,
@@ -63,7 +63,7 @@ const baseDeals: Deal[] = [
   {
     id: "d-2",
     hotel: "Delta Hotel",
-    location: "Pretoria, South Africa",
+    location: "Waterkloof, South Africa",
     nights: "2 nights",
     rating: 5,
     views: 550,
@@ -73,7 +73,7 @@ const baseDeals: Deal[] = [
   {
     id: "d-3",
     hotel: "Delta Hotel",
-    location: "Pretoria, South Africa",
+    location: "Waterkloof, South Africa",
     nights: "1 night",
     rating: 3,
     views: 777,

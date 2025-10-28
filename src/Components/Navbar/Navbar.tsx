@@ -43,7 +43,8 @@ export const Navbar: React.FC = () => {
           </div>
           <div className={styles.SubnavContainer2}>
             <ul className={`${styles.navLinks} ${menuOpen ? styles.showMenu : ""}`}>
-              <li>Home</li>
+              <li><a href="/">Home</a></li>
+              {isAuthenticated && <li><a href="/dashboard">Dashboard</a></li>}
               <li>Rooms</li>
               <li>Booking</li>
               {isAuthenticated ? (
