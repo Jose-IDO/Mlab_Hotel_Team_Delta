@@ -12,12 +12,14 @@ function rowToRoom(row: any): Room {
     numberOfBeds: row.number_of_beds,
     roomSizeSqm: Number(row.room_size_sqm),
     amenities: row.amenities || [],
-    units: row.units || []
+    units: row.units || [],
+    status: row.status || 'active'
   };
 }
 
 class RoomRepository {
-  async findAll(): Promise<Room[]> {
+  async findAll(status?: 'active' | 'archived'): Promise<Room[]> {
+    const statusFilter = status ? `WHERE r.status = $1` : '';
     const sql = `
       SELECT r.*,
              COALESCE(
@@ -28,10 +30,13 @@ class RoomRepository {
              ) AS units
       FROM rooms r
       LEFT JOIN room_units ru ON ru.room_id = r.id
+      ${statusFilter}
       GROUP BY r.id
       ORDER BY r.created_at DESC;
     `;
-    const { rows } = await pool.query(sql);
+    const { rows } = status 
+      ? await pool.query(sql, [status])
+      : await pool.query(sql);
     return rows.map(rowToRoom);
   }
 
@@ -136,6 +141,24 @@ class RoomRepository {
   async delete(id: string): Promise<boolean> {
     const { rowCount } = await pool.query('DELETE FROM rooms WHERE id = $1;', [id]);
     return (rowCount ?? 0) > 0;
+  }
+
+  async archive(id: string): Promise<Room | null> {
+    const { rows } = await pool.query(
+      'UPDATE rooms SET status = $1 WHERE id = $2 RETURNING *;',
+      ['archived', id]
+    );
+    if (!rows[0]) return null;
+    return (await this.findById(id)) as Room;
+  }
+
+  async restore(id: string): Promise<Room | null> {
+    const { rows } = await pool.query(
+      'UPDATE rooms SET status = $1 WHERE id = $2 RETURNING *;',
+      ['active', id]
+    );
+    if (!rows[0]) return null;
+    return (await this.findById(id)) as Room;
   }
 }
 

@@ -2,8 +2,8 @@ import { Room, RoomPayload } from '../types/room.types';
 import { roomRepository } from '../repositories/roomRepository';
 
 export class RoomService {
-  async getAllRooms(): Promise<Room[]> {
-    return roomRepository.findAll();
+  async getAllRooms(status?: 'active' | 'archived'): Promise<Room[]> {
+    return roomRepository.findAll(status);
   }
 
   async getRoomById(id: string): Promise<Room | undefined> {
@@ -20,6 +20,14 @@ export class RoomService {
 
   async deleteRoom(id: string): Promise<boolean> {
     return roomRepository.delete(id);
+  }
+
+  async archiveRoom(id: string): Promise<Room | null> {
+    return roomRepository.archive(id);
+  }
+
+  async restoreRoom(id: string): Promise<Room | null> {
+    return roomRepository.restore(id);
   }
 }
 
