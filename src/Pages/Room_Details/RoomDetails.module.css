@@ -1,0 +1,247 @@
+.filterContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 100px 0 20px;
+  justify-content: center;
+}
+
+.filterSelect {
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.filterSelect:hover {
+  border-color: #f93448;
+}
+
+.filterSelect:focus {
+  border-color: #f93448;
+  box-shadow: 0 0 5px rgba(249, 52, 72, 0.5);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 1rem;
+  background: rgba(16, 10, 10, 0.05); 
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.mainImage img {
+  width: 100%; 
+  height: 350px;
+  border-radius: 16px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.sideImages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+}
+
+.sideImages img {
+  width: 100%;
+  height: 160px;
+  border-radius: 12px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.sideImages img:hover {
+  transform: scale(1.05);
+}
+
+.infoSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  gap: 20px;
+  background-color: #f0f0f0;
+  padding: 12px 15px;
+  border-radius: 12px;
+}
+
+.roomType h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.price {
+  font-size: 20px;
+  margin-top: 6px;
+}
+
+.bookNowBtn {
+  background-color: #f93448;
+  color: #fff;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.bookNowBtn:hover {
+  background-color: #d62639;
+}
+
+.amenitiesSection {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.amenitiesSection h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.amenitiesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.amenity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+  text-align: center;
+  color: #555;
+  font-size: 14px;
+}
+
+.amenity img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 8px;
+  object-fit: contain;
+}
+
+.rulesSection {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.rulesSection h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.rulesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+.rule {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+  text-align: center;
+  gap: 8px;
+  color: #555;
+  font-size: 14px;
+}
+
+.rule img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.availabilitySection {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.availabilityInfo {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.availabilityItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: #555;
+}
+
+.availabilityIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .sideImages {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .sideImages img {
+    height: 100px;
+  }
+
+  .filterContainer {
+    margin-top: 120px;
+  }
+
+  .amenitiesContainer {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .amenitiesContainer::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rulesContainer {
+    justify-content: center;
+  }
+
+  .availabilityInfo {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

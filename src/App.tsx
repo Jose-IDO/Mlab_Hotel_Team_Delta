@@ -8,6 +8,7 @@ import SignUp from './Pages/Auth/SignUp';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './Components/ProtectedRoute/ProtectedRoute';
 import { Navbar } from './Components/Navbar/Navbar';
+import RoomDetails from "./Pages/Room_Details/RoomDetails";
 
 function AppContent() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function AppContent() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/room-details/:id" element={<RoomDetails />} />
           <Route 
             path="/dashboard" 
             element={
