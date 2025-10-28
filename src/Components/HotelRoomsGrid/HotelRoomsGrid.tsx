@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import styles from "./HotelRoomsGrid.module.css";
 import Displayroom1 from "../../assets/Displayroom 1.jpg";
 import Displayroom2 from "../../assets/Displayroom 2.jpg";
@@ -37,6 +38,7 @@ const STAR_SVG = ({ filled }: { filled: boolean }) => (
 
 export const HotelRoomsGrid = () => {
   const [showAll, setShowAll] = useState(false);
+  const navigate = useNavigate();
 
   const roomImages = [
     Displayroom1,
@@ -67,13 +69,19 @@ export const HotelRoomsGrid = () => {
   return (
     <div className={styles.hotelGridWrapper}>
       <div className={styles.hotelGrid}>
-        {Array.from({ length: numberOfRooms }).map((_, index) => (
-          <div key={index} className={styles.hotelCard}>
-            <img 
-              src={roomImages[index]} 
-              alt={`Room ${index + 1}`}
-              className={styles.hotelImage}
-            />
+{Array.from({ length: numberOfRooms }).map((_, index) => (
+  <div
+    key={index}
+    className={styles.hotelCard}
+    style={{ cursor: 'pointer' }}
+    onClick={() => navigate(`/room-details/${index + 1}`)}
+  >
+    <img 
+      src={roomImages[index]} 
+      alt={`Room ${index + 1}`}
+      className={styles.hotelImage}
+    />
+
             <div className={styles.amenitiesContainer}>
               {hotelData[index].amenities.map((amenity, i) => (
                 <AMENITY_BADGE key={i} text={amenity} />
