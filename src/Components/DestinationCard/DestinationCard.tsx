@@ -23,7 +23,7 @@ interface DestinationCardProps {
   index?: number;
 }
 
-export const DestinationCard: React.FC<DestinationCardProps> = ({ data, index }) => {
+export const DestinationCard: React.FC<DestinationCardProps> = ({ data }) => {
   const location = data?.location?.toLowerCase() || "sandton";
   const imageSrc = destinationImages[location] || sandtonImage;
   const displayName = data?.location || "Sandton";

@@ -83,7 +83,7 @@ const GUEST_SVG = (
   </svg>
 );
 
-const STAR_SVG = ({ filled, half }: { filled: boolean, half?: boolean }) => (
+const STAR_SVG = ({ filled }: { filled: boolean }) => (
   <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
     <rect width="25" height="25" fill={filled ? "url(#pattern0_280_19)" : "none"}/>
     <defs>
@@ -108,12 +108,6 @@ export const HotelRoomsGrid = () => {
     Displayroom7,
     Displayroom8,
     Displayroom9
-  ];
-
-  const amenities = [
-    "WiFi", "Pool", "Gym", "Spa", "Parking", "Restaurant", 
-    "Bar", "Room Service", "Laundry", "Concierge", "Business Center", 
-    "Pet Friendly", "Beach Access", "Mountain View", "City View"
   ];
 
   const hotelData = [
@@ -151,11 +145,11 @@ export const HotelRoomsGrid = () => {
                 {Array.from({ length: 5 }).map((_, i) => {
                   const rating = hotelData[index].rating;
                   if (i + 1 <= rating) {
-                    return <span key={i}><STAR_SVG filled={true} half={false} /></span>;
+                    return <span key={i}><STAR_SVG filled={true} /></span>;
                   } else if (i < rating && i + 1 > rating) {
-                    return <span key={i}><STAR_SVG filled={false} half={true} /></span>;
+                    return <span key={i}><STAR_SVG filled={true} /></span>;
                   } else {
-                    return <span key={i}><STAR_SVG filled={false} half={false} /></span>;
+                    return <span key={i}><STAR_SVG filled={false} /></span>;
                   }
                 })}
               </div>
