@@ -107,12 +107,36 @@
 .userInfo {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.flagIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .userName {
   font-size: 0.9rem;
   font-weight: 500;
   color: #fff;
+  position: relative;
+  cursor: pointer;
+}
+
+.userName::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background-color: #F93448;
+  transition: width 0.3s ease;
+}
+
+.userName:hover::after {
+  width: 100%;
 }
 
 .logoutBtn {

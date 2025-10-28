@@ -1,29 +1,21 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import Logo from '../../assets/Logo.png'
+import Logo from '../../assets/Logo.png';
+import HomeIcon from '../../assets/home-icon-silhouette-svgrepo-com.svg';
 import { useAuth } from '../../contexts/AuthContext';
-import { LoginForm } from '../Auth/LoginForm';
-import { SignupForm } from '../Auth/SignupForm';
 
 export const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    setShowLogin(true);
-    setShowSignup(false);
+    navigate('/signin');
   };
 
   const handleSignupClick = () => {
-    setShowSignup(true);
-    setShowLogin(false);
-  };
-
-  const handleCloseAuth = () => {
-    setShowLogin(false);
-    setShowSignup(false);
+    navigate('/signup');
   };
 
   const handleLogout = () => {
@@ -31,11 +23,15 @@ export const Navbar: React.FC = () => {
     setMenuOpen(false);
   };
 
+  const handleHomeClick = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <>
       <nav className={styles.navbar}>
         <div className={styles.navContainer}>
-          <div className={styles.SubnavContainer1}>
+          <div className={styles.SubnavContainer1} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
             <div className={styles.LogoCard}>
               <img src={Logo} alt="Logo" style={{width: '50px', height: '50px'}} />
             </div>
@@ -43,18 +39,17 @@ export const Navbar: React.FC = () => {
           </div>
           <div className={styles.SubnavContainer2}>
             <ul className={`${styles.navLinks} ${menuOpen ? styles.showMenu : ""}`}>
-              <li><a href="/">Home</a></li>
-              {isAuthenticated && <li><a href="/dashboard">Dashboard</a></li>}
-              <li>Rooms</li>
-              <li>Booking</li>
               {isAuthenticated ? (
                 <>
-                  <li>Welcome, {user?.name}</li>
-                  {user?.role === 'admin' && <li><a href="/admin">Admin</a></li>}
+                  <li className={styles.homeIconWrapper} onClick={handleHomeClick}>
+                    <img src={HomeIcon} alt="Home" className={styles.homeIcon} />
+                  </li>
+                  <li>{user?.name}</li>
                   <li className={styles.redButton} onClick={handleLogout}>Logout</li>
                 </>
               ) : (
                 <>
+                  <li>Rooms</li>
                   <li className={styles.redButton} onClick={handleLoginClick}>Sign In</li>
                   <li className={styles.redButton} onClick={handleSignupClick}>Sign Up</li>
                 </>
@@ -71,26 +66,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </nav>
-
-      {showLogin && (
-        <LoginForm 
-          onClose={handleCloseAuth} 
-          onSwitchToSignup={() => {
-            setShowLogin(false);
-            setShowSignup(true);
-          }} 
-        />
-      )}
-
-      {showSignup && (
-        <SignupForm 
-          onClose={handleCloseAuth} 
-          onSwitchToLogin={() => {
-            setShowSignup(false);
-            setShowLogin(true);
-          }} 
-        />
-      )}
     </>
   );
 };

@@ -64,11 +64,14 @@
   list-style: none;
   color: white;
   font-size: 15px;
+  align-items: center;
 }
 
 .navLinks li {
   position: relative;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .navLinks li::after {
@@ -142,5 +145,34 @@
 }
 
 .redButton::after {
+  display: none;
+}
+
+.homeIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.homeIconLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.homeIcon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+  transition: filter 0.3s ease;
+}
+
+.homeIcon:hover {
+  filter: brightness(0) invert(1) drop-shadow(0 0 8px #F93448) drop-shadow(0 0 12px #F93448);
+}
+
+.homeIconWrapper::after {
   display: none;
 }

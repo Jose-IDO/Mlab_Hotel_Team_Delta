@@ -40,12 +40,12 @@ const BookingTable = ({
   onCheckout: (id: string) => void;
   onCheckin: (id: string) => void; // NEW
 }) => (
-  <section className={styles.bookingSection}>
+        <section className={styles.bookingSection}>
     <h3 className={styles.subtitle}>{title}</h3>
     <div className={styles.tableWrapper}>
-      <table className={styles.table}>
-        <thead>
-          <tr>
+          <table className={styles.table}>
+            <thead>
+              <tr>
             <th scope="col">Booking ID</th>
             <th scope="col">Guest Name</th>
             <th scope="col">Room</th>
@@ -53,15 +53,15 @@ const BookingTable = ({
             <th scope="col">Check-out</th>
             <th scope="col">Status</th>
             <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+              </tr>
+            </thead>
+            <tbody>
           {data.length === 0 ? (
             <tr>
               <td colSpan={7} className={styles.emptyCell}>
                 No records found.
-              </td>
-            </tr>
+                </td>
+              </tr>
           ) : (
             data.map((b) => (
               <tr key={b.id}>
@@ -95,10 +95,10 @@ const BookingTable = ({
               </tr>
             ))
           )}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
     </div>
-  </section>
+        </section>
 );
 
 export const ManageBooking = () => {

@@ -9,9 +9,12 @@ import Displayroom6 from "../../assets/Displayroom 6.jpg";
 import Displayroom7 from "../../assets/Displayroom 7.jpg";
 import Displayroom8 from "../../assets/Displayroom 8.webp";
 import Displayroom9 from "../../assets/Displayroom 9.jpg";
+import BedroomIcon from "../../assets/bedroom-hotel-svgrepo-com.svg";
+import BathroomIcon from "../../assets/bathroom-svgrepo-com.svg";
+import GuestsIcon from "../../assets/people-svgrepo-com.svg";
 
 const AMENITY_BADGE = ({ text }: { text: string }) => (
-  <svg width="107" height="50" viewBox="0 0 107 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="80" height="28" viewBox="0 0 107 50" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M25 0.5H82C95.531 0.5 106.5 11.469 106.5 25C106.5 38.531 95.531 49.5 82 49.5H25C11.469 49.5 0.5 38.531 0.5 25C0.5 11.469 11.469 0.5 25 0.5Z" fill="white" stroke="black"/>
     <text x="53.5" y="28" textAnchor="middle" fill="black" fontSize="12" fontWeight="500">
       {text}
@@ -19,32 +22,6 @@ const AMENITY_BADGE = ({ text }: { text: string }) => (
   </svg>
 );
 
- 
-
-const BATHROOM_SVG = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-    <rect width="24" height="24" fill="url(#pattern0_44_379)"/>
-    <defs>
-      <pattern id="pattern0_44_379" patternContentUnits="objectBoundingBox" width="1" height="1">
-        <use xlinkHref="#image0_44_379" transform="scale(0.0078125)"/>
-      </pattern>
-      <image id="image0_44_379" width="128" height="128" preserveAspectRatio="none" xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAcjSURBVHic7Z1bbFRFGMd/3UIlUCmoGC0ooomCJsotxQuYlagkvCm+aESN4UFCvMQACXh/8EVNwFtUTIyRqImaoKBBQYK+IKJFTYwiasULNwm2QCkCpfVhdrWsu+fM7p6Z7+zO90u+hNDpfN+Z799zzlzOTAPJ0wzMBK4BLgUuBIbnLIpe4ADwB/A98DGwDvjdQYyKAyYBrwHdQH+C9jVwGzDY36Uo5TAOeBfoI9nEF9oO4E4/l6TYMh/owW3iC201cKaPi1NKMxhYid/ED7Q9QJvzq1SK0gR8gFzy89YFTHN8rUoBGeAt5JM/XASSnV5xndNQZvmlwONllO8ENgE7c/+OohE4A5iI6T5mLH38hOmBdJcRl1IBU4Hj2P1lfghcS+Vdt1HAEmCXpb9XKvSjWJIBthCfiJ2YxCdFC7DCwm9/wn6VAm4kPgFbgdGO/C/AjBRG+f/EkW8F2Ex04+/Afd98YUwM/cBVjmMIkouJbvTjmJcwH6yKiWWlpziC4mGiG32Fx1jGEj3yuBf73oNiyUZKN/gJ4BzP8bwaEU8/MMVzPHVNA3CQ0o39med4xgDPRcTTD3yKmTRy9UIaFKOJbuxHPMTQBNwFfE75M45bgbnAIA9x1iUTiW7gOxz6zmDWAXTExGBjHY5jrVumE92wsxz5HYUZTaw28YX2Xq5uxZIs0Q2adeDzSsyysKSTn7fd6CyiNVn8CuByol86k7IDOV/Bk6Y+8yRgLXCqB1/DMY+Y4LuMaRFAC2Zd4QjPPt8mfrVyXZMWATwDnCvgdxywXMBvzZDF/TvA7BgfPuy6BK6jJknDHeAh6QCAB6UDkEJaADNIx9v41Zgxj+CQFsACYf8DuVs6AAkkBdAIXC/ov5DZwBDpIHwjKYApwEhB/4U0E+DHJpICmCHouxQqAI+MEfRdigukA/CNpADSOCt3tnQAvlEBnEyzdAC+kRRAk6DvUjRKB+Ab6XEARRgVQOBILpZ8E7PQM010SAfgG0kB+PygRCmBPgICRwUQOCqAwFEBBI4KIHBUAIGjAggcFUDgqAACRwUQOCqAwFEBBI4KIHBUAIETNx3ciTm8KernCpwHtAJDI8r0YPZS/tVHQIp7hgEPUP4mVh2YbfejxKKknAnAj1T3Sfp24CLfgSvV00pym1jtJp0fyCgRrCXZzSnW+A1fqYapuNmhROzcI+0GlscNNVZvLCqA8pjgqN7xjuqNpdg4wFjgJuxtKbQTOr/BnExSClf7GZwe8/OngOuqqP9PoB14B/itVKEhwNPAMeR37ZKyjTENubHG/R4FlgGn5CvOPwKGARuAe9BTuuuZJuA+zOjuUPhPAC9jNmlWwmA68BIYAUwHbhYNR5HgVuCKDDBPOhJFjHkZzCaJSphkMwS4L47yL60Z4LB0FIoYhzLANokoFDG2ZTDHsSphsiqD6Q/ulY5E8c5uYEUG6MYcrtgrG4/ikV5Mzg/nRwLXA3OAQ2IhKb44iJl+3gAnTwevxkx3vgj85T8uxTH7gRcwOX4//5+F08E7gfmYwxPOB84inTt6uiKty9wXUvlU9DFgD/Az5rT3kyj1XUAvZtXq9gqdKsnS7qpiXREUOCqAwFEBBI4KIHBUAIET93XwSMI6YbsTh2/cVVDNCWvtVNG9zSK/UldXBVfnNxtVsT4CAkcFEDiSB0bUIq5OORE7qUQFUB51d8qJPgICRwUQOCqAwFEBBI4KIHBUAIET1w084iWK9JDFDJ/WEz1RP4y7A6R1jZxiT+QC3zgB6Org2ifyj7gh5pcHYR4DOmJYm/Ri9n7632rgPHF3gF7guyQjUrzyLRHJB7tewBfJxKIIEJs7FUB9k4gA1lN/XaMQ6Cf6sA/ATgAduJkDV9yyCfglrpDtSOAb1cWiCPC6TaG4bmCeURg1Das4HMUn3ZhzjPbHFbS9A+wDnq8iIMUvz2KRfLC/A4DZ0boDGF5JRIo3ujGf9u+zKdxYRsVHcuVnVhCU4o/HgI9cVT4I2Iz8Bxxqxe1LytztvZxHQJ7xmM+N9Ny7dNGDOeTjBx/Obgf6kFe8mrE+zK5fXlmSQOBqydjimFw5Y7llgGrubFlslhxzL2bKUbohQrM+4NH49PhhDuYlRLpRQrG/gVusMuORSzCTRtKNU+/2FTDJMifeacRsahjy0XOu7FiubcsZvIsl6e8CTmCeTXr0XPIMxuzaGrnES5r7kf9LqXdbap0NzyzC7gK6MAtNj1qWD8GO5tqky7L8IsucxFLJUHAxFgFPWJTrAmYBWzDPslZgBNBMeGsNDmNm7rqAXZhbextmImeExe8vBp50Fl0ZzMVOtZ2YC1SiacO0lU2beh/+LUYL8TOEXcA0qQBrkMmYBR1RbdoOnCYVYCFRItDkV0aUCFKV/DzFRKDJr45iIkhl8vMMFIEmPxkGiiDVyc/TAqxDX/iSpA3Tpi1JV/wPqdCafJLz5DAAAAAASUVORK5CYII="/>
-    </defs>
-  </svg>
-);
-
-
-const GUEST_SVG = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
-    <rect width="24" height="24" fill="url(#pattern0_44_380)"/>
-    <defs>
-      <pattern id="pattern0_44_380" patternContentUnits="objectBoundingBox" width="1" height="1">
-        <use xlinkHref="#image0_44_380" transform="scale(0.0078125)"/>
-      </pattern>
-      <image id="image0_44_380" width="128" height="128" preserveAspectRatio="none" xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAA3NCSVQICAjb4U/gAAAACXBIWXMAABYcAAAWHAFko/8vAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAtNQTFRF////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACOdhNgAAAPB0Uk5TAAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxweHyAhIiMkJSYnKCkqKywtLjAxMjM0NTY3ODk6Ozw9Pj9AQUJDREVGR0hJSktMTU9QUVJTVFVWWVpbXF1fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e31+f4CBgoOEhYeIiYqLjI2Oj5CRkpOUlpeYmZqbnJ2en6ChoqOkpaanqKmqq62ur7CxsrO0tba3uLq7vL2+v8DBwsPExcfIycrLzM3Oz9DR0tPV1tfY2drb3d7f4OHi4+Tl5ufo6err7O3u7/Dy8/T19vf4+fr7/P3+0gpDxQAABxJJREFUGBntwftDleUBB/AvB/AcJON1lgNMXTNTI9eckJm5dFkrWum8ZYtNzU3L3KY4mVTzwixnpqiImrfEmc55RdZcgropky3Ny6YiSoqveEHA8/0T9hwgJ5zzXM557Dc+H6BVq1atWklFD8zK3XLw4JbcrIHRiED0gKyl248c2b7stwOjEb7BKy/ytosrByNMgz+6yNsurhyM8PQpZAuFfRCGvoVsobAPzPny/Qziz/fBkHc5g/lXxMFQ0gGGdCAJRhKLGdLfH4CRR89S4uyjMNDjDCUqvgsDiacpdToRWvefpFR5MrS8xVQo9kLDu48K+33QWUSlxdD4kEqLodGjnkr1j0CpZx2V6ntBbRM1tkLpT9TYAqU+1HoCCmnUSoXK+9RaBIX3qDUfKieodTYKciepdRIKvWkgFVK9aaA35CbQwFuQeo0GJkBuFg3kQGomDcyC3CoaWAOpfBpYBblCGtgDqdU0UAi5HTRQhNu6PjFs4oSXUjuhiW8F9XZALo96VWloEPvMh2fY5Iuc/h40mFhHnTzIZVPrXAoCon9WzmaODUODpyqpkQ25DOqceBABz3/OICWPIyC1hmoZkOtCjWs9IURl+xlC7VgE/IRqXaBQSrWxEOIKKPGHaAgLqFIKlWwqbYTg2UGppRBiiqiQDZVudVSodCDMo8JECA/VU6quG5QWU2EGhDFUqXsawjpKLYZa4lVKXXEAOFVUOh4LIMVPiauJ0JhKqbkQ5lBjEoRPKDEVWhso4U8G8MB1anx5L4A0hrYBem0PMbQyCNnUeh1A1CWGcqgtDCQdZEgLIZRSayeEbQzhYBKM+NYylKEAulLv5r0AZjDYWh9MvekyyJUOACbQwMsAnmZL7psIQ4cFtWymfFoChN/TwFsA4m+ymdoFHRCerpnFfn6l7LU2aLCeBnIgdBhXdItN/MWZXRGBxOGT565ePn34d+7BV/bSwBo0Snp+/O9WrZ47eXgiIuD1NeP1IOAwDWyG0MbXjBfG4ofOL9h3qoYt+IsgbKeBJRAusLmaU/sK5g+Nh0bH8dtqGFoFhKU0MBNAPEOq2Ta+I+TavXuVcm0BzKSBcQAeoczVd9shtNhJlVTpBeBFGugLIJ1ylZNiEULnUqr9CIDvGrXORgGYQpXSzgjS7zw18iBsotYiCJ9S6Xw/tDCmhjpVbQCMotYgAIm3qFYzBs2MooF0ANGfU+NTCBOpNQp36HuDBtZAeIlq/r4Q/katG31xW3I5TdzsBuEzKq2F8H0aKE9GE08JzWyG0LmSCsccAJ5SmijxoFEGTQ2CMKCWUu7DEMbSTAYaxJ2hqdJYCK/WU+LaMxDaX6CZM3EImEZz+Qh41mVIpx+DELuHpqZBSLjMMGQhoMcxhrC3IwLyaOxyAoDRDMsrCPBOucQW/jM6CgFTGYbRADYyDNXL+6FRwjsneIeyKV40+sH6GhrbCHiraWz/q/G4Q8qMnUe+9N86f2jrlAdxh/a/+DcNVXvxAk2deyUKwWJjECzmjcs08wLm0ExtTjs0iX0sfdzbyz5ubn1u1k9/mOJBk/uW3KKJOVhNI+WpaNRuxDqXUhfy0n1oNOQyDazGHpo4kIwGDxfUUKN6WSc06H6MentwlAbW+hDwzUV1NHB9dgICnN3UOoor1Ps4CgG/rKahSxkI8O6lzhVQ7y9tIMStZxgWxkBo/y/qgFplCRA6HWRYCr8BoXM5NUCd6i4QHjrHMB1PhJBaTzVQ5w0IzlGGrcQH4X2qgRolHgDRuxiBtRDiT1EJVKtNgfABI/IbCM9SCVRbBuEpRqa+J4TdVAHVUiCUMEKbIaRTBVQqhDCMEesPIOoLKoBK6QBijjFi+yBMpAKoUhkF4EVa+B6AhHrKgSobICynhXcg7KccqDIegKeSFv4JYTblQJXuAAbQShcAQygHKpyDMJtWxgNoW08pUKEYwgZamQuhglKgwlYIn9HKGghllAIV8iGcpJUiCEWUAhVyINTQylEIBZRCBeWmA7iXdqogLKHMFviezCq8ztAyATi040LIZUhn5vRCgzb9Z+y6ymCZABzacSHkMtiVFYM8uENsv8xd1WwuE4BDOy6EXLZwftPIOASLSZu67cRN3pYJwKEdF0Iu/6/2wAcjvwUFT/LjI369cMvhKjITgEM7LoRckrcq/vHnZW+/3t8HU/f06gzAoR0XQr/0PknRiIxDOy4sObTjwpJDOy4sObTjwpJDOy4sObTjwpJDOy4sObTjwpJDOy4sObTjwlIC7ZyHrZc/qmDELs66D3dB71/tusHw1e3O8OFu8Q2Zd4ThuLk9owPuso7PTS847qfe5T05IxLwNWn35KT8ff+to0TV7jkjvo2vn6dT2o8nv7d83Sc7/3qg7HDRH/Pmzfj5yOfSut+PVq1atWoVrv8BFatsmLyIo7AAAAAASUVORK5CYII="/>
-    </defs>
-  </svg>
-);
 
 const STAR_SVG = ({ filled }: { filled: boolean }) => (
   <svg width="20" height="20" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
@@ -75,13 +52,13 @@ export const HotelRoomsGrid = () => {
 
   const hotelData = [
     { name: "Delta hotel Durban", rating: 3.5, amenities: ["WiFi", "Pool", "Parking"], bedrooms: 2, bathrooms: 1, guests: 4, price: 1200 },
-    { name: "Delta hotel Cape Town", rating: 5, amenities: ["WiFi", "Spa", "Beach Access"], bedrooms: 3, bathrooms: 2, guests: 6, price: 2500 },
+    { name: "Delta hotel Cape Town", rating: 5, amenities: ["WiFi", "Spa", "Beach Access"], bedrooms: 3, bathrooms: 2, guests: 6, price: 1500 },
     { name: "Delta hotel Sandton", rating: 4, amenities: ["WiFi", "Gym", "Business Center"], bedrooms: 1, bathrooms: 1, guests: 2, price: 800 },
     { name: "Delta hotel Waterkloof", rating: 3, amenities: ["WiFi", "Parking", "Restaurant"], bedrooms: 2, bathrooms: 1, guests: 4, price: 1000 },
-    { name: "Delta hotel Stellenbosch", rating: 4.5, amenities: ["WiFi", "Spa", "Mountain View"], bedrooms: 3, bathrooms: 3, guests: 6, price: 3200 },
+    { name: "Delta hotel Stellenbosch", rating: 4.5, amenities: ["WiFi", "Spa", "Mountain View"], bedrooms: 3, bathrooms: 3, guests: 6, price: 1500 },
     { name: "Delta hotel Durban", rating: 3.5, amenities: ["WiFi", "Pool", "Room Service"], bedrooms: 1, bathrooms: 1, guests: 2, price: 750 },
-    { name: "Delta hotel Cape Town", rating: 4.5, amenities: ["WiFi", "Pool", "Bar"], bedrooms: 2, bathrooms: 1, guests: 4, price: 1800 },
-    { name: "Delta hotel Sandton", rating: 3, amenities: ["WiFi", "Parking", "Concierge"], bedrooms: 3, bathrooms: 2, guests: 6, price: 2200 },
+    { name: "Delta hotel Cape Town", rating: 4.5, amenities: ["WiFi", "Pool", "Bar"], bedrooms: 2, bathrooms: 1, guests: 4, price: 1500 },
+    { name: "Delta hotel Sandton", rating: 3, amenities: ["WiFi", "Parking", "Concierge"], bedrooms: 3, bathrooms: 2, guests: 6, price: 1500 },
     { name: "Delta hotel Waterkloof", rating: 4, amenities: ["WiFi", "Gym", "Laundry"], bedrooms: 2, bathrooms: 1, guests: 3, price: 950 }
   ];
 
@@ -118,7 +95,18 @@ export const HotelRoomsGrid = () => {
               </div>
             </div>
             <div className={styles.roomDetailsContainer}>
-              <ROOM_BADGE bedrooms={hotelData[index].bedrooms} bathrooms={hotelData[index].bathrooms} guests={hotelData[index].guests} />
+              <div className={styles.roomDetail}>
+                <img src={BedroomIcon} alt="Bedrooms" className={styles.roomIcon} />
+                <span>{hotelData[index].bedrooms}</span>
+              </div>
+              <div className={styles.roomDetail}>
+                <img src={BathroomIcon} alt="Bathrooms" className={styles.roomIcon} />
+                <span>{hotelData[index].bathrooms}</span>
+              </div>
+              <div className={styles.roomDetail}>
+                <img src={GuestsIcon} alt="Guests" className={styles.roomIcon} />
+                <span>{hotelData[index].guests}</span>
+              </div>
             </div>
             <div className={styles.price}>
               R{hotelData[index].price}/day

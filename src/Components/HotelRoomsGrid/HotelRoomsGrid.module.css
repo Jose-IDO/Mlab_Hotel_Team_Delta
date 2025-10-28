@@ -1,3 +1,14 @@
+.bubbleContainer {
+  display: block;
+  width: 100%;
+  margin: 0.25rem 0 0 0;
+  padding: 0; /* no padding so bubble can be flush */
+  box-sizing: border-box;
+  background: transparent; /* remove visual gap from container */
+  border: 0; /* bubble itself has stroke */
+  border-radius: 0;
+  text-align: left;
+}
 .hotelGridWrapper {
   text-align: center;
 }
@@ -20,6 +31,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
 }
 
 .imagePlaceholder {
@@ -83,18 +95,28 @@
 
 .roomDetailsContainer {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-.roomDetailsContainer svg {
-  width: 220px;
-  height: 28px;
+.roomDetail {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
-.roomDetailsContainer > div {
-  width: 100%;
+.roomIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.roomDetail span {
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 500;
 }
 
 .price {

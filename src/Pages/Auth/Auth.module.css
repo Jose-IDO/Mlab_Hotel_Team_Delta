@@ -1,0 +1,127 @@
+.container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.leftPanel {
+  background-image: url('../../assets/hotel-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: none;
+}
+
+.leftOverlay {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35));
+  height: 100%;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.leftContent {
+  max-width: 500px;
+  color: white;
+  padding: 48px;
+  padding-left: 80px;
+}
+
+.welcomeTitle {
+  font-size: 2.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  color: white;
+}
+
+.welcomeText {
+  opacity: 0.9;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: white;
+}
+
+.rightPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  padding: 48px 24px;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+  padding: 32px;
+}
+
+.formTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #111827;
+}
+
+.buttonWrapper {
+  margin-top: 1.5rem;
+}
+
+.switchText {
+  margin-top: 1rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.switchLink {
+  color: #F44369;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.switchLink:hover {
+  text-decoration: underline;
+}
+
+.divider {
+  margin: 1rem 0;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.nameRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .leftPanel {
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .formCard {
+    box-shadow: none;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .nameRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+

@@ -2,6 +2,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import styles from "./LoggedInNavbar.module.css";
 import Logo from '../../assets/Logo.png';
+import SouthAfricaFlag from '../../assets/south-africa-svgrepo-com.svg';
 
 export const LoggedInNavbar = () => {
   const { user, logout } = useAuth();
@@ -14,7 +15,7 @@ export const LoggedInNavbar = () => {
 
   return (
     <nav className={styles.navbar}>
-      <div className={styles.logoSection}>
+      <div className={styles.logoSection} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
         <img src={Logo} alt="Delta Hotel Logo" style={{width: '40px', height: '40px'}} />
         <h2 className={styles.brandName}>Delta Hotels</h2>
       </div>
@@ -34,9 +35,9 @@ export const LoggedInNavbar = () => {
       </div>
 
       <div className={styles.profileSection}>
-        <div className={styles.notificationIcon}>🔔</div>
         <div className={styles.userInfo}>
           <span className={styles.userName}>{user?.name || 'User'}</span>
+          <img src={SouthAfricaFlag} alt="South Africa" className={styles.flagIcon} />
         </div>
         <button className={styles.logoutBtn} onClick={handleLogout}>
           Logout
