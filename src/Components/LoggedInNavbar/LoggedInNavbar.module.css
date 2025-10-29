@@ -121,8 +121,9 @@
 
 .userName {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   position: relative;
   cursor: pointer;
 }
@@ -149,11 +150,16 @@
   padding: 0.5rem 1rem;
   border-radius: 6px;
   font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(249, 52, 72, 0.3);
+  transition: all 0.3s ease;
 }
 
 .logoutBtn:hover {
   background: #d62639;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.4);
 }
 
 .authButtons {
@@ -171,11 +177,14 @@
   border-radius: 6px;
   font-size: 0.9rem;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(249, 52, 72, 0.3);
+  transition: all 0.3s ease;
 }
 
 .signInBtn:hover,
 .signUpBtn:hover {
   background: #d62639;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.4);
 }
