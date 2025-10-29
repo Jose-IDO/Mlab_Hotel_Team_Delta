@@ -27,6 +27,41 @@ function rowToUser(row: any): User {
 }
 
 class UserRepository {
+  async findAll(search?: string, limit = 50, offset = 0): Promise<User[]> {
+    const values: any[] = [];
+    let where = '';
+
+    if (search && search.trim()) {
+      values.push(`%${search.trim().toLowerCase()}%`);
+      where = `WHERE LOWER(u.email) LIKE $${values.length} OR LOWER(u.first_name) LIKE $${values.length} OR LOWER(u.last_name) LIKE $${values.length}`;
+    }
+
+    values.push(limit);
+    values.push(offset);
+
+    const sql = `
+      SELECT 
+        u.*,
+        COALESCE(
+          JSON_AGG(
+            JSON_BUILD_OBJECT('name', r.name, 'displayName', r.display_name)
+          ) FILTER (WHERE r.id IS NOT NULL),
+          '[]'
+        ) AS roles
+      FROM users u
+      LEFT JOIN user_roles ur ON ur.user_id = u.id AND ur.is_active = TRUE
+      LEFT JOIN roles r ON r.id = ur.role_id
+      ${where}
+      GROUP BY u.id
+      HAVING bool_or(r.name = 'customer') = TRUE
+      ORDER BY u.created_at DESC
+      LIMIT $${values.length - 1}
+      OFFSET $${values.length};
+    `;
+
+    const { rows } = await pool.query(sql, values);
+    return rows.map(rowToUser);
+  }
   async findByEmail(email: string): Promise<(User & { passwordHash?: string }) | null> {
     const sql = `
       SELECT 
@@ -97,6 +132,13 @@ class UserRepository {
     await pool.query(
       'UPDATE users SET last_login_at = NOW() WHERE id = $1',
       [userId]
+    );
+  }
+
+  async updateIsActive(userId: string, isActive: boolean): Promise<void> {
+    await pool.query(
+      'UPDATE users SET is_active = $1, updated_at = NOW() WHERE id = $2',
+      [isActive, userId]
     );
   }
 }

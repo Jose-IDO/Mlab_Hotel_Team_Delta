@@ -1,7 +1,21 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./ManageGuests.module.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 type GuestStatus = "Active" | "Blocked" | "Pending";
+
+type ApiUser = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  emailVerified: boolean;
+  isActive: boolean;
+  updatedAt: string | Date;
+  lastLoginAt?: string | Date;
+  roles?: Array<{ name: string; displayName: string }>;
+};
 
 type Guest = {
   id: string;
@@ -11,19 +25,51 @@ type Guest = {
   totalBookings: number;
   lastStay: string; // ISO or display date
   status: GuestStatus;
+  roles: string[];
 };
-
-const sampleGuests: Guest[] = [
-  { id: "G1001", name: "Alex Johnson", email: "alex.j@example.com", phone: "+1 555 0234", totalBookings: 6, lastStay: "2025-08-14", status: "Active" },
-  { id: "G1002", name: "Priya Patel", email: "priya.p@example.com", phone: "+44 20 7123 9876", totalBookings: 2, lastStay: "2025-07-01", status: "Pending" },
-  { id: "G1003", name: "Chen Wei", email: "chen.w@example.com", phone: "+86 21 1234 5678", totalBookings: 10, lastStay: "2025-09-28", status: "Active" },
-  { id: "G1004", name: "Maria Garcia", email: "maria.g@example.com", phone: "+34 91 123 4567", totalBookings: 1, lastStay: "2024-12-04", status: "Blocked" }
-];
 
 export const ManageGuests: React.FC = () => {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"" | GuestStatus>("");
-  const [data, setData] = useState<Guest[]>(sampleGuests);
+  const [data, setData] = useState<Guest[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
+  const API_URL = (import.meta as any).env.VITE_API_URL as string;
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_URL}/admin/users?limit=100`, {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : ''
+          }
+        });
+        const json = await res.json();
+        if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch users');
+        const users: ApiUser[] = json.data.users;
+        const mapped: Guest[] = users.map(u => ({
+          id: u.id,
+          name: `${u.firstName} ${u.lastName}`.trim(),
+          email: u.email,
+          phone: u.phone || '-',
+          totalBookings: 0,
+          lastStay: (u.lastLoginAt || u.updatedAt || new Date()).toString(),
+          status: u.isActive ? 'Active' : 'Blocked',
+          roles: (u.roles || []).map(r => r.name)
+        }));
+        setData(mapped);
+      } catch (e: any) {
+        setError(e.message || 'Failed to load users');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [API_URL, token]);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -39,12 +85,35 @@ export const ManageGuests: React.FC = () => {
     });
   }, [query, status, data]);
 
-  const toggleBlock = (id: string) => {
-    setData(prev =>
-      prev.map(g =>
-        g.id === id ? { ...g, status: g.status === "Blocked" ? "Active" : "Blocked" } : g
-      )
-    );
+  const toggleBlock = async (id: string) => {
+    const user = data.find(g => g.id === id);
+    if (!user) return;
+
+    const endpoint = user.status === "Blocked" ? 'activate' : 'deactivate';
+    
+    try {
+      const res = await fetch(`${API_URL}/admin/users/${id}/${endpoint}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || `Failed to ${endpoint} user`);
+      }
+
+      // Update local state
+      setData(prev =>
+        prev.map(g =>
+          g.id === id ? { ...g, status: g.status === "Blocked" ? "Active" : "Blocked" } : g
+        )
+      );
+    } catch (e: any) {
+      alert(e.message || 'Failed to update user status');
+    }
   };
 
   return (
@@ -72,6 +141,8 @@ export const ManageGuests: React.FC = () => {
       </div>
 
       <section className={styles.section}>
+        {loading && (<div style={{ padding: 16 }}>Loading users…</div>)}
+        {error && (<div style={{ padding: 16, color: '#b00020' }}>{error}</div>)}
         <h3 className={styles.subtitle}>Guest Directory</h3>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
@@ -81,8 +152,8 @@ export const ManageGuests: React.FC = () => {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
-                <th>Total Bookings</th>
-                <th>Last Stay</th>
+                <th>Roles</th>
+                <th>Last Login</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -94,8 +165,8 @@ export const ManageGuests: React.FC = () => {
                   <td className={styles.truncate}>{g.name}</td>
                   <td className={styles.truncate}>{g.email}</td>
                   <td className={styles.truncate}>{g.phone}</td>
-                  <td className={styles.numeric}>{g.totalBookings}</td>
-                  <td>{new Date(g.lastStay).toLocaleDateString()}</td>
+                  <td className={styles.truncate}>{g.roles.join(', ') || '-'}</td>
+                  <td>{g.lastStay ? new Date(g.lastStay).toLocaleString() : '-'}</td>
                   <td>
                     <span
                       className={`${styles.statusBadge} ${
@@ -111,12 +182,12 @@ export const ManageGuests: React.FC = () => {
                   </td>
                   <td className={styles.nowrap}>
                     <button className={styles.viewBtn}>View</button>
-                    <button className={styles.editBtn}>Edit</button>
                     <button
                       className={g.status === "Blocked" ? styles.restoreBtn : styles.deactivateBtn}
                       onClick={() => toggleBlock(g.id)}
+                      disabled={loading}
                     >
-                      {g.status === "Blocked" ? "Unblock" : "Block"}
+                      {g.status === "Blocked" ? "Activate" : "Deactivate"}
                     </button>
                   </td>
                 </tr>
