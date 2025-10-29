@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import styles from './LandingPage.module.css'
 import SearchSection from "../../Components/SearchSection/SearchSection"
 import DealsSection from '../../Components/DealSection/DealSection'
+import LandingSections from "../../Components/LandingSections/LandingSections"
 import santorini1 from '../../assets/Santorini_1.jpg'
 import santorini2 from '../../assets/Santorini_2.jpg'
 import santorini3 from '../../assets/Santorini_3.jpg'
@@ -77,11 +78,11 @@ export const LandingPage = () => {
           </div>
 
         </div>
-        <button className={styles.viewAllBtn}>
-          View All
-        </button>
 
       </div>
+
+      {/* ---------- NEW SECTIONS: ADDRESS, EVENTS, FOOTER ---------- */}
+      <LandingSections />
     </div>
   )
 }
