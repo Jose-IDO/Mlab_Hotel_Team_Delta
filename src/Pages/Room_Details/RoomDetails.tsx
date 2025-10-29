@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./RoomDetails.module.css";
 import { useParams } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
+import { Star } from "lucide-react";
 
 import room1 from "../../assets/room1.jpg";
 import room2 from "../../assets/room1B.jpg";
@@ -26,6 +27,10 @@ import damageIcon from "../../assets/administrative-fine.png";
 
 import calendarIcon from "../../assets/calendar.png";
 import peopleIcon from "../../assets/people.png";
+
+import profileIcon from "../../assets/user.png";
+import likeIcon from "../../assets/like.png";
+import dislikeIcon from "../../assets/dont-like.png";
 
 interface Room {
   id: number;
@@ -125,6 +130,102 @@ const RoomDetails: React.FC = () => {
       <span>2 Adults, 0 Children • 1 Room</span>
     </div>
   </div>
+
+<div className={styles.reviewsSection}>
+  <h2>Reviews & Ratings</h2>
+
+  <div className={styles.reviewsRow}>
+    <div className={styles.reviewsContainer}>
+      {/* Review 1 */}
+      <div className={styles.reviewCard}>
+        <div className={styles.reviewHeader}>
+          <img src={profileIcon} alt="User 1" className={styles.profileImg} />
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>Maluleke Florence</span>
+            <div className={styles.userRating}>
+              {[1,2,3,4,5].map((i) => (
+                <Star key={i} size={16} className={styles.star} />
+              ))}
+            </div>
+          </div>
+          <span className={styles.reviewDate}>August 18, 2025</span>
+        </div>
+        <p className={styles.reviewMessage}>
+          Amazing room! Very clean, comfortable, and the staff were friendly.
+        </p>
+        <div className={styles.reviewActions}>
+          <button className={styles.likeBtn}><img src={likeIcon} alt="Like" /> Like</button>
+          <button className={styles.dislikeBtn}><img src={dislikeIcon} alt="Dislike" /> Dislike</button>
+        </div>
+      </div>
+
+      {/* Review 2 */}
+      <div className={styles.reviewCard}>
+        <div className={styles.reviewHeader}>
+          <img src={profileIcon} alt="User 2" className={styles.profileImg} />
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>Kgopotso Lethole</span>
+            <div className={styles.userRating}>
+              {[1,2,3,4].map((i) => <Star key={i} size={16} className={styles.star} />)}
+            </div>
+          </div>
+          <span className={styles.reviewDate}>Nov 20, 2025</span>
+        </div>
+        <p className={styles.reviewMessage}>
+          Great view from the balcony and the WiFi was excellent!
+        </p>
+        <div className={styles.reviewActions}>
+          <button className={styles.likeBtn}><img src={likeIcon} alt="Like" /> Like</button>
+          <button className={styles.dislikeBtn}><img src={dislikeIcon} alt="Dislike" /> Dislike</button>
+        </div>
+      </div>
+
+      {/* Review 3 */}
+      <div className={styles.reviewCard}>
+        <div className={styles.reviewHeader}>
+          <img src={profileIcon} alt="User 3" className={styles.profileImg} />
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>Alick Macheso</span>
+            <div className={styles.userRating}>
+              {[1,2,3].map((i) => <Star key={i} size={16} className={styles.star} />)}
+            </div>
+          </div>
+          <span className={styles.reviewDate}>Nov 22, 2025</span>
+        </div>
+        <p className={styles.reviewMessage}>
+          Comfortable bed and excellent room service. Highly recommended!
+        </p>
+        <div className={styles.reviewActions}>
+          <button className={styles.likeBtn}><img src={likeIcon} alt="Like" /> Like</button>
+          <button className={styles.dislikeBtn}><img src={dislikeIcon} alt="Dislike" /> Dislike</button>
+        </div>
+      </div>
+
+      {/* Review 4 */}
+      <div className={styles.reviewCard}>
+        <div className={styles.reviewHeader}>
+          <img src={profileIcon} alt="User 4" className={styles.profileImg} />
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>Michael Jackson</span>
+            <div className={styles.userRating}>
+              {[1,2,3,4,5].map((i) => <Star key={i} size={16} className={styles.star} />)}
+            </div>
+          </div>
+          <span className={styles.reviewDate}>Nov 25, 2025</span>
+        </div>
+        <p className={styles.reviewMessage}>
+          Very spacious room and excellent amenities. Loved the pool!
+        </p>
+        <div className={styles.reviewActions}>
+          <button className={styles.likeBtn}><img src={likeIcon} alt="Like" /> Like</button>
+          <button className={styles.dislikeBtn}><img src={dislikeIcon} alt="Dislike" /> Dislike</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+
 </div>
 
         {/* ---------- IMAGE OVERLAY MODAL ---------- */}
