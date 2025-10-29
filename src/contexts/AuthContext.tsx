@@ -3,16 +3,24 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface User {
   id: string;
   email: string;
-  name: string;
-  role: 'customer' | 'admin';
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  profileImageUrl?: string;
+  emailVerified: boolean;
+  isActive: boolean;
+  roles?: Array<{ name: string; displayName: string }>;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
-  signup: (email: string, password: string, name: string) => boolean;
+  token: string | null;
+  login: (email: string, password: string) => Promise<boolean>;
+  signup: (firstName: string, lastName: string, email: string, phone: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,60 +35,107 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const savedUser = localStorage.getItem('hotel_user');
-    if (savedUser) {
+    const savedToken = localStorage.getItem('hotel_token');
+    if (savedUser && savedToken) {
       setUser(JSON.parse(savedUser));
+      setToken(savedToken);
     }
   }, []);
 
-  const login = (email: string, password: string): boolean => {
-    const users = JSON.parse(localStorage.getItem('hotel_users') || '[]');
-    const foundUser = users.find((u: any) => u.email === email && u.password === password);
-    
-    if (foundUser) {
-      const userData = { id: foundUser.id, email: foundUser.email, name: foundUser.name, role: foundUser.role as 'customer' | 'admin' };
-      setUser(userData);
-      localStorage.setItem('hotel_user', JSON.stringify(userData));
-      return true;
-    }
-    return false;
-  };
+  const login = async (email: string, password: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
 
-  const signup = (email: string, password: string, name: string): boolean => {
-    const users = JSON.parse(localStorage.getItem('hotel_users') || '[]');
-    
-    if (users.find((u: any) => u.email === email)) {
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        setError(data.error || 'Login failed');
+        setLoading(false);
+        return false;
+      }
+
+      const { user: userData, token: authToken } = data.data;
+      setUser(userData);
+      setToken(authToken);
+      localStorage.setItem('hotel_user', JSON.stringify(userData));
+      localStorage.setItem('hotel_token', authToken);
+      setLoading(false);
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Network error');
+      setLoading(false);
       return false;
     }
+  };
 
-    const newUser = {
-      id: Date.now().toString(),
-      email,
-      password,
-      name,
-      role: 'customer'
-    };
+  const signup = async (
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    password: string
+  ): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
 
-    users.push(newUser);
-    localStorage.setItem('hotel_users', JSON.stringify(users));
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ firstName, lastName, email, phone, password }),
+      });
 
-    const userData = { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role as 'customer' | 'admin' };
-    setUser(userData);
-    localStorage.setItem('hotel_user', JSON.stringify(userData));
-    return true;
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        setError(data.error || 'Registration failed');
+        setLoading(false);
+        return false;
+      }
+
+      const { user: userData, token: authToken } = data.data;
+      setUser(userData);
+      setToken(authToken);
+      localStorage.setItem('hotel_user', JSON.stringify(userData));
+      localStorage.setItem('hotel_token', authToken);
+      setLoading(false);
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Network error');
+      setLoading(false);
+      return false;
+    }
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem('hotel_user');
+    localStorage.removeItem('hotel_token');
   };
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user && !!token;
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, token, login, signup, logout, isAuthenticated, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

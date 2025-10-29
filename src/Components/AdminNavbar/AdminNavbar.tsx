@@ -33,7 +33,7 @@ export const AdminNavbar: React.FC = () => {
             alt="Admin Profile" 
             className={styles.profilePicture}
           />  
-          <span>{user?.name || 'Admin'}</span>
+          <span>{(user as any)?.name || 'Admin'}</span>
           <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
         </div>
       </div>

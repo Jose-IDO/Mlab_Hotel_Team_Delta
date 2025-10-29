@@ -12,7 +12,7 @@ const SignIn: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, error } = useAuth();
   const navigate = useNavigate();
 
   const validate = () => {
@@ -31,30 +31,37 @@ const SignIn: React.FC = () => {
     return ok;
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
 
-    setTimeout(() => {
-      const loginSuccess = login(email, password);
-      if (loginSuccess) {
+    try {
+      const success = await login(email, password);
+      if (success) {
         // Get the logged-in user to check their role
         const savedUser = localStorage.getItem('hotel_user');
         if (savedUser) {
           const userData = JSON.parse(savedUser);
-          // Redirect based on user role
-          if (userData.role === 'admin') {
+          // Check if user has admin or hotel_manager role
+          const hasAdminRole = userData.roles?.some(
+            (role: any) => role.name === 'super_admin' || role.name === 'hotel_manager'
+          );
+          
+          if (hasAdminRole) {
             navigate('/admin');
           } else {
             navigate('/dashboard');
           }
         }
       } else {
-        setPasswordError('Invalid email or password');
-        setLoading(false);
+        setPasswordError(error || 'Invalid email or password');
       }
-    }, 600);
+    } catch (err) {
+      setPasswordError('Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

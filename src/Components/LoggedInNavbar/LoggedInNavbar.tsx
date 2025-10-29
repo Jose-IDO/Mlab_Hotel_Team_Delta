@@ -46,7 +46,7 @@ export const LoggedInNavbar = () => {
         {isAuthenticated ? (
           <>
             <div className={styles.userInfo}>
-              <span className={styles.userName}>{user?.name || 'User'}</span>
+              <span className={styles.userName}>{user ? `${user.firstName} ${user.lastName}` : 'User'}</span>
               <img src={SouthAfricaFlag} alt="South Africa" className={styles.flagIcon} />
             </div>
             <button className={styles.logoutBtn} onClick={handleLogout}>

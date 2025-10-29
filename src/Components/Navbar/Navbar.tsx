@@ -24,7 +24,13 @@ export const Navbar: React.FC = () => {
   };
 
   const handleHomeClick = () => {
-    if (user?.role === 'admin') {
+    const adminRoles = ['super_admin', 'hotel_manager'];
+    const hasAdminRole = user?.roles?.some((r: any) => {
+      const roleName = typeof r === 'string' ? r : r?.name;
+      return adminRoles.includes(roleName);
+    });
+
+    if (hasAdminRole) {
       navigate('/admin');
     } else {
       navigate('/dashboard');
@@ -52,7 +58,7 @@ export const Navbar: React.FC = () => {
                   <li className={styles.homeIconWrapper} onClick={handleHomeClick}>
                     <img src={HomeIcon} alt="Home" className={styles.homeIcon} />
                   </li>
-                  <li>{user?.name}</li>
+                  <li>{user ? `${user.firstName} ${user.lastName}` : ''}</li>
                   <li className={styles.redButton} onClick={handleLogout}>Logout</li>
                 </>
               ) : (
