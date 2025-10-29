@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import roomRoutes from './routes/roomRoutes';
+import authRoutes from './routes/authRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './middleware/logger';
 
@@ -16,6 +17,7 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, message: 'Server is running' });
 });
 
+app.use('/auth', authRoutes);
 app.use('/admin/rooms', roomRoutes);
 
 // Error handling (must be last)

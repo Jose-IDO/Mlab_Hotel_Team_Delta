@@ -53,21 +53,25 @@ const SignUp: React.FC = () => {
     return ok;
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
 
-    setTimeout(() => {
-      const success = signup(`${firstName} ${lastName}`, email, password);
-      setLoading(false);
+    try {
+      const success = await signup(firstName, lastName, email, phone, password);
       if (success) {
-        alert('Sign-up successful! Please sign in.');
-        navigate('/signin');
+        alert('Sign-up successful! Redirecting to dashboard...');
+        // Redirect to dashboard after successful signup
+        navigate('/dashboard');
       } else {
-        setErrors({ email: 'Email already registered' });
+        setErrors({ email: 'Registration failed. Email may already be registered.' });
       }
-    }, 800);
+    } catch (err) {
+      setErrors({ email: 'Registration failed. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
