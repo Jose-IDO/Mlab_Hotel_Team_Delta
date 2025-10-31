@@ -208,6 +208,31 @@
   font-size: 1.1rem;
 }
 
+.filterSelect:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clearFiltersBtn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #F93448;
+  background: transparent;
+  color: #F93448;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.clearFiltersBtn:hover {
+  background: #F93448;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.3);
+}
+
 /* ---------- HEADER ---------- */
 .header {
   display: flex;

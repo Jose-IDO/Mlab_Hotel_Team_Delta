@@ -17,8 +17,7 @@ const SignUp: React.FC = () => {
   const [confirm, setConfirm] = useState('');
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
+  const { signup, loading, error } = useAuth();
   const navigate = useNavigate();
 
   const validate = () => {
@@ -54,29 +53,24 @@ const SignUp: React.FC = () => {
     return ok;
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    setLoading(true);
 
-    setTimeout(async () => {
-      const signupSuccess = await signup(firstName, lastName, email, phone, password);
-      if (signupSuccess) {
-        // Check if there's a pending booking
-        const pendingBooking = sessionStorage.getItem('pendingBooking');
-        if (pendingBooking) {
-          const bookingData = JSON.parse(pendingBooking);
-          sessionStorage.removeItem('pendingBooking');
-          navigate('/booking', { state: bookingData });
-        } else {
-          alert('Sign-up successful! Redirecting to dashboard...');
-          navigate('/dashboard');
-        }
+    const signupSuccess = await signup(firstName, lastName, email, phone, password);
+    if (signupSuccess) {
+      // Check if there's a pending booking
+      const pendingBooking = sessionStorage.getItem('pendingBooking');
+      if (pendingBooking) {
+        const bookingData = JSON.parse(pendingBooking);
+        sessionStorage.removeItem('pendingBooking');
+        navigate('/booking', { state: bookingData });
       } else {
-        setErrors({ email: 'Registration failed. Email may already be registered.' });
-        setLoading(false);
+        navigate('/dashboard');
       }
-    }, 600);
+    } else {
+      setErrors({ email: error || 'Registration failed. Email may already be registered.' });
+    }
   };
 
   return (

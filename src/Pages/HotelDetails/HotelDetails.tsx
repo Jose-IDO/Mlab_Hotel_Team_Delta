@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./HotelDetails.module.css";
 import { useNavigate } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
@@ -41,12 +41,25 @@ const HotelDetails: React.FC = () => {
   const [amenitiesOpen, setAmenitiesOpen] = useState(false);
   const [checkedAmenities, setCheckedAmenities] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [roomsData, setRoomsData] = useState<Array<{
+    id: string;
+    name: string;
+    type: string;
+    image: string;
+    adults: number;
+    kids: number;
+    price: number;
+    rating: number;
+    amenities: string[];
+  }>>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleFaq = (index: number) => {
     setExpandedFaq(expandedFaq === index ? null : index);
   };
 
-  const handleRoomClick = (roomId: number) => {
+  const handleRoomClick = (roomId: string) => {
     navigate(`/room-details/${roomId}`);
     window.scrollTo(0, 0);
   };
@@ -61,6 +74,18 @@ const HotelDetails: React.FC = () => {
     });
   };
 
+  const clearAllFilters = () => {
+    setSelectedRoomType("all");
+    setSelectedPriceRange("all");
+    setSelectedRating("all");
+    setCheckedAmenities([]);
+  };
+
+  const hasActiveFilters = selectedRoomType !== "all" || 
+                          selectedPriceRange !== "all" || 
+                          selectedRating !== "all" || 
+                          checkedAmenities.length > 0;
+
   // Hotel data - this can be replaced with API call later
   const hotelData = {
     name: "Delta Hotel",
@@ -69,70 +94,91 @@ const HotelDetails: React.FC = () => {
     galleryImages: [hotelImage1, hotelImage2, hotelImage3],
   };
 
-  // Rooms data with amenities and ratings (this can be replaced with API call later)
-  const allRoomsData = [
-    { 
-      id: 1, 
-      name: "Double Room", 
-      type: "Double",
-      image: room1, 
-      adults: 3, 
-      kids: 0, 
-      price: 1200,
-      rating: 3,
-      amenities: ["WiFi", "Air Conditioning"]
-    },
-    { 
-      id: 2, 
-      name: "Superior Double Room", 
-      type: "Double",
-      image: room2, 
-      adults: 2, 
-      kids: 0, 
-      price: 1470,
-      rating: 4,
-      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar"]
-    },
-    { 
-      id: 3, 
-      name: "Continental Room", 
-      type: "Suite",
-      image: room3, 
-      adults: 3, 
-      kids: 0, 
-      price: 1720,
-      rating: 4,
-      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar", "Balcony"]
-    },
-    { 
-      id: 4, 
-      name: "Family Room", 
-      type: "Family",
-      image: room4, 
-      adults: 3, 
-      kids: 3, 
-      price: 1950,
-      rating: 4,
-      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar", "Room Service"]
-    },
-    { 
-      id: 5, 
-      name: "Presidential Suite", 
-      type: "Suite",
-      image: room5, 
-      adults: 3, 
-      kids: 0, 
-      price: 2600,
-      rating: 5,
-      amenities: ["WiFi", "Air Conditioning", "TV", "Minibar", "Balcony", "Room Service", "Spa Access", "Pool"]
-    },
-  ];
+  // Fetch rooms from API and map to UI structure
+  useEffect(() => {
+    const API_URL = (import.meta as any).env.VITE_API_URL as string;
+    const fetchRooms = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_URL}/admin/rooms?status=active`);
+        const json = await res.json();
+        if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch rooms');
+        const rooms = json.data as Array<{
+          id: string;
+          roomName: string;
+          roomType: string;
+          price: number;
+          maxGuests: number;
+          amenities: string[];
+        }>;
 
-  // List of all amenities
-  const allAmenities = ["WiFi", "Air Conditioning", "TV", "Minibar", "Balcony", "Room Service", "Spa Access", "Pool"];
+        const pickImage = (type: string, name: string) => {
+          const t = (type || name || '').toLowerCase();
+          if (t.includes('presidential')) return room5;
+          if (t.includes('suite')) return room5;
+          if (t.includes('family')) return room4;
+          if (t.includes('superior')) return room3;
+          if (t.includes('double')) return room2;
+          return room1;
+        };
+
+        const mapped = rooms.map(r => ({
+          id: r.id,
+          name: r.roomName,
+          type: r.roomType,
+          image: pickImage(r.roomType, r.roomName),
+          adults: r.maxGuests ?? 2,
+          kids: 0,
+          price: Number(r.price) || 0,
+          rating: 4,
+          amenities: Array.isArray(r.amenities) ? r.amenities : []
+        }));
+        setRoomsData(mapped);
+      } catch (e: any) {
+        setError(e.message || 'Failed to load rooms');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  // List of all amenities - dynamically extracted from rooms
+  const allAmenities = useMemo(() => {
+    const amenitySet = new Set<string>();
+    roomsData.forEach(room => {
+      room.amenities.forEach(a => amenitySet.add(a));
+    });
+    return Array.from(amenitySet).sort();
+  }, [roomsData]);
+
+  // Extract unique room types from fetched data
+  const uniqueRoomTypes = useMemo(() => {
+    const types = new Set(roomsData.map(r => r.type).filter(Boolean));
+    return Array.from(types).sort();
+  }, [roomsData]);
+
+  // Extract price ranges dynamically
+  const priceRanges = useMemo(() => {
+    if (roomsData.length === 0) return [];
+    const prices = roomsData.map(r => r.price).sort((a, b) => a - b);
+    const min = prices[0];
+    const max = prices[prices.length - 1];
+    
+    // Create ranges
+    if (max <= 1500) return [{ label: `R${min} - R${max}`, value: `${min}-${max}` }];
+    
+    const ranges = [];
+    if (min < 1500) ranges.push({ label: 'R0 - R1500', value: '0-1500' });
+    if (max > 1500 && min < 2000) ranges.push({ label: 'R1501 - R2000', value: '1501-2000' });
+    if (max > 2000) ranges.push({ label: 'R2001+', value: '2001-99999' });
+    return ranges;
+  }, [roomsData]);
 
   // Filter rooms based on selected criteria
-  const filteredRooms = allRoomsData.filter(room => {
+  const filteredRooms = useMemo(() => roomsData.filter(room => {
     // Room Type filter
     if (selectedRoomType !== "all" && room.type !== selectedRoomType) {
       return false;
@@ -164,7 +210,7 @@ const HotelDetails: React.FC = () => {
     }
 
     return true;
-  });
+  }), [roomsData, selectedRoomType, selectedPriceRange, selectedRating, checkedAmenities]);
 
   // FAQ data - this can be replaced with API call later
   const faqData = [
@@ -240,7 +286,7 @@ const HotelDetails: React.FC = () => {
             
             {amenitiesOpen && (
               <div className={styles.amenitiesDropdownMenu}>
-                {allAmenities.map((amenity) => (
+                {allAmenities.length > 0 ? allAmenities.map((amenity) => (
                   <label key={amenity} className={styles.amenityOption}>
                     <input
                       type="checkbox"
@@ -250,7 +296,9 @@ const HotelDetails: React.FC = () => {
                     />
                     <span className={styles.amenityText}>{amenity}</span>
                   </label>
-                ))}
+                )) : (
+                  <div className={styles.amenityOption}>No amenities available</div>
+                )}
               </div>
             )}
           </div>
@@ -259,34 +307,47 @@ const HotelDetails: React.FC = () => {
             className={styles.filterSelect}
             value={selectedRoomType}
             onChange={(e) => setSelectedRoomType(e.target.value)}
+            disabled={roomsData.length === 0}
           >
             <option value="all">All Room Types</option>
-            <option value="Double">Double Room</option>
-            <option value="Suite">Suite</option>
-            <option value="Family">Family Room</option>
+            {uniqueRoomTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
           </select>
 
           <select 
             className={styles.filterSelect}
             value={selectedPriceRange}
             onChange={(e) => setSelectedPriceRange(e.target.value)}
+            disabled={roomsData.length === 0}
           >
             <option value="all">All Prices</option>
-            <option value="0-1500">R0 - R1500</option>
-            <option value="1501-2000">R1501 - R2000</option>
-            <option value="2001-99999">R2001+</option>
+            {priceRanges.map((range) => (
+              <option key={range.value} value={range.value}>{range.label}</option>
+            ))}
           </select>
 
           <select 
             className={styles.filterSelect}
             value={selectedRating}
             onChange={(e) => setSelectedRating(e.target.value)}
+            disabled={roomsData.length === 0}
           >
             <option value="all">All Ratings</option>
             <option value="5">5 Stars</option>
             <option value="4">4 Stars</option>
             <option value="3">3 Stars</option>
           </select>
+
+          {hasActiveFilters && (
+            <button 
+              className={styles.clearFiltersBtn}
+              onClick={clearAllFilters}
+              type="button"
+            >
+              Clear Filters
+            </button>
+          )}
         </div>
 
         {/* ---------- HEADER SECTION ---------- */}
@@ -318,8 +379,10 @@ const HotelDetails: React.FC = () => {
         {/* ---------- ROOMS GRID ---------- */}
         <section className={styles.roomsSection}>
           <h2 className={styles.sectionTitle}>
-            Available Rooms {filteredRooms.length < allRoomsData.length && `(${filteredRooms.length} of ${allRoomsData.length})`}
+            Available Rooms {roomsData.length > 0 && filteredRooms.length < roomsData.length && `(${filteredRooms.length} of ${roomsData.length})`}
           </h2>
+          {loading && <div style={{padding: 12}}>Loading rooms…</div>}
+          {error && !loading && <div style={{padding: 12, color:'#b00020'}}>{error}</div>}
           <div className={styles.roomsGrid}>
             {filteredRooms.length > 0 ? filteredRooms.map((room) => (
               <div 

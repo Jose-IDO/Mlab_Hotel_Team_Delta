@@ -106,6 +106,70 @@
   margin-top: 6px;
 }
 
+/* Room Details Section */
+.roomDetailsSection {
+  margin: 30px 0;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.roomDetailsSection h2 {
+  font-size: 1.6rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.detailItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.detailIcon {
+  font-size: 32px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.detailContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detailLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailValue {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
 /* Booking Form Styles */
 .bookingForm {
   background: #f9f9f9;
@@ -227,6 +291,12 @@
   text-align: center;
   color: #555;
   font-size: 14px;
+  gap: 8px;
+}
+
+.amenity svg {
+  color: #F93448;
+  flex-shrink: 0;
 }
 
 .amenity img {
@@ -265,6 +335,11 @@
   font-size: 14px;
 }
 
+.rule svg {
+  color: #F93448;
+  flex-shrink: 0;
+}
+
 .rule img {
   width: 50px;
   height: 50px;
@@ -293,9 +368,8 @@
 }
 
 .availabilityIcon {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
+  flex-shrink: 0;
+  color: #F93448;
 }
 
 @media (max-width: 768px) {

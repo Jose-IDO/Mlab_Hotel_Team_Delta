@@ -12,8 +12,7 @@ const SignIn: React.FC = () => {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login, error } = useAuth();
+  const { login, loading, error, user } = useAuth();
   const navigate = useNavigate();
 
   const validate = () => {
@@ -32,50 +31,28 @@ const SignIn: React.FC = () => {
     return ok;
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🔐 LOGIN ATTEMPT STARTED');
-    console.log('📧 Email entered:', email);
-    console.log('🔑 Password entered:', password ? '***' + password.slice(-3) : 'empty');
     
     if (!validate()) {
-      console.log('❌ VALIDATION FAILED');
       return;
     }
-    
-    console.log('✅ VALIDATION PASSED');
-    setLoading(true);
 
-    setTimeout(() => {
-      console.log('⏳ Attempting login...');
-      const loginSuccess = login(email, password);
-      console.log('🎯 Login result:', loginSuccess ? 'SUCCESS' : 'FAILED');
+    const success = await login(email, password);
+    
+    if (success && user) {
+      // Check if user has admin roles
+      const adminRoles = ['super_admin', 'hotel_manager'];
+      const isAdmin = user.roles?.some(r => adminRoles.includes(r.name));
       
-      if (loginSuccess) {
-        const savedUser = localStorage.getItem('hotel_user');
-        console.log('💾 User data from localStorage:', savedUser);
-        
-        if (savedUser) {
-          const userData = JSON.parse(savedUser);
-          console.log('👤 Parsed user data:', userData);
-          console.log('🎭 User role:', userData.role);
-          
-          if (userData.role === 'admin') {
-            console.log('🔴 ADMIN DETECTED - Navigating to /admin');
-            navigate('/admin');
-          } else {
-            console.log('🔵 CUSTOMER DETECTED - Navigating to /dashboard');
-            navigate('/dashboard');
-          }
-        } else {
-          console.log('⚠️ WARNING: Login successful but no user data in localStorage');
-        }
+      if (isAdmin) {
+        navigate('/admin');
       } else {
-        console.log('❌ LOGIN FAILED - Invalid credentials');
-        setPasswordError('Invalid email or password');
-        setLoading(false);
+        navigate('/dashboard');
       }
-    }, 600);
+    } else {
+      setPasswordError(error || 'Invalid email or password');
+    }
   };
 
   return (
