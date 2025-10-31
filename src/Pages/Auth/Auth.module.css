@@ -2,6 +2,44 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  position: relative;
+}
+
+/* Home Button with Logo */
+.homeButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  padding: 8px;
+}
+
+.homeButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(249, 52, 72, 0.3);
+  background: rgba(255, 255, 255, 1);
+}
+
+.homeButton:hover .homeIcon {
+  filter: drop-shadow(0 0 8px rgba(249, 52, 72, 0.8));
+}
+
+.homeIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  transition: filter 0.3s ease;
 }
 
 .leftPanel {

@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { isEmail, isPhone, isStrongPassword } from '../../utils/validation';
 import styles from './Auth.module.css';
+import HomeIcon from '../../assets/home-icon-silhouette-svgrepo-com.svg';
 
 const SignUp: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -53,29 +54,42 @@ const SignUp: React.FC = () => {
     return ok;
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
 
-    try {
-      const success = await signup(firstName, lastName, email, phone, password);
-      if (success) {
-        alert('Sign-up successful! Redirecting to dashboard...');
-        // Redirect to dashboard after successful signup
-        navigate('/dashboard');
+    setTimeout(async () => {
+      const signupSuccess = await signup(firstName, lastName, email, phone, password);
+      if (signupSuccess) {
+        // Check if there's a pending booking
+        const pendingBooking = sessionStorage.getItem('pendingBooking');
+        if (pendingBooking) {
+          const bookingData = JSON.parse(pendingBooking);
+          sessionStorage.removeItem('pendingBooking');
+          navigate('/booking', { state: bookingData });
+        } else {
+          alert('Sign-up successful! Redirecting to dashboard...');
+          navigate('/dashboard');
+        }
       } else {
         setErrors({ email: 'Registration failed. Email may already be registered.' });
+        setLoading(false);
       }
-    } catch (err) {
-      setErrors({ email: 'Registration failed. Please try again.' });
-    } finally {
-      setLoading(false);
-    }
+    }, 600);
   };
 
   return (
     <div className={styles.container}>
+      {/* Home Button with Icon */}
+      <button 
+        className={styles.homeButton} 
+        onClick={() => navigate('/')}
+        aria-label="Go to home page"
+      >
+        <img src={HomeIcon} alt="Home" className={styles.homeIcon} />
+      </button>
+
       <div className={styles.leftPanel}>
         <div className={styles.leftOverlay}>
           <div className={styles.leftContent}>

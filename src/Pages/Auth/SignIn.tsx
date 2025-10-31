@@ -5,6 +5,7 @@ import GoogleButton from '../../Components/Shared/GoogleButton';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
+import HomeIcon from '../../assets/home-icon-silhouette-svgrepo-com.svg';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -31,41 +32,63 @@ const SignIn: React.FC = () => {
     return ok;
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    console.log('🔐 LOGIN ATTEMPT STARTED');
+    console.log('📧 Email entered:', email);
+    console.log('🔑 Password entered:', password ? '***' + password.slice(-3) : 'empty');
+    
+    if (!validate()) {
+      console.log('❌ VALIDATION FAILED');
+      return;
+    }
+    
+    console.log('✅ VALIDATION PASSED');
     setLoading(true);
 
-    try {
-      const success = await login(email, password);
-      if (success) {
-        // Get the logged-in user to check their role
+    setTimeout(() => {
+      console.log('⏳ Attempting login...');
+      const loginSuccess = login(email, password);
+      console.log('🎯 Login result:', loginSuccess ? 'SUCCESS' : 'FAILED');
+      
+      if (loginSuccess) {
         const savedUser = localStorage.getItem('hotel_user');
+        console.log('💾 User data from localStorage:', savedUser);
+        
         if (savedUser) {
           const userData = JSON.parse(savedUser);
-          // Check if user has admin or hotel_manager role
-          const hasAdminRole = userData.roles?.some(
-            (role: any) => role.name === 'super_admin' || role.name === 'hotel_manager'
-          );
+          console.log('👤 Parsed user data:', userData);
+          console.log('🎭 User role:', userData.role);
           
-          if (hasAdminRole) {
+          if (userData.role === 'admin') {
+            console.log('🔴 ADMIN DETECTED - Navigating to /admin');
             navigate('/admin');
           } else {
+            console.log('🔵 CUSTOMER DETECTED - Navigating to /dashboard');
             navigate('/dashboard');
           }
+        } else {
+          console.log('⚠️ WARNING: Login successful but no user data in localStorage');
         }
       } else {
-        setPasswordError(error || 'Invalid email or password');
+        console.log('❌ LOGIN FAILED - Invalid credentials');
+        setPasswordError('Invalid email or password');
+        setLoading(false);
       }
-    } catch (err) {
-      setPasswordError('Login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    }, 600);
   };
 
   return (
     <div className={styles.container}>
+      {/* Home Button with Icon */}
+      <button 
+        className={styles.homeButton} 
+        onClick={() => navigate('/')}
+        aria-label="Go to home page"
+      >
+        <img src={HomeIcon} alt="Home" className={styles.homeIcon} />
+      </button>
+
       <div className={styles.leftPanel}>
         <div className={styles.leftOverlay}>
           <div className={styles.leftContent}>

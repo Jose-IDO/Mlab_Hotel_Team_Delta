@@ -14,6 +14,8 @@ import HotelDetails from "./Pages/HotelDetails/HotelDetails";
 
 // Import BookingPage from the correct folder
 import BookingPage from './Pages/Booking_Page/BookingPage';
+import PaymentPage from './Pages/Payment/PaymentPage';
+import BookingConfirmation from './Pages/BookingConfirmation/BookingConfirmation';
 
 function AppContent() {
   const location = useLocation();
@@ -32,12 +34,28 @@ function AppContent() {
         <Route path="/hotel-details/:id" element={<HotelDetails />} />
         <Route path="/room-details/:id" element={<RoomDetails />} />
 
-        {/* Protected Booking Page */}
+        {/* Protected Booking Flow */}
         <Route
           path="/booking"
           element={
             <ProtectedRoute>
               <BookingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute>
+              <PaymentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking-confirmation"
+          element={
+            <ProtectedRoute>
+              <BookingConfirmation />
             </ProtectedRoute>
           }
         />

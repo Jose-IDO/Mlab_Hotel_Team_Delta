@@ -7,6 +7,81 @@
   padding-top: 80px; /* space for fixed navbar */
 }
 
+/* Booking Form Card */
+.bookingFormCard {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.dateInput,
+.selectInput {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #1f2937;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dateInput:focus,
+.selectInput:focus {
+  border-color: #f93448;
+  box-shadow: 0 0 0 3px rgba(249, 52, 72, 0.1);
+}
+
+.priceBreakdown {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.totalPrice {
+  color: #f93448;
+  font-size: 1.2rem;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -128,23 +203,15 @@
 }
 
 /* ---- ADD GUEST BUTTON (red outline) ---- */
-.addGuestBtn {
-  align-self: flex-start;
-  background: transparent;
-  border: 2px solid #f93448;
-  color: #f93448;
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 1.5rem;
-}
-
-.addGuestBtn:hover {
-  background: #f93448;
-  color: white;
+.guestInfo {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #1e40af;
+  line-height: 1.5;
 }
 
 /* ---- Responsive ------------------------------------------------ */
