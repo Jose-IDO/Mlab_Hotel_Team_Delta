@@ -48,7 +48,7 @@ const SignIn: React.FC = () => {
       if (isAdmin) {
         navigate('/admin');
       } else {
-        navigate('/dashboard');
+        navigate('/hotel-details');
       }
     } else {
       setPasswordError(error || 'Invalid email or password');

@@ -31,7 +31,7 @@ function AppContent() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/hotel-details/:id" element={<HotelDetails />} />
+        <Route path="/hotel-details" element={<HotelDetails />} />
         <Route path="/room-details/:id" element={<RoomDetails />} />
 
         {/* Protected Booking Flow */}

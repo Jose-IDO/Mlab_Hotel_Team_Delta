@@ -38,7 +38,7 @@ export const Navbar: React.FC = () => {
   };
 
   const handleRoomsClick = () => {
-    navigate('/rooms');
+    navigate('/hotel-details');
   };
 
   return (
@@ -55,6 +55,7 @@ export const Navbar: React.FC = () => {
             <ul className={`${styles.navLinks} ${menuOpen ? styles.showMenu : ""}`}>
               {isAuthenticated ? (
                 <>
+                  <li onClick={handleRoomsClick}>Rooms</li>
                   <li className={styles.homeIconWrapper} onClick={handleHomeClick}>
                     <img src={HomeIcon} alt="Home" className={styles.homeIcon} />
                   </li>

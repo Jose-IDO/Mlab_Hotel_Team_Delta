@@ -21,12 +21,23 @@ export const LoggedInNavbar = () => {
     navigate('/signup');
   };
 
+  const handleBrowseRooms = () => {
+    navigate('/hotel-details');
+  };
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.logoSection} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
         <img src={Logo} alt="Delta Hotel Logo" style={{width: '40px', height: '40px'}} />
         <h2 className={styles.brandName}>Delta Hotels</h2>
       </div>
+
+      {/* Navigation Links
+      <div className={styles.navLinks}>
+        <button className={styles.navLink} onClick={handleBrowseRooms}>
+          Browse Rooms
+        </button>
+      </div> */}
 
       <div className={styles.searchBar}>
         <input 

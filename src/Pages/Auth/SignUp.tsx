@@ -66,7 +66,7 @@ const SignUp: React.FC = () => {
         sessionStorage.removeItem('pendingBooking');
         navigate('/booking', { state: bookingData });
       } else {
-        navigate('/dashboard');
+        navigate('/hotel-details');
       }
     } else {
       setErrors({ email: error || 'Registration failed. Email may already be registered.' });
