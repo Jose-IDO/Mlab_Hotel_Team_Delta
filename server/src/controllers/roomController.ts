@@ -1,4 +1,3 @@
-// roomController.ts
 import { Request, Response } from 'express';
 import { roomService } from '../services/roomService';
 import { validateRoomPayload } from '../utils/validators';
@@ -114,7 +113,7 @@ export class RoomController {
     }
   }
 
-  // ✅ NEW METHOD: Fetch reviews for a specific room
+  // Fetch reviews for a specific room
   async getRoomReviews(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -128,6 +127,25 @@ export class RoomController {
       res.json({ ok: true, data: reviews });
     } catch (error) {
       res.status(500).json({ ok: false, error: 'Failed to fetch room reviews' });
+    }
+  }
+
+  // Add a review to a room
+  async addRoomReview(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params; // room ID
+      const { name, rating, comment } = req.body; // <- use 'name' to match service
+
+      if (!name || !rating || !comment) {
+        res.status(400).json({ ok: false, error: 'Name, rating, and comment are required' });
+        return;
+      }
+
+      const newReview = await roomService.addRoomReview(id, { name, rating, comment });
+      res.status(201).json({ ok: true, data: newReview });
+    } catch (error) {
+      console.error('Error adding room review:', error);
+      res.status(500).json({ ok: false, error: 'Failed to add room review' });
     }
   }
 }

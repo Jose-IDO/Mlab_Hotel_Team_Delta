@@ -612,38 +612,53 @@
 .dislikeBtn:hover {
   background: #f0d4d4;
 }
-.reviewsSection {
-  margin-top: 2rem;
+/* Review Form Inputs - Styled like Booking Form */
+.reviewForm select,
+.reviewForm textarea {
+  width: 100%;
+  padding: 10px 12px;       /* same as booking form inputs */
+  border: 1px solid #ccc;
+  border-radius: 12px;      /* rounded corners like booking form */
+  font-size: 14px;          /* consistent font size */
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.reviewsContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.reviewForm select:hover,
+.reviewForm textarea:hover {
+  border-color: #f93448;
 }
 
-.review {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #fafafa;
+.reviewForm select:focus,
+.reviewForm textarea:focus {
+  border-color: #f93448;
+  box-shadow: 0 0 0 3px rgba(249, 52, 72, 0.1);
 }
 
-.reviewHeader {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
+/* Review Form Submit Button - Styled like Book Now button */
+.reviewForm button {
+  margin-top: 12px;
+  padding: 14px 32px;
+  background-color: #f93448;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  width: 100%;
 }
 
-.reviewRating {
-  color: #f59e0b;
+.reviewForm button:hover {
+  background-color: #d62639;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.3);
 }
 
-.reviewComment {
-  margin-bottom: 0.5rem;
-}
-
-.reviewDate {
-  font-size: 0.85rem;
-  color: #666;
+.reviewForm button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

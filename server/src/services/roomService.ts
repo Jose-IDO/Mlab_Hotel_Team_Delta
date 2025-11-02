@@ -34,6 +34,19 @@ export class RoomService {
   async getRoomReviews(roomId: string): Promise<Review[]> {
     return reviewRepository.findByRoomId(roomId);
   }
+
+  async addRoomReview(
+    roomId: string,
+    review: { name: string; rating: number; comment: string } // <- use "name"
+  ): Promise<Review> {
+    return reviewRepository.create({
+      roomId,
+      name: review.name,          // must match repository
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: new Date(),      // required for timestamp
+    });
+  }
 }
 
 export const roomService = new RoomService();

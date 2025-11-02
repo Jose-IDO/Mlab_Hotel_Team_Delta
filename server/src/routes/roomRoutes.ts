@@ -4,6 +4,7 @@ import { roomController } from '../controllers/roomController';
 const router = Router();
 
 router.get('/:id/reviews', roomController.getRoomReviews.bind(roomController));
+router.post('/:id/reviews', roomController.addRoomReview.bind(roomController));
 router.get('/', roomController.getAllRooms.bind(roomController));
 router.get('/:id', roomController.getRoomById.bind(roomController));
 router.post('/', roomController.createRoom.bind(roomController));
