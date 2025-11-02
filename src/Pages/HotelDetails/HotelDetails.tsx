@@ -80,6 +80,13 @@ const HotelDetails: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
+  const scrollToMap = () => {
+    const el = document.getElementById('hotel-map');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const handleAmenityToggle = (amenity: string) => {
     setCheckedAmenities(prev => {
       if (prev.includes(amenity)) {
@@ -395,7 +402,7 @@ const HotelDetails: React.FC = () => {
             <p className={styles.hotelAddress}>{hotelData.address}</p>
           </div>
           <div className={styles.headerActions}>
-            <button className={styles.mapBtn}>View on Map</button>
+            <button className={styles.mapBtn} onClick={scrollToMap}>View on Map</button>
             <button className={styles.favoriteBtn}>♡ Added to favorites</button>
           </div>
         </header>
@@ -451,45 +458,72 @@ const HotelDetails: React.FC = () => {
           </div>
         </section>
 
-        {/* ---------- FAQ SECTION ---------- */}
-        <section className={styles.faqSection}>
-          <h2 className={styles.sectionTitle}>Frequently Asked Questions</h2>
-          <div className={styles.faqList}>
-            {faqData.map((faq, index) => (
-              <div key={index} className={styles.faqItem}>
-                <div 
-                  className={styles.faqHeader}
-                  onClick={() => toggleFaq(index)}
-                >
-                  <h4>{faq.question}</h4>
-                  <button 
-                    className={`${styles.faqToggle} ${expandedFaq === index ? styles.expanded : ''}`}
-                    aria-label="Toggle answer"
+        {/* ---------- FAQ + MAP SIDE-BY-SIDE ---------- */}
+        <section className={styles.infoSplitSection}>
+          {/* FAQ */}
+          <section className={styles.faqSection}>
+            <h2 className={styles.sectionTitle}>Frequently Asked Questions</h2>
+            <div className={styles.faqList}>
+              {faqData.map((faq, index) => (
+                <div key={index} className={styles.faqItem}>
+                  <div 
+                    className={styles.faqHeader}
+                    onClick={() => toggleFaq(index)}
                   >
-                    <svg 
-                      width="16" 
-                      height="16" 
-                      viewBox="0 0 16 16" 
-                      fill="none" 
-                      xmlns="http://www.w3.org/2000/svg"
-                      className={styles.arrow}
+                    <h4>{faq.question}</h4>
+                    <button 
+                      className={`${styles.faqToggle} ${expandedFaq === index ? styles.expanded : ''}`}
+                      aria-label="Toggle answer"
                     >
-                      <path 
-                        d="M4 6L8 10L12 6" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
+                      <svg 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 16 16" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={styles.arrow}
+                      >
+                        <path 
+                          d="M4 6L8 10L12 6" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  {expandedFaq === index && (
+                    <p className={styles.faqAnswer}>{faq.answer}</p>
+                  )}
                 </div>
-                {expandedFaq === index && (
-                  <p className={styles.faqAnswer}>{faq.answer}</p>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
+
+          {/* MAP */}
+          <section id="hotel-map" className={styles.mapSection}>
+            <h2 className={styles.sectionTitle}>Location</h2>
+            <div className={styles.mapContainer}>
+              <iframe
+                title={`${hotelData.name} location`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(`${hotelData.name}, ${hotelData.address}`)}&hl=en&z=15&output=embed`}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+            <div className={styles.mapActions}>
+              <a
+                className={styles.mapLinkBtn}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotelData.name}, ${hotelData.address}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open in Google Maps
+              </a>
+            </div>
+          </section>
         </section>
 
         {/* ---------- IMAGE OVERLAY MODAL ---------- */}
