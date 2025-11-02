@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styles from './AvailabilityCalendar.module.css';
+import { useAuth } from '../../contexts/AuthContext';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 interface RoomAvailability {
   roomId: string;
@@ -11,70 +14,10 @@ interface RoomAvailability {
 export const AvailabilityCalendar: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedRoom, setSelectedRoom] = useState<string>('all');
-
-  // Static room data
-  const rooms: RoomAvailability[] = [
-    {
-      roomId: 'R2001',
-      roomName: 'Ocean View Suite 101',
-      roomType: 'Suite',
-      dates: {
-        '2025-10-27': 'booked',
-        '2025-10-28': 'booked',
-        '2025-10-29': 'booked',
-        '2025-10-30': 'available',
-        '2025-10-31': 'maintenance',
-        '2025-11-01': 'available',
-        '2025-11-05': 'booked',
-        '2025-11-06': 'booked',
-      }
-    },
-    {
-      roomId: 'R2002',
-      roomName: 'Deluxe King 202',
-      roomType: 'Deluxe',
-      dates: {
-        '2025-10-27': 'available',
-        '2025-10-28': 'available',
-        '2025-10-29': 'booked',
-        '2025-10-30': 'booked',
-        '2025-10-31': 'booked',
-        '2025-11-01': 'booked',
-        '2025-11-02': 'available',
-        '2025-11-10': 'maintenance',
-      }
-    },
-    {
-      roomId: 'R2003',
-      roomName: 'Standard Double 305',
-      roomType: 'Standard',
-      dates: {
-        '2025-10-27': 'booked',
-        '2025-10-28': 'available',
-        '2025-10-29': 'available',
-        '2025-10-30': 'available',
-        '2025-10-31': 'available',
-        '2025-11-01': 'maintenance',
-        '2025-11-08': 'booked',
-        '2025-11-09': 'booked',
-      }
-    },
-    {
-      roomId: 'R2004',
-      roomName: 'Presidential Suite 401',
-      roomType: 'Presidential',
-      dates: {
-        '2025-10-27': 'available',
-        '2025-10-28': 'booked',
-        '2025-10-29': 'booked',
-        '2025-10-30': 'booked',
-        '2025-10-31': 'booked',
-        '2025-11-01': 'booked',
-        '2025-11-02': 'booked',
-        '2025-11-03': 'available',
-      }
-    }
-  ];
+  const [rooms, setRooms] = useState<RoomAvailability[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
 
   // Get days in month
   const getDaysInMonth = (date: Date) => {
@@ -112,9 +55,62 @@ export const AvailabilityCalendar: React.FC = () => {
     return room.dates[dateStr] || 'available';
   };
 
-  const filteredRooms = selectedRoom === 'all' 
-    ? rooms 
-    : rooms.filter(r => r.roomId === selectedRoom);
+  // Build weekly chunks (7 days) including leading empties
+  const buildWeekChunks = (room: RoomAvailability) => {
+    const leading = startingDayOfWeek; // 0-6 where 0=Sun
+    const cells: Array<{ key: string; status?: 'available'|'booked'|'maintenance'; day?: number } | null> = [];
+    for (let i = 0; i < leading; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) {
+      const status = getStatusForDate(room, d);
+      cells.push({ key: `${year}-${month}-${d}`, status, day: d });
+    }
+    // pad to multiple of 7
+    while (cells.length % 7 !== 0) cells.push(null);
+    // chunk
+    const weeks: typeof cells[] = [];
+    for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+    return weeks;
+  };
+
+  // Fetch availability for current month
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      if (!token) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const start = `${year}-${String(month + 1).padStart(2,'0')}-01`;
+        const endDate = new Date(year, month + 1, 0).getDate();
+        const end = `${year}-${String(month + 1).padStart(2,'0')}-${String(endDate).padStart(2,'0')}`;
+        const res = await fetch(`${API_URL}/bookings/admin/availability?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Server returned non-JSON response. Is the API running?');
+        }
+        const json = await res.json();
+        if (!res.ok || json.ok === false) throw new Error(json.error || 'Failed to load availability');
+        const data = (json.data || []) as Array<any>;
+        const mapped: RoomAvailability[] = data.map((r: any) => ({
+          roomId: r.roomId,
+          roomName: r.roomName,
+          roomType: r.roomType,
+          dates: r.dates || {}
+        }));
+        setRooms(mapped);
+      } catch (e: any) {
+        setError(e.message || 'Failed to load availability');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAvailability();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year, month, token]);
+
+  const filteredRooms = useMemo(() => (selectedRoom === 'all' ? rooms : rooms.filter(r => r.roomId === selectedRoom)), [rooms, selectedRoom]);
 
   // Calculate summary stats
   const totalRooms = rooms.length;
@@ -194,7 +190,11 @@ export const AvailabilityCalendar: React.FC = () => {
         </span>
       </div>
 
-      {/* Calendar Section */}
+  {/* Loading / Error */}
+  {loading && (<div className={styles.legend}>Loading availability…</div>)}
+  {error && !loading && (<div className={styles.legend} style={{color:'#b00020'}}>⚠️ {error}</div>)}
+
+  {/* Calendar Section */}
       <section className={styles.calendarSection}>
         {/* Month Navigation */}
         <div className={styles.monthNav}>
@@ -219,40 +219,42 @@ export const AvailabilityCalendar: React.FC = () => {
             ))}
           </div>
 
-          {/* Room Rows */}
-          {filteredRooms.map(room => (
-            <div key={room.roomId} className={styles.roomRow}>
-              <div className={styles.roomNameCell}>
-                <div className={styles.roomName}>{room.roomName}</div>
-                <div className={styles.roomType}>{room.roomType}</div>
-              </div>
-              
-              {/* Empty cells for days before month starts */}
-              {Array.from({ length: startingDayOfWeek }).map((_, i) => (
-                <div key={`empty-${i}`} className={styles.emptyCell}></div>
-              ))}
-              
-              {/* Date cells */}
-              {Array.from({ length: daysInMonth }).map((_, i) => {
-                const day = i + 1;
-                const status = getStatusForDate(room, day);
-                const isToday = 
-                  day === new Date().getDate() && 
-                  month === new Date().getMonth() && 
-                  year === new Date().getFullYear();
-
-                return (
-                  <div 
-                    key={day} 
-                    className={`${styles.dateCell} ${styles[status]} ${isToday ? styles.today : ''}`}
-                    title={`${room.roomName} - ${formatDate(day)} - ${status}`}
-                  >
-                    <span className={styles.dayNumber}>{day}</span>
+          {/* Room Rows rendered by weeks to keep 7 columns aligned */}
+          {filteredRooms.map(room => {
+            const weeks = buildWeekChunks(room);
+            return (
+              <React.Fragment key={room.roomId}>
+                {weeks.map((week, wIdx) => (
+                  <div key={`${room.roomId}-w${wIdx}`} className={styles.roomRow}>
+                    {wIdx === 0 ? (
+                      <div className={styles.roomNameCell}>
+                        <div className={styles.roomName}>{room.roomName}</div>
+                        <div className={styles.roomType}>{room.roomType}</div>
+                      </div>
+                    ) : (
+                      <div className={styles.roomNameSpacer} />
+                    )}
+                    {week.map((cell, idx) => {
+                      if (!cell) return <div key={`e-${idx}`} className={styles.emptyCell}></div>;
+                      const isToday = 
+                        cell.day === new Date().getDate() && 
+                        month === new Date().getMonth() && 
+                        year === new Date().getFullYear();
+                      return (
+                        <div
+                          key={`d-${cell.day}`}
+                          className={`${styles.dateCell} ${styles[cell.status!]} ${isToday ? styles.today : ''}`}
+                          title={`${room.roomName} - ${formatDate(cell.day!)} - ${cell.status}`}
+                        >
+                          <span className={styles.dayNumber}>{cell.day}</span>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
-          ))}
+                ))}
+              </React.Fragment>
+            );
+          })}
         </div>
       </section>
     </div>

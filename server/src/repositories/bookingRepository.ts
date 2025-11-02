@@ -153,6 +153,25 @@ export class BookingRepository {
     );
     return rowCount ?? 0;
   }
+
+  async findInRange(startDate: string, endDate: string): Promise<Array<{ roomId: string; checkIn: string; checkOut: string; status: string; roomCount: number }>> {
+    // Return bookings overlapping the given range. Checkout is exclusive.
+    const { rows } = await pool.query(
+      `SELECT room_id, check_in, check_out, status, COALESCE(room_count,1) AS room_count
+       FROM bookings
+       WHERE status IN ('pending','confirmed')
+         AND check_in < $2
+         AND $1 < check_out`,
+      [startDate, endDate]
+    );
+    return rows.map(r => ({
+      roomId: r.room_id,
+      checkIn: r.check_in,
+      checkOut: r.check_out,
+      status: r.status,
+      roomCount: Number(r.room_count) || 1,
+    }));
+  }
 }
 
 export const bookingRepository = new BookingRepository();

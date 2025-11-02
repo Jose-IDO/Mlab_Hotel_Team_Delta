@@ -15,6 +15,7 @@ router.patch('/:id/cancel', authenticate, bookingController.cancelBooking);
 // Admin
 router.get('/admin', authenticate, requireRole(['super_admin','hotel_manager']), bookingController.listAll);
 router.patch('/:id/status', authenticate, requireRole(['super_admin','hotel_manager']), bookingController.updateStatus);
+router.get('/admin/availability', authenticate, requireRole(['super_admin','hotel_manager']), bookingController.availability);
 
 // Webhook placeholder (replace with yojjur gateway)
 router.post('/webhooks/payment', express.raw({ type: 'application/json' }), async (req, res) => {
