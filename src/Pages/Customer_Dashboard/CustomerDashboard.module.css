@@ -1,0 +1,21 @@
+.dashboard {
+  padding: 1rem;
+  font-family: "Inter", sans-serif;
+  background-color: #f9f9f9;
+  padding-top: 120px;
+  min-height: 100vh;
+}
+
+.section {
+  margin-bottom: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: left;
+}

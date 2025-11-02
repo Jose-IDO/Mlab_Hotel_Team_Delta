@@ -1,0 +1,158 @@
+/* -------------------------------------------------
+   BookingPage.module.css
+   ------------------------------------------------- */
+.main {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding-top: 80px; /* space for fixed navbar */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr; /* left image/info | right form */
+  gap: 2rem;
+}
+
+/* ---- LEFT SIDE ------------------------------------------------ */
+.hotelInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hotelImg {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.infoBlock {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f93448;
+  margin: 0.75rem 0;
+}
+
+.cancellation {
+  font-size: 0.85rem;
+  color: #ef4444;
+}
+
+/* ---- RIGHT SIDE ------------------------------------------------ */
+.guestSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.guestCard {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.guestHeader {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #374151;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* ---- COUNTRY SELECT (matches Input style) ---- */
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inputLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.countrySelect {
+  width: 100%;
+  border: 1.5px solid rgba(244, 164, 168, 0.9);
+  border-radius: 12px;
+  padding: 14px;
+  background: white;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.countrySelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(244, 67, 105, 0.06);
+  border-color: #f44369;
+}
+
+/* ---- ADD GUEST BUTTON (red outline) ---- */
+.addGuestBtn {
+  align-self: flex-start;
+  background: transparent;
+  border: 2px solid #f93448;
+  color: #f93448;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.addGuestBtn:hover {
+  background: #f93448;
+  color: white;
+}
+
+/* ---- Responsive ------------------------------------------------ */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

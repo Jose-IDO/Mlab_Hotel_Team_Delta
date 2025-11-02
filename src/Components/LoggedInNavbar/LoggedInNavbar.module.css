@@ -1,0 +1,218 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(94, 107, 123, 0.6);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  padding: 0.8rem 2rem;
+  border-radius: 0;
+  font-family: "Inter", sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 50;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.navLinks {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-left: 40px;
+}
+
+.navLink {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.navLink:hover {
+  background-color: #f5f5f5;
+  color: #0093E9;
+}
+
+.navLink:active {
+  transform: scale(0.98);
+}
+
+.brandName {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  max-width: 500px;
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 3.5rem 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #F93448;
+}
+
+.searchButton {
+  position: absolute;
+  right: 0.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.searchButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.searchIcon {
+  color: #5E6B7B;
+}
+
+.navLinks {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.navItem:hover {
+  color: #1e40af;
+}
+
+.navItem a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.notificationIcon {
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.flagIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.userName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+  cursor: pointer;
+}
+
+.userName::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background-color: #F93448;
+  transition: width 0.3s ease;
+}
+
+.userName:hover::after {
+  width: 100%;
+}
+
+.logoutBtn {
+  background: #F93448;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(249, 52, 72, 0.3);
+  transition: all 0.3s ease;
+}
+
+.logoutBtn:hover {
+  background: #d62639;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.4);
+}
+
+.authButtons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.signInBtn,
+.signUpBtn {
+  background: #F93448;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(249, 52, 72, 0.3);
+  transition: all 0.3s ease;
+}
+
+.signInBtn:hover,
+.signUpBtn:hover {
+  background: #d62639;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.4);
+}

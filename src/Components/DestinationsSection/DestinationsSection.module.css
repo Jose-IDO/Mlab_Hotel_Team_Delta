@@ -1,0 +1,25 @@
+.destinationGridWrapper {
+  text-align: center;
+}
+
+.destinationGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.viewAllBtn {
+  margin-top: 1.5rem;
+  padding: 0.5rem 1.2rem;
+  background: #F93448;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.3s ease;
+}
+
+.viewAllBtn:hover {
+  background: #d62639;
+}

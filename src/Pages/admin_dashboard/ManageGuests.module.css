@@ -1,0 +1,190 @@
+.container {
+  padding: 20px;
+}
+
+.headerBar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.title {
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.actionsRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchInput {
+  min-width: 260px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,147,233,0.2);
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  outline: none;
+  transition: all 0.2s;
+}
+.searchInput:focus {
+  border-color: #0093E9;
+  box-shadow: 0 0 0 3px rgba(0,147,233,0.12);
+  background: rgba(255,255,255,0.85);
+}
+
+.filterSelect {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,147,233,0.2);
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  outline: none;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  overflow-x: auto;
+}
+
+.subtitle {
+  color: #4a5568;
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+/* Table wrapper for horizontal scroll on small widths */
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Table styling similar to ManageBooking */
+.table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.30);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.1);
+}
+
+.table thead {
+  background: rgba(0, 147, 233, 0.50);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+}
+
+.table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.table thead th:first-child { border-top-left-radius: 12px; }
+.table thead th:last-child  { border-top-right-radius: 12px; }
+
+.table tbody tr {
+  border-bottom: 1px solid rgba(224, 224, 224, 0.25);
+  transition: background-color 0.2s;
+  backdrop-filter: blur(6px);
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(0, 147, 233, 0.04);
+}
+
+.table tbody td {
+  padding: 14px 16px;
+  color: #333;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.table tbody td:first-child {
+  font-weight: 700;
+  color: #0093E9;
+}
+
+.table tbody tr:last-child { border-bottom: none; }
+.table tbody tr:last-child td:first-child { border-bottom-left-radius: 12px; }
+.table tbody tr:last-child td:last-child  { border-bottom-right-radius: 12px; }
+
+.numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.nowrap  { white-space: nowrap; }
+.truncate { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Badges */
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.statusActive  { background: rgba(212, 237, 218, 0.80); color: #155724; }
+.statusPending { background: rgba(255, 243, 205, 0.80); color: #856404; }
+.statusBlocked { background: rgba(248, 215, 218, 0.80); color: #721C24; }
+
+/* Buttons */
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+}
+
+.viewBtn       { background: rgba(33,150,243,0.85); box-shadow: 0 2px 8px rgba(33,150,243,0.25); }
+.editBtn       { background: rgba(255,152,0,0.85);  box-shadow: 0 2px 8px rgba(255,152,0,0.25); }
+.deactivateBtn { background: rgba(244,67,54,0.85);  box-shadow: 0 2px 8px rgba(244,67,54,0.25); }
+.restoreBtn    { background: rgba(76,175,80,0.85);  box-shadow: 0 2px 8px rgba(76,175,80,0.25); }
+
+button:hover { transform: translateY(-2px); }
