@@ -95,7 +95,8 @@ tbody td:first-child {
 /* Status badges */
 .statusPending,
 .statusConfirmed,
-.statusCheckedIn {
+.statusCheckedIn,
+.statusCancelled {
     padding: 4px 12px;
     border-radius: 12px;
     font-size: 12px;
@@ -119,6 +120,11 @@ tbody td:first-child {
 .statusCheckedIn {
     background: rgba(212, 237, 218, 0.6);
     color: #155724;
+}
+
+.statusCancelled {
+    background: rgba(254, 226, 226, 0.7);
+    color: #991b1b;
 }
 
 /* Buttons */

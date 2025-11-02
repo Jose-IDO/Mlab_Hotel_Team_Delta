@@ -3,6 +3,9 @@ import cors from 'cors';
 import roomRoutes from './routes/roomRoutes';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import bookingRoutes from './routes/bookingRoutes';
+import paymentsRoutes from './routes/paymentsRoutes';
+import hotelSettingsRoutes from './routes/hotelSettingsRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './middleware/logger';
 
@@ -21,6 +24,9 @@ app.get('/health', (_req, res) => {
 app.use('/auth', authRoutes);
 app.use('/admin/rooms', roomRoutes);
 app.use('/admin/users', userRoutes);
+app.use('/bookings', bookingRoutes);
+app.use('/payments', paymentsRoutes);
+app.use('/settings', hotelSettingsRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);

@@ -1,29 +1,121 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./BookingConfirmation.module.css";
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+interface BookingData {
+  bookingId: string;
+  hotelName: string;
+  roomType: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  totalPrice: number;
+  guest: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    country: string;
+    phone: string;
+  };
+  paymentMethod: string;
+  cardholderName: string;
+  paymentReference?: string;
+}
 
 const BookingConfirmation: React.FC = () => {
   const { state } = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [isRedirecting, setIsRedirecting] = useState(true);
-
-  const {
-    bookingId = "UNKNOWN",
-    hotelName = "Delta Hotel",
-    roomType = "Luxury Suite",
-    checkIn,
-    checkOut,
-    nights = 3,
-    totalPrice = 3600,
-    guest = { firstName: "", lastName: "", email: "", country: "", phone: "" },
-    paymentMethod = "Visa **** 1234",
-    cardholderName = "Guest",
-  } = state || {};
+  const { token, user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [bookingData, setBookingData] = useState<BookingData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsRedirecting(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchBookingDetails = async () => {
+      try {
+        // Check if we have a payment reference in the URL (from Paystack redirect)
+        const searchParams = new URLSearchParams(location.search);
+        const reference = searchParams.get('reference') || searchParams.get('trxref') || searchParams.get('ref');
+
+        if (reference) {
+          // Try to verify payment (fallback if webhook hasn't fired)
+          try {
+            await fetch(`${API_URL}/payments/paystack/verify?reference=${encodeURIComponent(reference)}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+          } catch {}
+
+          // Fetch booking by payment reference
+          const response = await fetch(`${API_URL}/bookings/by-reference/${reference}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch booking details');
+          }
+
+          const data = await response.json();
+          const booking = data.booking || data;
+
+          setBookingData({
+            bookingId: booking.id || booking.bookingId,
+            hotelName: booking.hotelName || "Delta Hotel",
+            roomType: booking.roomType || booking.room_type || "Room",
+            checkIn: booking.checkIn || booking.check_in,
+            checkOut: booking.checkOut || booking.check_out,
+            nights: booking.nights || calculateNights(booking.check_in, booking.check_out),
+            totalPrice: booking.totalPrice || booking.total_price,
+            guest: {
+              firstName: booking.firstName || user?.firstName || "",
+              lastName: booking.lastName || user?.lastName || "",
+              email: booking.email || user?.email || "",
+              country: booking.country || "",
+              phone: booking.phone || user?.phone || ""
+            },
+            paymentMethod: "Paystack",
+            cardholderName: `${user?.firstName || ""} ${user?.lastName || ""}`,
+            paymentReference: reference
+          });
+        } else if (state) {
+          // Use data from navigation state (direct navigation from payment page)
+          setBookingData({
+            bookingId: state.bookingId || "UNKNOWN",
+            hotelName: state.hotelName || "Delta Hotel",
+            roomType: state.roomType || "Luxury Suite",
+            checkIn: state.checkIn,
+            checkOut: state.checkOut,
+            nights: state.nights || 3,
+            totalPrice: state.totalPrice || 3600,
+            guest: state.guest || { firstName: "", lastName: "", email: "", country: "", phone: "" },
+            paymentMethod: state.paymentMethod || "Paystack",
+            cardholderName: state.cardholderName || "Guest"
+          });
+        } else {
+          throw new Error('No booking information available');
+        }
+
+        setTimeout(() => setIsLoading(false), 1200);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load booking details');
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookingDetails();
+  }, [location.search, state, token, user]);
+
+  const calculateNights = (checkIn: string, checkOut: string) => {
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -31,38 +123,40 @@ const BookingConfirmation: React.FC = () => {
   };
 
   const downloadReceipt = () => {
+    if (!bookingData) return;
+
     // Create a simple text receipt
     const receiptContent = `
 ===========================================
         DELTA HOTEL BOOKING RECEIPT
 ===========================================
 
-Booking ID: ${bookingId}
+Booking ID: ${bookingData.bookingId}
 Date: ${new Date().toLocaleString()}
 
 -------------------------------------------
 BOOKING DETAILS
 -------------------------------------------
-Hotel: ${hotelName}
-Room Type: ${roomType}
-Check-in: ${formatDate(checkIn)}
-Check-out: ${formatDate(checkOut)}
-Nights: ${nights}
+Hotel: ${bookingData.hotelName}
+Room Type: ${bookingData.roomType}
+Check-in: ${formatDate(bookingData.checkIn)}
+Check-out: ${formatDate(bookingData.checkOut)}
+Nights: ${bookingData.nights}
 
 -------------------------------------------
 GUEST INFORMATION
 -------------------------------------------
-Primary Guest: ${guest.firstName} ${guest.lastName}
-Email: ${guest.email}
-Phone: ${guest.phone}
-Country: ${guest.country}
+Primary Guest: ${bookingData.guest.firstName} ${bookingData.guest.lastName}
+Email: ${bookingData.guest.email}
+Phone: ${bookingData.guest.phone}
+Country: ${bookingData.guest.country}
 
 -------------------------------------------
 PAYMENT INFORMATION
 -------------------------------------------
-Amount Paid: R${totalPrice.toLocaleString()}
-Payment Method: ${paymentMethod}
-Cardholder: ${cardholderName}
+Amount Paid: R${bookingData.totalPrice.toLocaleString()}
+Payment Method: ${bookingData.paymentMethod}
+${bookingData.paymentReference ? `Payment Reference: ${bookingData.paymentReference}` : ''}
 
 -------------------------------------------
 Thank you for choosing Delta Hotel!
@@ -74,7 +168,7 @@ For questions, contact: support@deltahotel.com
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `receipt-${bookingId}.txt`;
+    link.download = `receipt-${bookingData.bookingId}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -82,7 +176,7 @@ For questions, contact: support@deltahotel.com
   };
 
   const handleBackToDashboard = () => {
-    navigate('/dashboard');
+    navigate('/hotel-details');
   };
 
   return (
@@ -94,14 +188,29 @@ For questions, contact: support@deltahotel.com
         </div>
         <div className={styles.userSection}>
           <div className={styles.userAvatar}>
-            {cardholderName.charAt(0).toUpperCase()}
+            {user?.firstName?.charAt(0).toUpperCase() || 'U'}
           </div>
         </div>
       </header>
 
       <div className={styles.content}>
-        {isRedirecting ? (
-          /* STATE 1: Payment Successful - Redirecting */
+        {error ? (
+          /* Error State */
+          <div className={`${styles.card} ${styles.fadeIn}`}>
+            <div className={styles.iconWrapper}>
+              <div className={styles.errorIcon}>❌</div>
+            </div>
+            <h1 className={styles.title}>Error Loading Booking</h1>
+            <p className={styles.subtitle}>{error}</p>
+            <button
+              className={styles.dashboardBtn}
+              onClick={handleBackToDashboard}
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        ) : isLoading || !bookingData ? (
+          /* Loading State */
           <div className={`${styles.card} ${styles.fadeIn}`}>
             <div className={styles.iconWrapper}>
               <div className={styles.successIcon}>
@@ -112,11 +221,11 @@ For questions, contact: support@deltahotel.com
               </div>
             </div>
             <h1 className={styles.title}>Payment Successful</h1>
-            <p className={styles.subtitle}>Redirecting to booking confirmation...</p>
+            <p className={styles.subtitle}>Loading booking confirmation...</p>
             <div className={styles.loader}></div>
           </div>
         ) : (
-          /* STATE 2: Booking Confirmed */
+          /* Booking Confirmed State */
           <div className={`${styles.card} ${styles.fadeIn}`}>
             <div className={styles.iconWrapper}>
               <div className={styles.successIcon}>
@@ -129,10 +238,10 @@ For questions, contact: support@deltahotel.com
 
             <h1 className={styles.titleLarge}>Booking Confirmed</h1>
             <p className={styles.bookingId}>
-              ID# <span className={styles.bookingIdValue}>{bookingId}</span>
+              ID# <span className={styles.bookingIdValue}>{bookingData.bookingId}</span>
             </p>
             <p className={styles.confirmationText}>
-              A confirmation email will be sent to your email shortly.
+              A confirmation email will be sent to {bookingData.guest.email} shortly.
             </p>
 
             <div className={styles.actions}>

@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import Button from "../../Components/Shared/Button";
 import Input from "../../Components/Shared/Input";
 import styles from "./BookingPage.module.css";
 import hotelImage from "../../assets/Santorini_7.jpg";   // ← Your image
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 interface Guest {
   firstName: string;
@@ -15,14 +18,19 @@ interface Guest {
 }
 
 const BookingPage: React.FC = () => {
+  // --- Auth context ---
+  const { token, isAuthenticated, user } = useAuth();
+  
   // --- Read data from RoomDetails ---
   const { state } = useLocation();
   const navigate = useNavigate();
   const {
+    roomId,
     hotelName = "Delta Hotel",
     roomType = "Luxury Deluxe Suite",
     roomImage = hotelImage,
     pricePerNight: initialPricePerNight = 1200,
+    maxGuests = 2,
   } = state || {};
 
   // --- Booking form state (dates and guests count) ---
@@ -38,6 +46,35 @@ const BookingPage: React.FC = () => {
   });
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  const [roomCount, setRoomCount] = useState(1);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [taxRate, setTaxRate] = useState<number>(15); // Default 15% tax
+  const [cancellationPolicy, setCancellationPolicy] = useState<string>("R300 if cancelled within 24 hrs");
+
+  // Fetch tax rate and cancellation policy from settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${API_URL}/settings/public`);
+        const json = await res.json();
+        if (res.ok && json.ok && json.data) {
+          if (json.data.taxRate) {
+            setTaxRate(json.data.taxRate);
+          }
+          if (json.data.cancellationPolicy) {
+            setCancellationPolicy(json.data.cancellationPolicy);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch settings:', err);
+        // Keep defaults
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   // Calculate nights and total price
   const calculateNights = () => {
@@ -49,48 +86,138 @@ const BookingPage: React.FC = () => {
   };
 
   const nights = calculateNights();
-  const totalPrice = initialPricePerNight * nights;
+  const totalGuests = adults + children;
+  const maxAllowedGuests = maxGuests * roomCount;
+  const totalPrice = initialPricePerNight * nights * roomCount;
+
+  // Calculate tax and grand total
+  const subtotal = totalPrice;
+  const taxAmount = (subtotal * taxRate) / 100;
+  const grandTotal = subtotal + taxAmount;
 
   // --- Format stay string ---
   const formatDate = (date: string) => {
     const d = new Date(date);
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   };
-  const stay = `${nights} Night${nights > 1 ? "s" : ""}, ${formatDate(checkIn)} - ${formatDate(checkOut)}`;
-  const priceDisplay = `R${totalPrice.toLocaleString()}`;
-  const cancellationFee = "R300 if cancelled within 24 hrs";
 
   // --- Primary guest details state (only one guest form) ---
   const [guest, setGuest] = useState<Guest>({
-    firstName: "",
-    lastName: "",
-    email: "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
     country: "South Africa",
-    phone: "",
+    phone: user?.phone || "",
   });
 
   const updateGuest = (field: keyof Guest, value: string) => {
     setGuest((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleContinue = () => {
-    // Prepare booking data for payment page
-    const bookingData = {
-      hotelName,
-      roomType,
-      roomImage,
-      checkIn,
-      checkOut,
-      nights,
-      adults,
-      children,
-      pricePerNight: initialPricePerNight,
-      totalPrice,
-      guest, // Single guest object instead of array
-    };
-    
-    console.log("Proceeding to payment with data:", bookingData);
-    navigate('/payment', { state: bookingData });
+  const handleContinue = async () => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // Check authentication
+      if (!isAuthenticated || !token) {
+        setError('You must be logged in to make a booking');
+        navigate('/signin');
+        return;
+      }
+
+      // Validate required fields
+      if (!guest.firstName || !guest.lastName || !guest.email || !guest.phone) {
+        setError('Please fill in all guest details');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!roomId) {
+        setError('Room information is missing. Please go back and select a room.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (totalGuests > maxAllowedGuests) {
+        setError(`Too many guests! This room allows up to ${maxGuests} guests per room. You selected ${roomCount} room${roomCount > 1 ? 's' : ''}, so the maximum is ${maxAllowedGuests} guests.`);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Create booking payload
+      const bookingPayload = {
+        roomId,
+        checkIn,
+        checkOut,
+        guests: totalGuests,
+        roomCount,
+        guestDetails: {
+          firstName: guest.firstName,
+          lastName: guest.lastName,
+          email: guest.email,
+          country: guest.country,
+          phone: guest.phone,
+          adults,
+          children,
+        }
+      };
+
+      console.log('Submitting booking:', bookingPayload);
+
+      // Submit booking to backend (creates pending booking)
+      const response = await fetch(`${API_URL}/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(bookingPayload)
+      });
+
+      if (!response.ok) {
+        let errorMsg = 'Failed to create booking';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorData.message || errorMsg;
+        } catch {}
+        throw new Error(errorMsg);
+      }
+
+      const result = await response.json();
+      console.log("Backend response:", result);
+      
+      // Backend returns { ok: true, data: { booking, payment } }
+      const bookingData = result.data?.booking || result.booking || result.data || result;
+      const paymentInfo = result.data?.payment || result.payment;
+
+      // Prepare data for payment page
+      const paymentData = {
+        bookingId: bookingData.id,
+        paymentReference: bookingData.paymentReference || paymentInfo?.reference,
+        hotelName,
+        roomType,
+        roomImage,
+        checkIn,
+        checkOut,
+        nights,
+        adults,
+        children,
+        pricePerNight: initialPricePerNight,
+        totalPrice,
+        guest,
+        expiresAt: bookingData.expiresAt, // Show expiry timer on payment page
+      };
+
+      console.log("Booking created successfully:", bookingData);
+      console.log("Payment data being sent:", paymentData);
+      navigate('/payment', { state: paymentData });
+    } catch (err) {
+      console.error('Booking error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create booking. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -102,19 +229,63 @@ const BookingPage: React.FC = () => {
           <aside className={styles.hotelInfo}>
             <img src={roomImage} alt={hotelName} className={styles.hotelImg} />
             <div className={styles.infoBlock}>
-              <p className={styles.label}>Hotel Name:</p>
-              <p className={styles.value}>{hotelName}</p>
+              <h2 className={styles.summaryTitle}>Booking Summary</h2>
+              
+              <div className={styles.summaryRow}>
+                <span className={styles.label}>Hotel:</span>
+                <span className={styles.value}>{hotelName}</span>
+              </div>
 
-              <p className={styles.label}>Room Type:</p>
-              <p className={styles.value}>{roomType}</p>
+              <div className={styles.summaryRow}>
+                <span className={styles.label}>Room:</span>
+                <span className={styles.value}>{roomType}</span>
+              </div>
 
-              <p className={styles.label}>Total Stay:</p>
-              <p className={styles.value}>{stay}</p>
+              <div className={styles.summaryRow}>
+                <span className={styles.label}>Check-in:</span>
+                <span className={styles.value}>{formatDate(checkIn)}</span>
+              </div>
 
-              <p className={styles.label}>Total Price:</p>
-              <p className={styles.price}>{priceDisplay}</p>
+              <div className={styles.summaryRow}>
+                <span className={styles.label}>Check-out:</span>
+                <span className={styles.value}>{formatDate(checkOut)}</span>
+              </div>
 
-              <p className={styles.cancellation}>{cancellationFee}</p>
+              <div className={styles.summaryRow}>
+                <span className={styles.label}>Guests:</span>
+                <span className={styles.value}>{adults} Adult{adults > 1 ? 's' : ''}{children > 0 ? `, ${children} Child${children > 1 ? 'ren' : ''}` : ''}</span>
+              </div>
+
+              <div className={styles.summaryRow}>
+                <span className={styles.label}>Nights:</span>
+                <span className={styles.value}>{nights}</span>
+              </div>
+
+              <div className={styles.summaryRow}>
+                <span className={styles.label}>Rooms:</span>
+                <span className={styles.value}>{roomCount}</span>
+              </div>
+
+              <div className={styles.divider}></div>
+
+              <div className={styles.priceRow}>
+                <span>R{initialPricePerNight.toLocaleString()} × {nights} night{nights > 1 ? 's' : ''}</span>
+                <span>R{subtotal.toLocaleString()}</span>
+              </div>
+
+              <div className={styles.priceRow}>
+                <span>Tax ({taxRate}%)</span>
+                <span>R{taxAmount.toFixed(2)}</span>
+              </div>
+
+              <div className={styles.totalRow}>
+                <span>Grand Total</span>
+                <span className={styles.totalPrice}>R{grandTotal.toFixed(2)}</span>
+              </div>
+
+              {cancellationPolicy && (
+                <p className={styles.cancellation}>{cancellationPolicy}</p>
+              )}
             </div>
           </aside>
 
@@ -172,16 +343,32 @@ const BookingPage: React.FC = () => {
                     ))}
                   </select>
                 </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Number of rooms</label>
+                  <select
+                    value={roomCount}
+                    onChange={(e) => setRoomCount(Number(e.target.value))}
+                    className={styles.selectInput}
+                  >
+                    {[1,2,3,4,5].map(num => (
+                      <option key={num} value={num}>{num}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className={styles.priceBreakdown}>
                 <div className={styles.priceRow}>
-                  <span>R{initialPricePerNight.toLocaleString()} × {nights} night{nights > 1 ? 's' : ''}</span>
-                  <span>R{totalPrice.toLocaleString()}</span>
+                  <span>R{initialPricePerNight.toLocaleString()} × {nights} night{nights > 1 ? 's' : ''} × {roomCount} room{roomCount > 1 ? 's' : ''}</span>
+                  <span>R{subtotal.toLocaleString()}</span>
+                </div>
+                <div className={styles.priceRow}>
+                  <span>Tax ({taxRate}%)</span>
+                  <span>R{taxAmount.toFixed(2)}</span>
                 </div>
                 <div className={styles.totalRow}>
-                  <span>Total</span>
-                  <span className={styles.totalPrice}>R{totalPrice.toLocaleString()}</span>
+                  <span>Grand Total</span>
+                  <span className={styles.totalPrice}>R{grandTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -253,8 +440,20 @@ const BookingPage: React.FC = () => {
               💡 This information will be used for booking confirmation and communication.
             </p>
 
+            {/* Error Message */}
+            {error && (
+              <div className={styles.errorMessage}>
+                ⚠️ {error}
+              </div>
+            )}
+
             {/* Continue Button */}
-            <Button text="Continue to payment" onClick={handleContinue} type="button" />
+            <Button 
+              text={isSubmitting ? "Creating booking..." : "Continue to payment"} 
+              onClick={handleContinue} 
+              type="button"
+              disabled={isSubmitting}
+            />
           </section>
         </div>
       </main>

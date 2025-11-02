@@ -54,6 +54,22 @@ const HotelDetails: React.FC = () => {
   }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hotelSettings, setHotelSettings] = useState<{
+    hotelName: string;
+    tagline: string;
+    description: string;
+    email: string;
+    phone: string;
+    website: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    stateProvince: string;
+    postalCode: string;
+    country: string;
+    checkInTime: string;
+    checkOutTime: string;
+  } | null>(null);
 
   const toggleFaq = (index: number) => {
     setExpandedFaq(expandedFaq === index ? null : index);
@@ -86,13 +102,33 @@ const HotelDetails: React.FC = () => {
                           selectedRating !== "all" || 
                           checkedAmenities.length > 0;
 
-  // Hotel data - this can be replaced with API call later
+  // Hotel data from API or defaults
   const hotelData = {
-    name: "Delta Hotel",
-    address: "123 Main Street, Sandton, GP, 2196",
+    name: hotelSettings?.hotelName || "Delta Hotel",
+    address: hotelSettings 
+      ? `${hotelSettings.addressLine1}${hotelSettings.addressLine2 ? ', ' + hotelSettings.addressLine2 : ''}, ${hotelSettings.city}, ${hotelSettings.stateProvince}, ${hotelSettings.postalCode}`
+      : "123 Main Street, Sandton, GP, 2196",
     mainImage: hotelMain,
     galleryImages: [hotelImage1, hotelImage2, hotelImage3],
   };
+
+  // Fetch hotel settings from API
+  useEffect(() => {
+    const API_URL = (import.meta as any).env.VITE_API_URL as string;
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${API_URL}/settings/public`);
+        const json = await res.json();
+        if (res.ok && json.ok) {
+          setHotelSettings(json.data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch hotel settings:', e);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   // Fetch rooms from API and map to UI structure
   useEffect(() => {
@@ -212,11 +248,13 @@ const HotelDetails: React.FC = () => {
     return true;
   }), [roomsData, selectedRoomType, selectedPriceRange, selectedRating, checkedAmenities]);
 
-  // FAQ data - this can be replaced with API call later
+  // FAQ data - dynamically including check-in/check-out times from settings
   const faqData = [
     {
       question: "What time is check-in and check-out?",
-      answer: "Check-in starts at 2:00 PM and check-out is before 10:00 AM. Early check-in and late check-out may be available upon request, subject to availability."
+      answer: hotelSettings 
+        ? `Check-in starts at ${hotelSettings.checkInTime} and check-out is before ${hotelSettings.checkOutTime}. Early check-in and late check-out may be available upon request, subject to availability.`
+        : "Check-in starts at 2:00 PM and check-out is before 10:00 AM. Early check-in and late check-out may be available upon request, subject to availability."
     },
     {
       question: "Is the swimming pool heated?",
@@ -402,7 +440,7 @@ const HotelDetails: React.FC = () => {
                     ))}
                   </div>
                   <p>{room.adults} adults • {room.kids} kids</p>
-                  <p className={styles.price}>Price per night: R {room.price.toLocaleString()} PN</p>
+                  <p className={styles.price}>Price per night: R {room.price.toLocaleString()}</p>
                 </div>
               </div>
             )) : (

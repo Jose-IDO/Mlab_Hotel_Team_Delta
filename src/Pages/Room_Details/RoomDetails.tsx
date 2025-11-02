@@ -132,6 +132,7 @@ const RoomDetails: React.FC = () => {
   const handleBookNow = () => {
     if (!room) return;
     const bookingData = {
+      roomId: room.id, // Include room ID for backend booking
       hotelName: "Delta Hotel",
       roomType: room.name,
       roomImage: room.image,
@@ -179,7 +180,7 @@ const RoomDetails: React.FC = () => {
           <div className={styles.infoSection}>
             <div className={styles.roomType}>
               <h2>{room.name}</h2>
-              <p className={styles.price}>R {room.price.toLocaleString()} PN</p>
+              <p className={styles.price}>R {room.price.toLocaleString()}</p>
             </div>
 
             <button className={styles.bookNowBtn} onClick={handleBookNow}>

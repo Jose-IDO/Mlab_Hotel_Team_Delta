@@ -1,11 +1,14 @@
 import styles from "./ManageBooking.module.css";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
-type BookingStatus = "pending" | "confirmed" | "checked-in";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+type BookingStatus = "pending" | "confirmed" | "cancelled" | "checked-in";
 type Booking = {
   id: string;
-  guest: string;
-  room: string;
+  guest: string; // display name or userId fallback
+  room: string;  // display room name or roomId fallback
   checkIn: string;   // ISO
   checkOut: string;  // ISO
   status: BookingStatus;
@@ -17,9 +20,17 @@ const StatusBadge = ({ status }: { status: BookingStatus }) => {
       ? styles.statusPending
       : status === "confirmed"
       ? styles.statusConfirmed
+      : status === "cancelled"
+      ? styles.statusCancelled
       : styles.statusCheckedIn;
   const label =
-    status === "pending" ? "Pending" : status === "confirmed" ? "Confirmed" : "Checked-in";
+    status === "pending"
+      ? "Pending"
+      : status === "confirmed"
+      ? "Confirmed"
+      : status === "cancelled"
+      ? "Cancelled"
+      : "Checked-in";
   return <span className={className}>{label}</span>;
 };
 
@@ -102,16 +113,43 @@ const BookingTable = ({
 );
 
 export const ManageBooking = () => {
+  const { token } = useAuth();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | BookingStatus>("");
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const bookings: Booking[] = [
-    { id: "#B1001", guest: "John Doe",    room: "Suite 201",    checkIn: "2025-11-01", checkOut: "2025-11-05", status: "pending" },
-    { id: "#B1003", guest: "Michael Brown", room: "Standard 305", checkIn: "2025-11-07", checkOut: "2025-11-10", status: "pending" },
-    { id: "#B1005", guest: "David Lee",   room: "Deluxe 110",   checkIn: "2025-11-08", checkOut: "2025-11-12", status: "pending" },
-    { id: "#B1002", guest: "Jane Smith",  room: "Deluxe 102",   checkIn: "2025-11-03", checkOut: "2025-11-06", status: "confirmed" },
-    { id: "#B1004", guest: "Lisa Green",  room: "Suite 203",    checkIn: "2025-11-02", checkOut: "2025-11-04", status: "checked-in" },
-  ];
+  const loadBookings = async () => {
+    if (!token) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_URL}/bookings/admin`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok || data.ok === false) throw new Error(data.error || "Failed to load bookings");
+      const list = (data.data || data).map((b: any) => ({
+        id: b.id,
+        guest: b.guestName || `${b.guestEmail || 'Unknown'}`,
+        room: b.roomName || b.roomType || `Room ${b.roomId || '-'}`,
+        checkIn: b.checkIn || b.check_in,
+        checkOut: b.checkOut || b.check_out,
+        status: (b.status as BookingStatus) || "pending",
+      })) as Booking[];
+      setBookings(list);
+    } catch (e: any) {
+      setError(e.message || "Failed to load bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBookings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -128,18 +166,36 @@ export const ManageBooking = () => {
 
   const pending = filtered.filter((b) => b.status === "pending");
   const confirmed = filtered.filter((b) => b.status === "confirmed");
-  const checkedIn = filtered.filter((b) => b.status === "checked-in");
+  // const checkedIn = filtered.filter((b) => b.status === "checked-in");
+
+  const updateStatus = async (id: string, status: "confirmed" | "cancelled") => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/bookings/${id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.ok === false) throw new Error(data.error || "Failed to update status");
+      // Refresh list
+      loadBookings();
+    } catch (e) {
+      alert((e as any).message || "Failed to update booking");
+    }
+  };
 
   const handleApprove = (id: string) => {
     if (confirm(`Approve booking ${id}?`)) {
-      // TODO: call API to change status from pending -> confirmed
-      console.log("Approved", id);
+      updateStatus(id, "confirmed");
     }
   };
   const handleCancel = (id: string) => {
     if (confirm(`Cancel booking ${id}?`)) {
-      // TODO: call API to cancel booking
-      console.log("Cancelled", id);
+      updateStatus(id, "cancelled");
     }
   };
   const handleView = (id: string) => {
@@ -179,10 +235,21 @@ export const ManageBooking = () => {
             <option value="">All statuses</option>
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
-            <option value="checked-in">Checked-in</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
       </div>
+
+      {loading && (
+        <div className={styles.bookingSection}>
+          <p>Loading bookings…</p>
+        </div>
+      )}
+      {error && (
+        <div className={styles.bookingSection}>
+          <p style={{ color: '#b91c1c' }}>Error: {error}</p>
+        </div>
+      )}
 
       <BookingTable
         title="Pending Bookings"
@@ -203,8 +270,8 @@ export const ManageBooking = () => {
         onCheckin={handleCheckin}
       />
       <BookingTable
-        title="Checked-in Bookings"
-        data={checkedIn}
+        title="Cancelled Bookings"
+        data={filtered.filter((b) => b.status === "cancelled")}
         onApprove={handleApprove}
         onCancel={handleCancel}
         onView={handleView}

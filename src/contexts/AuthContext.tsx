@@ -36,7 +36,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with true to check localStorage first
   const [error, setError] = useState<string | null>(null);
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -47,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(JSON.parse(savedUser));
       setToken(savedToken);
     }
+    setLoading(false); // Done checking localStorage
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
