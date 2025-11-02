@@ -128,6 +128,13 @@ export const ManageBooking = () => {
       const res = await fetch(`${API_URL}/bookings/admin`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      // Check content type before parsing
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(`Server returned ${contentType} instead of JSON. Server might be down or misconfigured.`);
+      }
+      
       const data = await res.json();
       if (!res.ok || data.ok === false) throw new Error(data.error || "Failed to load bookings");
       const list = (data.data || data).map((b: any) => ({
@@ -140,6 +147,7 @@ export const ManageBooking = () => {
       })) as Booking[];
       setBookings(list);
     } catch (e: any) {
+      console.error('Error loading bookings:', e);
       setError(e.message || "Failed to load bookings");
     } finally {
       setLoading(false);
