@@ -159,11 +159,11 @@ export const Settings: React.FC = () => {
             <div className={styles.grid}>
               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                 <label>Address Line 1</label>
-                <input name="addressLine1" value={form.addressLine1} onChange={onChange} placeholder="123 Main Street" />
+                <input name="addressLine1" value={form.addressLine1} onChange={onChange} placeholder="1 Mark Shuttleworth Street" />
               </div>
               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                 <label>Address Line 2</label>
-                <input name="addressLine2" value={form.addressLine2} onChange={onChange} placeholder="Hatfield" />
+                <input name="addressLine2" value={form.addressLine2} onChange={onChange} placeholder="Lynwood" />
               </div>
               <div className={styles.formGroup}>
                 <label>City</label>
@@ -175,7 +175,7 @@ export const Settings: React.FC = () => {
               </div>
               <div className={styles.formGroup}>
                 <label>Postal Code</label>
-                <input name="postalCode" value={form.postalCode} onChange={onChange} placeholder="0028" />
+                <input name="postalCode" value={form.postalCode} onChange={onChange} placeholder="0087" />
               </div>
               <div className={styles.formGroup}>
                 <label>Country</label>
