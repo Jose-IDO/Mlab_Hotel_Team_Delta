@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./RoomDetails.module.css";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 import { 
@@ -27,12 +27,14 @@ type ApiRoom = {
   roomSizeSqm?: number;
   amenities?: string[];
   description?: string;
+  images?: string[]; // Add images array from Cloudinary
 };
 
 type UiRoom = {
   id: string;
   name: string;
   image: string;
+  images: string[]; // Add multiple images support
   price: number;
   adults: number;
   kids: number;
@@ -46,11 +48,17 @@ type UiRoom = {
 const RoomDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [room, setRoom] = useState<UiRoom | null>(null);
+
+  // Get deal price from URL if present
+  const dealPrice = searchParams.get('dealPrice');
+  const dealId = searchParams.get('dealId');
+  const effectivePrice = dealPrice ? parseFloat(dealPrice) : null;
 
   const pickImage = (type?: string, name?: string) => {
     const t = (type || name || '').toLowerCase();
@@ -105,10 +113,16 @@ const RoomDetails: React.FC = () => {
         const json = await res.json();
         if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch room');
         const r = json.data as ApiRoom;
+        
+        // Use Cloudinary images if available, otherwise fallback to hardcoded images
+        const cloudinaryImages = Array.isArray(r.images) && r.images.length > 0 ? r.images : [];
+        const fallbackImage = pickImage(r.roomType, r.roomName);
+        
         const mapped: UiRoom = {
           id: r.id,
           name: r.roomName,
-          image: pickImage(r.roomType, r.roomName),
+          image: cloudinaryImages.length > 0 ? cloudinaryImages[0] : fallbackImage,
+          images: cloudinaryImages.length > 0 ? cloudinaryImages : [fallbackImage],
           price: Number(r.price) || 0,
           adults: r.maxGuests ?? 2,
           kids: 0,
@@ -136,7 +150,8 @@ const RoomDetails: React.FC = () => {
       hotelName: "Delta Hotel",
       roomType: room.name,
       roomImage: room.image,
-      pricePerNight: room.price,
+      pricePerNight: effectivePrice || room.price, // Use deal price if available
+      dealId: dealId || undefined, // Include deal ID if booking from deal
     };
 
     if (!isAuthenticated) {
@@ -165,14 +180,25 @@ const RoomDetails: React.FC = () => {
       {!loading && !error && room && (
         <>
           <div className={styles.gallery}>
-            <div className={styles.mainImage} onClick={() => setSelectedImage(room.image)}>
-              <img src={room.image} alt={room.name} />
+            <div className={styles.mainImage} onClick={() => setSelectedImage(selectedImage || room.image)}>
+              <img src={selectedImage || room.image} alt={room.name} />
             </div>
             <div className={styles.sideImages}>
-              <img src={room1} alt="Room 1" onClick={() => setSelectedImage(room1)} />
-              <img src={room2} alt="Room 2" onClick={() => setSelectedImage(room2)} />
-              <img src={room3} alt="Room 3" onClick={() => setSelectedImage(room3)} />
-              <img src={room4} alt="Room 4" onClick={() => setSelectedImage(room4)} />
+              {room.images.slice(0, 4).map((img, idx) => (
+                <img 
+                  key={idx} 
+                  src={img} 
+                  alt={`${room.name} ${idx + 1}`} 
+                  onClick={() => setSelectedImage(img)}
+                  className={selectedImage === img ? styles.activeThumb : ''}
+                />
+              ))}
+              {/* Fill remaining slots with placeholders if less than 4 images */}
+              {room.images.length < 4 && Array.from({ length: 4 - room.images.length }).map((_, idx) => (
+                <div key={`placeholder-${idx}`} className={styles.emptySlot}>
+                  <span>📷</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -180,7 +206,32 @@ const RoomDetails: React.FC = () => {
           <div className={styles.infoSection}>
             <div className={styles.roomType}>
               <h2>{room.name}</h2>
-              <p className={styles.price}>R {room.price.toLocaleString()}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {effectivePrice ? (
+                  <>
+                    <p className={styles.price} style={{ textDecoration: 'line-through', opacity: 0.6, fontSize: '1rem' }}>
+                      R {room.price.toLocaleString()}
+                    </p>
+                    <p className={styles.price} style={{ color: '#10B981', fontWeight: 700 }}>
+                      R {effectivePrice.toLocaleString()}
+                    </p>
+                    {dealId && (
+                      <span style={{ 
+                        background: 'linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%)', 
+                        color: 'white', 
+                        padding: '4px 12px', 
+                        borderRadius: '20px', 
+                        fontSize: '0.75rem',
+                        fontWeight: 700
+                      }}>
+                        DEAL
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <p className={styles.price}>R {room.price.toLocaleString()}</p>
+                )}
+              </div>
             </div>
 
             <button className={styles.bookNowBtn} onClick={handleBookNow}>
@@ -196,7 +247,7 @@ const RoomDetails: React.FC = () => {
                 <span className={styles.detailIcon}>👥</span>
                 <div className={styles.detailContent}>
                   <span className={styles.detailLabel}>Max Guests</span>
-                  <span className={styles.detailValue}>{room.adults} Adults, {room.kids} Children</span>
+                  <span className={styles.detailValue}>{room.adults} Guests</span>
                 </div>
               </div>
               <div className={styles.detailItem}>

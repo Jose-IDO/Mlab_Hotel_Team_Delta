@@ -133,6 +133,27 @@
   font-size: 0.875rem;
 }
 
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.loadingContainer h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.loadingContainer p {
+  color: #666;
+  font-size: 1rem;
+}
+
 .nameRow {
   display: grid;
   grid-template-columns: 1fr 1fr;

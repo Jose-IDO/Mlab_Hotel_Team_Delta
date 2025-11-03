@@ -6,6 +6,7 @@ import { AdminDashboard } from './Pages/admin_dashboard/AdminDashboard';
 import { CustomerDashboard } from './Pages/Customer_Dashboard/CustomerDashboard';
 import SignIn from './Pages/Auth/SignIn';
 import SignUp from './Pages/Auth/SignUp';
+import OAuthCallback from './Pages/Auth/OAuthCallback';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './Components/ProtectedRoute/ProtectedRoute';
 import { Navbar } from './Components/Navbar/Navbar';
@@ -31,6 +32,7 @@ function AppContent() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route path="/hotel-details" element={<HotelDetails />} />
         <Route path="/room-details/:id" element={<RoomDetails />} />
 

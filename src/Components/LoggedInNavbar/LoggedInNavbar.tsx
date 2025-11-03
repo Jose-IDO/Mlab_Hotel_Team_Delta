@@ -21,10 +21,6 @@ export const LoggedInNavbar = () => {
     navigate('/signup');
   };
 
-  const handleBrowseRooms = () => {
-    navigate('/hotel-details');
-  };
-
   return (
     <nav className={styles.navbar}>
       <div className={styles.logoSection} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>

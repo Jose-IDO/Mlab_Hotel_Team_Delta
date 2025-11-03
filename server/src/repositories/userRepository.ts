@@ -141,6 +141,34 @@ class UserRepository {
       [isActive, userId]
     );
   }
+
+  async findAdmins(): Promise<User[]> {
+    const sql = `
+      SELECT 
+        u.*,
+        COALESCE(
+          JSON_AGG(
+            JSON_BUILD_OBJECT('name', r.name, 'displayName', r.display_name)
+          ) FILTER (WHERE r.id IS NOT NULL),
+          '[]'
+        ) AS roles
+      FROM users u
+      LEFT JOIN user_roles ur ON ur.user_id = u.id AND ur.is_active = TRUE
+      LEFT JOIN roles r ON r.id = ur.role_id
+      GROUP BY u.id
+      HAVING bool_or(r.name IN ('super_admin', 'hotel_manager', 'support_agent')) = TRUE
+      ORDER BY 
+        CASE 
+          WHEN bool_or(r.name = 'super_admin') THEN 1
+          WHEN bool_or(r.name = 'hotel_manager') THEN 2
+          WHEN bool_or(r.name = 'support_agent') THEN 3
+          ELSE 4
+        END,
+        u.created_at DESC;
+    `;
+    const { rows } = await pool.query(sql);
+    return rows.map(rowToUser);
+  }
 }
 
 export const userRepository = new UserRepository();

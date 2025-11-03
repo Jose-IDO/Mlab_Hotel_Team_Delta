@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/authService';
-import { User } from '../types/user.types';
+import { User, Role } from '../types/user.types';
 
 // Extend Express Request type to include user
 declare global {
@@ -42,14 +42,14 @@ export const authenticate = async (
 
 export const requireRole = (allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    const user = req.user;
+    const user = req.user as User;
 
     if (!user) {
       res.status(401).json({ ok: false, error: 'Not authenticated' });
       return;
     }
 
-    const userRoles = user.roles?.map(r => r.name) || [];
+    const userRoles = user.roles?.map((r: Role) => r.name) || [];
     const hasRole = allowedRoles.some(role => userRoles.includes(role));
 
     if (!hasRole) {

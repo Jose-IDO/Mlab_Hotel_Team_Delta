@@ -7,6 +7,9 @@ const router = Router();
 // GET /admin/users
 router.get('/', authenticate, requireRole(['super_admin', 'hotel_manager']), (req, res) => userController.list(req, res));
 
+// GET /admin/users/admins
+router.get('/admins', authenticate, requireRole(['super_admin', 'hotel_manager']), (req, res) => userController.listAdmins(req, res));
+
 // PATCH /admin/users/:id/deactivate
 router.patch('/:id/deactivate', authenticate, requireRole(['super_admin', 'hotel_manager']), (req, res) => userController.deactivate(req, res));
 

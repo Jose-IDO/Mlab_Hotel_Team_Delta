@@ -55,6 +55,16 @@ export class UserController {
       res.status(500).json({ ok: false, error: 'Failed to activate user' });
     }
   }
+
+  async listAdmins(req: Request, res: Response): Promise<void> {
+    try {
+      const admins = await userRepository.findAdmins();
+      res.json({ ok: true, data: { admins } });
+    } catch (error) {
+      console.error('List admins error:', error);
+      res.status(500).json({ ok: false, error: 'Failed to fetch administrators' });
+    }
+  }
 }
 
 export const userController = new UserController();

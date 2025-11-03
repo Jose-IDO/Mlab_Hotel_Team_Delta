@@ -172,7 +172,10 @@ const SignUp: React.FC = () => {
           </div>
 
           <div className={styles.divider}>Or</div>
-          <GoogleButton onClick={() => alert('Mock Google Sign-up')} />
+          <GoogleButton onClick={() => {
+            const API_URL = (import.meta as any).env.VITE_API_URL as string;
+            window.location.href = `${API_URL}/auth/google`;
+          }} />
         </div>
       </div>
     </div>
