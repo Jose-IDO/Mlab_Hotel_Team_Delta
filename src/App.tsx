@@ -16,6 +16,7 @@ import HotelDetails from "./Pages/HotelDetails/HotelDetails";
 import BookingPage from './Pages/Booking_Page/BookingPage';
 import PaymentPage from './Pages/Payment/PaymentPage';
 import BookingConfirmation from './Pages/BookingConfirmation/BookingConfirmation';
+import UserProfile from './Pages/UserProfile/UserProfile';
 
 function AppContent() {
   const location = useLocation();
@@ -56,6 +57,16 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <BookingConfirmation />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* User Profile */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
             </ProtectedRoute>
           }
         />

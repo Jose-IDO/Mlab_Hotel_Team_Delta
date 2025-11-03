@@ -209,3 +209,14 @@
   color: #fff;
 }
 
+/* ---------- DESTINATIONS SECTION STYLES ---------- */
+.destinationsSection {
+  margin-top: 80px;
+  padding-bottom: 80px;
+}
+
+.destinationsSection .sectionTitle {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+

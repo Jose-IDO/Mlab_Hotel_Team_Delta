@@ -3,6 +3,7 @@ import styles from "./LandingSections.module.css";
 import comedyClub from "../../assets/comedy-club.jpg";
 import liveBand from "../../assets/live-band.jpg";
 import charityDinner from "../../assets/charity-dinner.jpg";
+import { DestinationsSection } from "../DestinationsSection/DestinationsSection";
 
 const LandingSections: React.FC = () => {
   const eventImages = [comedyClub, liveBand, charityDinner];
@@ -44,17 +45,32 @@ const LandingSections: React.FC = () => {
         </div>
       </section>
 
+      {/* ---------- DESTINATIONS SECTION ---------- */}
+      <section className={styles.destinationsSection}>
+        <h2 className={styles.sectionTitle}>Destinations</h2>
+        <DestinationsSection />
+      </section>
+
       {/* ---------- ADDRESS SECTION ---------- */}
       <section className={styles.addressSection}>
         <h2 className={styles.sectionTitle}>Our Address</h2>
         <div className={styles.addressCard}>
-          <div className={styles.mapPlaceholder}>Map Image Placeholder</div>
+          <div className={styles.mapPlaceholder}>
+            <iframe
+              title="Delta Hotel location"
+              src="https://www.google.com/maps?q=1+Mark+Shuttleworth+Street,+Lynwood,+Pretoria,+0087,+South+Africa&hl=en&z=15&output=embed"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              style={{ width: '100%', height: '100%', border: 'none', borderRadius: '8px' }}
+            />
+          </div>
           <div className={styles.addressDetails}>
-            <p>The Innovation Hub</p>
-            <p>The Enterprise Building</p>
-            <p>Allan Cormack St, Persequor, Pretoria, 0020</p>
+            <p>1 Mark Shuttleworth Street</p>
+            <p>Lynwood, Pretoria</p>
+            <p>0087, South Africa</p>
             <a
-              href="https://maps.app.goo.gl/i55D5Rdb1XTL4r8M9"
+              href="https://www.google.com/maps/search/?api=1&query=1+Mark+Shuttleworth+Street,+Lynwood,+Pretoria,+0087,+South+Africa"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.mapLink}
@@ -90,10 +106,10 @@ const LandingSections: React.FC = () => {
 
           <div className={styles.footerColumn}>
             <h4>Address</h4>
-            <p>The Innovation Hub</p>
-            <p>The Enterprise Building</p>
-            <p>Allan Cormack St, Persequor</p>
-            <p>Pretoria, 0020</p>
+            <p>1 Mark Shuttleworth Street</p>
+            <p>Lynwood</p>
+            <p>Pretoria, 0087</p>
+            <p>South Africa</p>
           </div>
         </div>
 

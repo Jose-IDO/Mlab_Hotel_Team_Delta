@@ -34,18 +34,21 @@ const BookingPage: React.FC = () => {
   } = state || {};
 
   // --- Booking form state (dates and guests count) ---
+  // Support pre-filled data from "Book Again" or start with defaults
   const [checkIn, setCheckIn] = useState(() => {
+    if (state?.checkIn) return state.checkIn;
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
   });
   const [checkOut, setCheckOut] = useState(() => {
+    if (state?.checkOut) return state.checkOut;
     const nextWeek = new Date();
     nextWeek.setDate(nextWeek.getDate() + 4);
     return nextWeek.toISOString().split('T')[0];
   });
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
+  const [adults, setAdults] = useState(state?.adults || 2);
+  const [children, setChildren] = useState(state?.children || 0);
   const [roomCount, setRoomCount] = useState(1);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,12 +105,13 @@ const BookingPage: React.FC = () => {
   };
 
   // --- Primary guest details state (only one guest form) ---
+  // Support pre-filled data from "Book Again" or start with user data
   const [guest, setGuest] = useState<Guest>({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    email: user?.email || "",
-    country: "South Africa",
-    phone: user?.phone || "",
+    firstName: state?.guestDetails?.firstName || user?.firstName || "",
+    lastName: state?.guestDetails?.lastName || user?.lastName || "",
+    email: state?.guestDetails?.email || user?.email || "",
+    country: state?.guestDetails?.country || "South Africa",
+    phone: state?.guestDetails?.phone || user?.phone || "",
   });
 
   const updateGuest = (field: keyof Guest, value: string) => {

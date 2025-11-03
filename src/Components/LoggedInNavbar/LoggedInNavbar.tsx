@@ -56,7 +56,12 @@ export const LoggedInNavbar = () => {
       <div className={styles.profileSection}>
         {isAuthenticated ? (
           <>
-            <div className={styles.userInfo}>
+            <div className={styles.userInfo} onClick={() => navigate('/profile')} style={{cursor: 'pointer'}}>
+              <div className={styles.profileIcon}>
+                <span className={styles.profileInitials}>
+                  {user?.firstName?.charAt(0).toUpperCase()}{user?.lastName?.charAt(0).toUpperCase()}
+                </span>
+              </div>
               <span className={styles.userName}>{user ? `${user.firstName} ${user.lastName}` : 'User'}</span>
               <img src={SouthAfricaFlag} alt="South Africa" className={styles.flagIcon} />
             </div>

@@ -114,7 +114,7 @@ const HotelDetails: React.FC = () => {
     name: hotelSettings?.hotelName || "Delta Hotel",
     address: hotelSettings 
       ? `${hotelSettings.addressLine1}${hotelSettings.addressLine2 ? ', ' + hotelSettings.addressLine2 : ''}, ${hotelSettings.city}, ${hotelSettings.stateProvince}, ${hotelSettings.postalCode}`
-      : "123 Main Street, Sandton, GP, 2196",
+      : "1 Mark Shuttleworth Street, Lynwood, Pretoria, 0087, South Africa",
     mainImage: hotelMain,
     galleryImages: [hotelImage1, hotelImage2, hotelImage3],
   };
