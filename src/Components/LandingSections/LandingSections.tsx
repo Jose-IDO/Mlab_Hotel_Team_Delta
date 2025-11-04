@@ -1,7 +1,7 @@
 // src/Components/LandingSections/LandingSections.tsx
 import React, { useEffect, useState } from "react";
 import styles from "./LandingSections.module.css";
-
+import { DestinationsSection } from "../DestinationsSection/DestinationsSection";
 type Event = {
   id: number;
   title: string;
@@ -82,6 +82,78 @@ const LandingSections: React.FC = () => {
           ))}
         </div>
       </section>
+     {/* ---------- DESTINATIONS SECTION ---------- */}
+      <section className={styles.destinationsSection}>
+        <h2 className={styles.sectionTitle}>Destinations</h2>
+        <DestinationsSection />
+      </section>
+
+      {/* ---------- ADDRESS SECTION ---------- */}
+      <section className={styles.addressSection}>
+        <h2 className={styles.sectionTitle}>Our Address</h2>
+        <div className={styles.addressCard}>
+          <div className={styles.mapPlaceholder}>
+            <iframe
+              title="Delta Hotel location"
+              src="https://www.google.com/maps?q=1+Mark+Shuttleworth+Street,+Lynwood,+Pretoria,+0087,+South+Africa&hl=en&z=15&output=embed"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              style={{ width: '100%', height: '100%', border: 'none', borderRadius: '8px' }}
+            />
+          </div>
+          <div className={styles.addressDetails}>
+            <p>1 Mark Shuttleworth Street</p>
+            <p>Lynwood, Pretoria</p>
+            <p>0087, South Africa</p>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=1+Mark+Shuttleworth+Street,+Lynwood,+Pretoria,+0087,+South+Africa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.mapLink}
+            >
+              View on Google Maps
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- FOOTER SECTION ---------- */}
+      <footer className={styles.footer}>
+        <div className={styles.footerContent}>
+          <div className={styles.footerColumn}>
+            <h4>Useful Links</h4>
+            <ul>
+              <li>About Us</li>
+              <li>Contact Us</li>
+              <li>Terms & Conditions</li>
+              <li>Privacy & Cookies</li>
+              <li>Human Rights Statement</li>
+            </ul>
+          </div>
+
+          <div className={styles.footerColumn}>
+            <h4>Follow Us</h4>
+            <div className={styles.socialIcons}>
+              <div className={styles.iconPlaceholder}>FB</div>
+              <div className={styles.iconPlaceholder}>IG</div>
+              <div className={styles.iconPlaceholder}>X</div>
+            </div>
+          </div>
+
+          <div className={styles.footerColumn}>
+            <h4>Address</h4>
+            <p>1 Mark Shuttleworth Street</p>
+            <p>Lynwood</p>
+            <p>Pretoria, 0087</p>
+            <p>South Africa</p>
+          </div>
+        </div>
+
+        <div className={styles.footerBottom}>
+          <p>© 2025 Delta Hotel. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 };
