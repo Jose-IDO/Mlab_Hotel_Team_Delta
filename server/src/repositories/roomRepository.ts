@@ -13,7 +13,8 @@ function rowToRoom(row: any): Room {
     roomSizeSqm: Number(row.room_size_sqm),
     amenities: row.amenities || [],
     units: row.units || [],
-    status: row.status || 'active'
+    status: row.status || 'active',
+    images: row.images || []
   };
 }
 
@@ -159,6 +160,41 @@ class RoomRepository {
     );
     if (!rows[0]) return null;
     return (await this.findById(id)) as Room;
+  }
+
+  // Image management methods
+  async updateImages(roomId: string, images: string[]): Promise<Room | null> {
+    const { rows } = await pool.query(
+      `UPDATE rooms 
+       SET images = $1
+       WHERE id = $2
+       RETURNING *`,
+      [images, roomId]
+    );
+    return rows[0] ? rowToRoom(rows[0]) : null;
+  }
+
+  async addImages(roomId: string, imagePaths: string[]): Promise<Room | null> {
+    // Append multiple images to the existing array
+    const { rows } = await pool.query(
+      `UPDATE rooms 
+       SET images = images || $1::text[]
+       WHERE id = $2
+       RETURNING *`,
+      [imagePaths, roomId]
+    );
+    return rows[0] ? rowToRoom(rows[0]) : null;
+  }
+
+  async removeImage(roomId: string, imagePath: string): Promise<Room | null> {
+    const { rows } = await pool.query(
+      `UPDATE rooms 
+       SET images = array_remove(images, $1)
+       WHERE id = $2
+       RETURNING *`,
+      [imagePath, roomId]
+    );
+    return rows[0] ? rowToRoom(rows[0]) : null;
   }
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./HotelDetails.module.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 
 // Star rating component
@@ -34,6 +34,7 @@ const HotelDetails: React.FC = () => {
   // const hotelId = Number(id); // Will be used for API calls later
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [selectedRoomType, setSelectedRoomType] = useState<string>("all");
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>("all");
@@ -70,6 +71,32 @@ const HotelDetails: React.FC = () => {
     checkInTime: string;
     checkOutTime: string;
   } | null>(null);
+
+  // Apply search parameters from URL on mount
+  useEffect(() => {
+    const roomType = searchParams.get("roomType");
+    const guests = searchParams.get("guests");
+    
+    if (roomType) {
+      setSelectedRoomType(roomType);
+    }
+    
+    // If guests are specified, we could filter based on maxGuests
+    // For now, we'll just acknowledge them (could add to state if needed)
+    if (guests) {
+      console.log(`Searching for rooms with capacity for ${guests} guests`);
+    }
+
+    // Scroll to rooms section if coming from search
+    if (roomType || guests) {
+      setTimeout(() => {
+        const roomsSection = document.querySelector(`.${styles.roomsSection}`);
+        if (roomsSection) {
+          roomsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
+    }
+  }, [searchParams]);
 
   const toggleFaq = (index: number) => {
     setExpandedFaq(expandedFaq === index ? null : index);
@@ -154,6 +181,7 @@ const HotelDetails: React.FC = () => {
           price: number;
           maxGuests: number;
           amenities: string[];
+          images?: string[]; // Add images from Cloudinary
         }>;
 
         const pickImage = (type: string, name: string) => {
@@ -166,17 +194,23 @@ const HotelDetails: React.FC = () => {
           return room1;
         };
 
-        const mapped = rooms.map(r => ({
-          id: r.id,
-          name: r.roomName,
-          type: r.roomType,
-          image: pickImage(r.roomType, r.roomName),
-          adults: r.maxGuests ?? 2,
-          kids: 0,
-          price: Number(r.price) || 0,
-          rating: 4,
-          amenities: Array.isArray(r.amenities) ? r.amenities : []
-        }));
+        const mapped = rooms.map(r => {
+          // Use Cloudinary images if available, otherwise fallback to hardcoded images
+          const cloudinaryImages = Array.isArray(r.images) && r.images.length > 0 ? r.images : [];
+          const fallbackImage = pickImage(r.roomType, r.roomName);
+          
+          return {
+            id: r.id,
+            name: r.roomName,
+            type: r.roomType,
+            image: cloudinaryImages.length > 0 ? cloudinaryImages[0] : fallbackImage,
+            adults: r.maxGuests ?? 2,
+            kids: 0,
+            price: Number(r.price) || 0,
+            rating: 4,
+            amenities: Array.isArray(r.amenities) ? r.amenities : []
+          };
+        });
         setRoomsData(mapped);
       } catch (e: any) {
         setError(e.message || 'Failed to load rooms');
@@ -221,39 +255,49 @@ const HotelDetails: React.FC = () => {
   }, [roomsData]);
 
   // Filter rooms based on selected criteria
-  const filteredRooms = useMemo(() => roomsData.filter(room => {
-    // Room Type filter
-    if (selectedRoomType !== "all" && room.type !== selectedRoomType) {
-      return false;
-    }
-
-    // Price Range filter
-    if (selectedPriceRange !== "all") {
-      const [min, max] = selectedPriceRange.split("-").map(Number);
-      if (max) {
-        if (room.price < min || room.price > max) return false;
-      } else {
-        if (room.price < min) return false;
-      }
-    }
-
-    // Rating filter
-    if (selectedRating !== "all" && room.rating !== Number(selectedRating)) {
-      return false;
-    }
-
-    // Amenities filter - room must have ALL checked amenities
-    if (checkedAmenities.length > 0) {
-      const hasAllCheckedAmenities = checkedAmenities.every(amenity => 
-        room.amenities.includes(amenity)
-      );
-      if (!hasAllCheckedAmenities) {
+  const filteredRooms = useMemo(() => {
+    const guestsParam = searchParams.get("guests");
+    const minGuests = guestsParam ? parseInt(guestsParam, 10) : 0;
+    
+    return roomsData.filter(room => {
+      // Room Type filter
+      if (selectedRoomType !== "all" && room.type !== selectedRoomType) {
         return false;
       }
-    }
 
-    return true;
-  }), [roomsData, selectedRoomType, selectedPriceRange, selectedRating, checkedAmenities]);
+      // Guest capacity filter (from search)
+      if (minGuests > 0 && room.adults < minGuests) {
+        return false;
+      }
+
+      // Price Range filter
+      if (selectedPriceRange !== "all") {
+        const [min, max] = selectedPriceRange.split("-").map(Number);
+        if (max) {
+          if (room.price < min || room.price > max) return false;
+        } else {
+          if (room.price < min) return false;
+        }
+      }
+
+      // Rating filter
+      if (selectedRating !== "all" && room.rating !== Number(selectedRating)) {
+        return false;
+      }
+
+      // Amenities filter - room must have ALL checked amenities
+      if (checkedAmenities.length > 0) {
+        const hasAllCheckedAmenities = checkedAmenities.every(amenity => 
+          room.amenities.includes(amenity)
+        );
+        if (!hasAllCheckedAmenities) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [roomsData, selectedRoomType, selectedPriceRange, selectedRating, checkedAmenities, searchParams]);
 
   // FAQ data - dynamically including check-in/check-out times from settings
   const faqData = [
@@ -446,7 +490,7 @@ const HotelDetails: React.FC = () => {
                       <STAR_SVG key={star} filled={star <= room.rating} />
                     ))}
                   </div>
-                  <p>{room.adults} adults • {room.kids} kids</p>
+                  <p>{room.adults} guests</p>
                   <p className={styles.price}>Price per night: R {room.price.toLocaleString()}</p>
                 </div>
               </div>
@@ -507,7 +551,7 @@ const HotelDetails: React.FC = () => {
             <div className={styles.mapContainer}>
               <iframe
                 title={`${hotelData.name} location`}
-                src={`https://www.google.com/maps?q=${encodeURIComponent(`${hotelData.name}, ${hotelData.address}`)}&hl=en&z=15&output=embed`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(hotelData.address)}&hl=en&z=16&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
@@ -516,7 +560,7 @@ const HotelDetails: React.FC = () => {
             <div className={styles.mapActions}>
               <a
                 className={styles.mapLinkBtn}
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotelData.name}, ${hotelData.address}`)}`}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelData.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

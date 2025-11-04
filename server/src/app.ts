@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
+import passport from './config/passport';
 import roomRoutes from './routes/roomRoutes';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import paymentsRoutes from './routes/paymentsRoutes';
 import hotelSettingsRoutes from './routes/hotelSettingsRoutes';
+import dealRoutes from './routes/dealRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './middleware/logger';
 
@@ -14,6 +16,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
 app.use(logger);
 
 // Routes
@@ -24,6 +27,8 @@ app.get('/health', (_req, res) => {
 app.use('/auth', authRoutes);
 app.use('/admin/rooms', roomRoutes);
 app.use('/admin/users', userRoutes);
+app.use('/admin/deals', dealRoutes);
+app.use('/deals', dealRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/payments', paymentsRoutes);
 app.use('/settings', hotelSettingsRoutes);

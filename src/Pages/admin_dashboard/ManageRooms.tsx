@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styles from "./ManageRooms.module.css"
+import { RoomImageUpload } from "../../Components/RoomImageUpload/RoomImageUpload";
 
 export const ManageRooms: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedRoomForImages, setSelectedRoomForImages] = useState<any>(null);
   const [rooms, setRooms] = useState<any[]>([]);
   const [archivedRooms, setArchivedRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -251,6 +254,17 @@ export const ManageRooms: React.FC = () => {
       console.error('Delete error:', err);
       alert('Failed to delete room. Please try again.');
     }
+  };
+
+  const handleManageImages = (room: any) => {
+    setSelectedRoomForImages(room);
+    setShowImageModal(true);
+  };
+
+  const handleCloseImageModal = () => {
+    setShowImageModal(false);
+    setSelectedRoomForImages(null);
+    fetchRooms(); // Refresh rooms to get updated images
   };
 
   // Get unique room types and bed types for filters
@@ -626,6 +640,9 @@ export const ManageRooms: React.FC = () => {
                     <button className={styles.editBtn} onClick={() => handleEditRoom(room)}>
                       Edit
                     </button>
+                    <button className={styles.imagesBtn} onClick={() => handleManageImages(room)}>
+                      Images
+                    </button>
                     <button className={styles.archiveBtn} onClick={() => handleArchiveRoom(room.id)}>
                       Archive
                     </button>
@@ -678,6 +695,30 @@ export const ManageRooms: React.FC = () => {
           </table>
         )}
       </section>
+
+      {/* Image Management Modal */}
+      {showImageModal && selectedRoomForImages && (
+        <div className={styles.overlay}>
+          <div className={styles.imageModalContainer}>
+            <div className={styles.imageModalHeader}>
+              <h2>Manage Images - {selectedRoomForImages.roomName}</h2>
+              <button 
+                className={styles.closeBtn} 
+                onClick={handleCloseImageModal}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.imageModalContent}>
+              <RoomImageUpload
+                roomId={selectedRoomForImages.id}
+                currentImages={selectedRoomForImages.images || []}
+                onUploadSuccess={handleCloseImageModal}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

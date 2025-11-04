@@ -17,6 +17,7 @@ export interface RoomPayload {
 export interface Room extends RoomPayload {
   id: string;
   status?: 'active' | 'archived';
+  images?: string[]; // Array of Cloudinary URLs
 }
 
 export interface ApiResponse<T = any> {

@@ -9,6 +9,9 @@
 
 /* ---------- FILTERS ---------- */
 .filterContainer {
+  position: sticky;
+  top: 4rem; /* Position below the navbar */
+  z-index: 40; /* Below navbar (50) but above content */
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
@@ -17,6 +20,12 @@
   padding: 1rem;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Add shadow when scrolled */
+.filterContainer.scrolled {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* New Amenities Filter */

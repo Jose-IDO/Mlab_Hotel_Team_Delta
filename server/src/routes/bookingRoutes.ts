@@ -12,6 +12,9 @@ router.get('/me', authenticate, bookingController.myBookings);
 router.get('/by-reference/:reference', authenticate, bookingController.getByReference);
 router.patch('/:id/cancel', authenticate, bookingController.cancelBooking);
 
+// Public - booked dates (for date pickers / availability views)
+router.get('/booked-dates', bookingController.bookedDates);
+
 // Admin
 router.get('/admin', authenticate, requireRole(['super_admin','hotel_manager']), bookingController.listAll);
 router.patch('/:id/status', authenticate, requireRole(['super_admin','hotel_manager']), bookingController.updateStatus);
