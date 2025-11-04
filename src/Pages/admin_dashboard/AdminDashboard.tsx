@@ -8,6 +8,7 @@ import { Administrators } from './Administrators';
 import { Settings } from './Settings';
 import { ManageGuests } from './ManageGuests';
 import { AvailabilityCalendar } from './AvailabilityCalendar';
+import { ManageEvents } from './ManageEvents';
 
 export const AdminDashboard = () => {
   return (
@@ -63,6 +64,8 @@ export const AdminDashboard = () => {
                     <Route path="/administrators" element={<Administrators />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/calendar" element={<AvailabilityCalendar />} />
+                    <Route path="/events" element={<ManageEvents />} />
+
                 </Routes>
             </div>
         </div>

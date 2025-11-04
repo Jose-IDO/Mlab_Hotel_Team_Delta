@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 
-import { LandingPage } from './Pages/Landing_Page/LandingPage';
+import LandingPage from "./Pages/Landing_Page/LandingPage";
 import { AdminDashboard } from './Pages/admin_dashboard/AdminDashboard';
 import { CustomerDashboard } from './Pages/Customer_Dashboard/CustomerDashboard';
 import SignIn from './Pages/Auth/SignIn';

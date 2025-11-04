@@ -42,6 +42,19 @@ CREATE TABLE reviews (
 );
 
 
+--===========================
+-- Table: events
+--===========================
+CREATE TABLE IF NOT EXISTS events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(255) NOT NULL,
+  date DATE NOT NULL,
+  description TEXT NOT NULL,
+  image_url TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+
 -- Index for faster lookups
 CREATE INDEX IF NOT EXISTS idx_room_units_room ON room_units(room_id);
 

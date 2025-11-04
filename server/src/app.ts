@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './middleware/logger';
+import eventRoutes from "./routes/eventRoutes";
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.get('/health', (_req, res) => {
 app.use('/auth', authRoutes);
 app.use('/admin/rooms', roomRoutes);
 app.use('/admin/users', userRoutes);
+app.use("/uploads", express.static("uploads"));
+app.use("/admin/events", eventRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
