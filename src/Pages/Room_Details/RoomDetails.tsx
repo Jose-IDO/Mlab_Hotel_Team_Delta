@@ -6,7 +6,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { 
   Wifi, Wind, Tv, Wine, Palmtree, ConciergeBell, Waves, 
   CircleSlash2, PawPrint, Clock, Volume2, AlertCircle,
-  Calendar, Users, Sparkles, Coffee, Bath
+  Sparkles, Coffee, Bath, Users, Bed, Maximize2
 } from "lucide-react";
 
 // Room images (used to represent types)
@@ -244,21 +244,21 @@ const RoomDetails: React.FC = () => {
             <h2>Room Details</h2>
             <div className={styles.detailsGrid}>
               <div className={styles.detailItem}>
-                <span className={styles.detailIcon}>👥</span>
+                <Users size={32} className={styles.detailIcon} />
                 <div className={styles.detailContent}>
                   <span className={styles.detailLabel}>Max Guests</span>
                   <span className={styles.detailValue}>{room.adults} Guests</span>
                 </div>
               </div>
               <div className={styles.detailItem}>
-                <span className={styles.detailIcon}>🛏️</span>
+                <Bed size={32} className={styles.detailIcon} />
                 <div className={styles.detailContent}>
                   <span className={styles.detailLabel}>Bed Type</span>
                   <span className={styles.detailValue}>{room.numberOfBeds} × {room.bedType}</span>
                 </div>
               </div>
               <div className={styles.detailItem}>
-                <span className={styles.detailIcon}>📐</span>
+                <Maximize2 size={32} className={styles.detailIcon} />
                 <div className={styles.detailContent}>
                   <span className={styles.detailLabel}>Room Size</span>
                   <span className={styles.detailValue}>{room.roomSize} m²</span>
@@ -292,21 +292,6 @@ const RoomDetails: React.FC = () => {
                   <span>{r}</span>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* AVAILABILITY (static placeholder) */}
-          <div className={styles.availabilitySection}>
-            <h2>Availability</h2>
-            <div className={styles.availabilityInfo}>
-              <div className={styles.availabilityItem}>
-                <Calendar size={24} className={styles.availabilityIcon} />
-                <span>Tue 18 Nov - Thu 27 Nov</span>
-              </div>
-              <div className={styles.availabilityItem}>
-                <Users size={24} className={styles.availabilityIcon} />
-                <span>{room.adults} Adults, {room.kids} Children • 1 Room</span>
-              </div>
             </div>
           </div>
         </>

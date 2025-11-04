@@ -551,7 +551,7 @@ const HotelDetails: React.FC = () => {
             <div className={styles.mapContainer}>
               <iframe
                 title={`${hotelData.name} location`}
-                src={`https://www.google.com/maps?q=${encodeURIComponent(`${hotelData.name}, ${hotelData.address}`)}&hl=en&z=15&output=embed`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(hotelData.address)}&hl=en&z=16&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
@@ -560,7 +560,7 @@ const HotelDetails: React.FC = () => {
             <div className={styles.mapActions}>
               <a
                 className={styles.mapLinkBtn}
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotelData.name}, ${hotelData.address}`)}`}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelData.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -1,11 +1,43 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./LandingSections.module.css";
 import comedyClub from "../../assets/comedy-club.jpg";
 import liveBand from "../../assets/live-band.jpg";
 import charityDinner from "../../assets/charity-dinner.jpg";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const LandingSections: React.FC = () => {
   const eventImages = [comedyClub, liveBand, charityDinner];
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsContent, setTermsContent] = useState<string>('');
+  const [loadingTerms, setLoadingTerms] = useState(false);
+
+  useEffect(() => {
+    // Fetch terms and conditions from hotel settings
+    const fetchTerms = async () => {
+      try {
+        setLoadingTerms(true);
+        const res = await fetch(`${API_URL}/settings/public`);
+        const data = await res.json();
+        if (data.ok && data.data.termsAndConditions) {
+          setTermsContent(data.data.termsAndConditions);
+        }
+      } catch (error) {
+        console.error('Failed to load terms and conditions:', error);
+      } finally {
+        setLoadingTerms(false);
+      }
+    };
+    fetchTerms();
+  }, []);
+
+  const handleShowTerms = () => {
+    setShowTermsModal(true);
+  };
+
+  const handleCloseTerms = () => {
+    setShowTermsModal(false);
+  };
 
   return (
     <div className={styles.landingPage}>
@@ -73,7 +105,9 @@ const LandingSections: React.FC = () => {
             <ul>
               <li>About Us</li>
               <li>Contact Us</li>
-              <li>Terms & Conditions</li>
+              <li onClick={handleShowTerms} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
+                Terms & Conditions
+              </li>
               <li>Privacy & Cookies</li>
               <li>Human Rights Statement</li>
             </ul>
@@ -101,6 +135,37 @@ const LandingSections: React.FC = () => {
           <p>© 2025 Delta Hotel. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* ---------- TERMS & CONDITIONS MODAL ---------- */}
+      {showTermsModal && (
+        <div className={styles.modalOverlay} onClick={handleCloseTerms}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Terms & Conditions</h2>
+              <button 
+                className={styles.modalCloseBtn} 
+                onClick={handleCloseTerms}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              {loadingTerms ? (
+                <p>Loading...</p>
+              ) : termsContent ? (
+                <div className={styles.termsContent}>
+                  {termsContent.split('\n').map((line, index) => (
+                    <p key={index}>{line}</p>
+                  ))}
+                </div>
+              ) : (
+                <p>No terms and conditions available. Please contact the hotel for more information.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
