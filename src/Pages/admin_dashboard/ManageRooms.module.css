@@ -166,6 +166,53 @@ button {
 }
 
 .archiveBtn:hover { 
+.saveButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: linear-gradient(135deg, #0093E9 0%, #00B4DB 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 147, 233, 0.3);
+}
+
+.saveButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 147, 233, 0.4);
+}
+
+.cancelButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(128, 128, 128, 0.2);
+  backdrop-filter: blur(10px);
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cancelButton:hover {
+  background: rgba(128, 128, 128, 0.3);
+  transform: translateY(-2px);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
   background: rgba(218, 25, 11, 1);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
@@ -240,6 +287,35 @@ button {
   animation: slideUp 0.3s ease;
 }
 
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.closeFormBtn {
+  background: rgba(244, 67, 54, 0.1);
+  border: none;
+  color: #F44336;
+  font-size: 32px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+  font-weight: 300;
+}
+
+.closeFormBtn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  transform: rotate(90deg);
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(30px);
@@ -254,7 +330,7 @@ button {
 .formTitle {
   color: #333;
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   font-weight: 700;
   background: linear-gradient(135deg, #0093E9 0%, #00B4DB 100%);
   -webkit-background-clip: text;
@@ -282,6 +358,7 @@ button {
 
 .formGroup input[type="text"],
 .formGroup input[type="number"],
+.formGroup input[type="datetime-local"],
 .formGroup select,
 .formGroup textarea {
   padding: 10px;
@@ -544,3 +621,164 @@ button {
   border-radius: 8px;
   white-space: nowrap;
 }
+
+/* Images Button */
+.imagesBtn {
+  background: rgba(33, 150, 243, 0.9);
+  color: white;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+.imagesBtn:hover { 
+  background: rgba(25, 118, 210, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+/* Image Modal */
+.imageModalContainer {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.imageModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.imageModalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.imageModalContent {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .imageModalContainer {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .imageModalHeader {
+    padding: 1rem 1.5rem;
+  }
+
+  .imageModalHeader h2 {
+    font-size: 1.25rem;
+  }
+
+  .imageModalContent {
+    padding: 1rem;
+  }
+}
+
+/* Deal-specific styles */
+.discountBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
+  color: white;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.dealPrice {
+  color: #10B981;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.statusActive {
+  color: #10B981;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.statusScheduled {
+  color: #F59E0B;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.statusInactive {
+  color: #6B7280;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.inactiveDeal {
+  opacity: 0.6;
+}
+
+.activateBtn,
+.deactivateBtn {
+  background: none;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: all 0.2s;
+  margin: 0 4px;
+}
+
+.activateBtn {
+  color: #10B981;
+  border-color: #10B981;
+}
+
+.activateBtn:hover {
+  background: #10B981;
+  color: white;
+}
+
+.deactivateBtn {
+  color: #6B7280;
+  border-color: #6B7280;
+}
+
+.deactivateBtn:hover {
+  background: #6B7280;
+  color: white;
+}
+

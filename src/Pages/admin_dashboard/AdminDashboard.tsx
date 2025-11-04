@@ -4,6 +4,7 @@ import { AdminNavbar } from '../../Components/AdminNavbar/AdminNavbar';
 import { AdminSidebar } from '../../Components/AdminSidebar/AdminSidebar';
 import { ManageBooking } from './ManageBooking';
 import { ManageRooms } from './ManageRooms';
+import { ManageDeals } from './ManageDeals';
 import { Administrators } from './Administrators';
 import { Settings } from './Settings';
 import { ManageGuests } from './ManageGuests';
@@ -50,6 +51,7 @@ export const AdminDashboard = () => {
                     } />
                     <Route path="/bookings" element={<ManageBooking />} />
                     <Route path="/rooms" element={<ManageRooms />} />
+                    <Route path="/deals" element={<ManageDeals />} />
                     <Route path="/guests" element={<ManageGuests />} />
                     {/* <Route path="/payments" element={<h1>Payments & Invoices</h1>} />
                     <Route path="/reviews" element={<h1>Reviews & Ratings</h1>} />

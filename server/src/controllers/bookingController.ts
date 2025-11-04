@@ -164,5 +164,27 @@ export const bookingController = {
     } catch (e: any) {
       return res.status(400).json({ ok: false, error: e.message });
     }
+  },
+
+  // Public: get booked date ranges (overlapping bookings) for all rooms or a specific room
+  bookedDates: async (req: Request, res: Response) => {
+    try {
+      const now = new Date();
+      const defaultStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+      const defaultEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+      const start = (req.query.start as string) || defaultStart;
+      const end = (req.query.end as string) || defaultEnd;
+      const roomId = (req.query.roomId as string) || undefined;
+
+      // Fetch overlapping bookings in range (pending and confirmed)
+      const bookings = await bookingRepository.findInRange(start, end);
+
+      const filtered = roomId ? bookings.filter(b => b.roomId === roomId) : bookings;
+
+      return res.json({ ok: true, data: filtered, range: { start, end }, filter: { roomId } });
+    } catch (e: any) {
+      return res.status(400).json({ ok: false, error: e.message });
+    }
   }
 };
