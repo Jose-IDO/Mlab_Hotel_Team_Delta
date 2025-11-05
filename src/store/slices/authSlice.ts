@@ -22,8 +22,18 @@ interface AuthState {
   error: string | null;
 }
 
+// Safely get initial state from localStorage
+const getInitialUser = (): User | null => {
+  try {
+    const userStr = localStorage.getItem('hotel_user');
+    return userStr ? JSON.parse(userStr) : null;
+  } catch {
+    return null;
+  }
+};
+
 const initialState: AuthState = {
-  user: JSON.parse(localStorage.getItem('hotel_user') || 'null'),
+  user: getInitialUser(),
   token: localStorage.getItem('hotel_token'),
   isAuthenticated: !!localStorage.getItem('hotel_token'),
   loading: false,
@@ -43,15 +53,24 @@ export const loginUser = createAsyncThunk(
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || !data.ok) {
         return rejectWithValue(data.error || 'Login failed');
       }
 
-      // Store in localStorage
-      localStorage.setItem('hotel_token', data.token);
-      localStorage.setItem('hotel_user', JSON.stringify(data.user));
+      // Extract user and token from data.data (API format: { ok: true, data: { user, token } })
+      const userData = data.data || data;
+      const user = userData.user;
+      const token = userData.token;
 
-      return data;
+      if (!user || !token) {
+        return rejectWithValue('Invalid response from server');
+      }
+
+      // Store in localStorage
+      localStorage.setItem('hotel_token', token);
+      localStorage.setItem('hotel_user', JSON.stringify(user));
+
+      return { user, token };
     } catch (error: any) {
       return rejectWithValue(error.message || 'Network error');
     }
@@ -80,15 +99,24 @@ export const signupUser = createAsyncThunk(
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || !data.ok) {
         return rejectWithValue(data.error || 'Signup failed');
       }
 
-      // Store in localStorage
-      localStorage.setItem('hotel_token', data.token);
-      localStorage.setItem('hotel_user', JSON.stringify(data.user));
+      // Extract user and token from data.data (API format: { ok: true, data: { user, token } })
+      const userData = data.data || data;
+      const user = userData.user;
+      const token = userData.token;
 
-      return data;
+      if (!user || !token) {
+        return rejectWithValue('Invalid response from server');
+      }
+
+      // Store in localStorage
+      localStorage.setItem('hotel_token', token);
+      localStorage.setItem('hotel_user', JSON.stringify(user));
+
+      return { user, token };
     } catch (error: any) {
       return rejectWithValue(error.message || 'Network error');
     }
