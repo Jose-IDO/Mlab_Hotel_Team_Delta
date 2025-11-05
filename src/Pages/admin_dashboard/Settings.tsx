@@ -220,7 +220,7 @@ export const Settings: React.FC = () => {
               </div>
               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                 <label>Terms and Conditions</label>
-                <textarea name="termsAndConditions" rows={4} value={form.termsAndConditions} onChange={onChange} placeholder="General terms and conditions..." />
+                <textarea name="termsAndConditions" rows={12} value={form.termsAndConditions} onChange={onChange} placeholder="Enter your hotel's complete terms and conditions here. This will be displayed to users when they click 'Terms & Conditions' in the footer." />
               </div>
             </div>
           </section>

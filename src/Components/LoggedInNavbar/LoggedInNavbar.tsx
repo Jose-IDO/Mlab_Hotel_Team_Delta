@@ -21,7 +21,6 @@ export const LoggedInNavbar = () => {
     navigate('/signup');
   };
 
-
   return (
     <nav className={styles.navbar}>
       <div className={styles.logoSection} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>

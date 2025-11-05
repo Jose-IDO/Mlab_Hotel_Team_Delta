@@ -1,15 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "./DealSection.module.css"; 
 
 type Deal = {
-  id: string;
-  hotel: string;
-  location: string;
-  nights: string;
-  rating: number; 
-  views: number;
-  oldPrice: string;
-  newPrice: string;
+  id: number;
+  roomId: string;
+  roomName: string;
+  roomType: string;
+  title: string;
+  description?: string;
+  discountPercentage: number;
+  originalPrice: number;
+  discountedPrice: number;
+  images?: string[];
+  maxGuests: number;
+  bedType: string;
 };
 
 const STAR_SVG = ({ filled }: { filled: boolean }) => (
@@ -49,46 +54,70 @@ const EYE_SVG = () => (
   </svg>
 );
 
-const baseDeals: Deal[] = [
-  {
-    id: "d-1",
-    hotel: "Delta Hotel",
-    location: "Waterkloof, South Africa",
-    nights: "2 nights",
-    rating: 4,
-    views: 1134,
-    oldPrice: 'R1850',
-    newPrice: 'R1250',
-  },
-  {
-    id: "d-2",
-    hotel: "Delta Hotel",
-    location: "Waterkloof, South Africa",
-    nights: "2 nights",
-    rating: 5,
-    views: 550,
-    oldPrice: 'R2200',
-    newPrice: 'R1800',
-  },
-  {
-    id: "d-3",
-    hotel: "Delta Hotel",
-    location: "Waterkloof, South Africa",
-    nights: "1 night",
-    rating: 3,
-    views: 777,
-    oldPrice: 'R1100',
-    newPrice: 'R700',
-  },
-];
-
 import hotelRoom1 from "../../assets/Hotel-Room-1.jpg";
 import hotelRoom2 from "../../assets/Hotel-Room-2.jpg";
 import hotelRoom3 from "../../assets/Hotel-Room-3.jpg";
 
-const hotelImages = [hotelRoom1, hotelRoom2, hotelRoom3];
+const fallbackImages = [hotelRoom1, hotelRoom2, hotelRoom3];
 
 const DealsSection: React.FC = () => {
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    fetchActiveDeals();
+  }, []);
+
+  const fetchActiveDeals = async () => {
+    try {
+      const res = await fetch(`${API_URL}/deals/active`);
+      const data = await res.json();
+      if (data.ok && data.data) {
+        setDeals(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch active deals:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getImageUrl = (deal: Deal, index: number) => {
+    // Use Cloudinary image if available, otherwise use fallback
+    if (deal.images && deal.images.length > 0) {
+      return deal.images[0];
+    }
+    return fallbackImages[index % fallbackImages.length];
+  };
+
+  const getRating = () => {
+    // Generate random rating between 3-5 for display
+    return 4; // Fixed rating for simplicity
+  };
+
+  const getViews = () => {
+    // Generate random views between 200-2000
+    return Math.floor(Math.random() * 1800) + 200;
+  };
+
+  if (loading) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.headerRow}>
+          <h2 className={styles.heading}>Deals For The Weekend</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          Loading deals...
+        </div>
+      </section>
+    );
+  }
+
+  if (deals.length === 0) {
+    return null; // Don't show section if no deals available
+  }
+
   return (
     <section className={styles.section}>
       <div className={styles.headerRow}>
@@ -96,43 +125,51 @@ const DealsSection: React.FC = () => {
       </div>
 
       <div className={styles.grid}>
-        {baseDeals.map((deal, idx) => (
-          <div className={styles.card} key={deal.id}>
+        {deals.map((deal, idx) => (
+          <Link 
+            to={`/room-details/${deal.roomId}?dealPrice=${deal.discountedPrice}&dealId=${deal.id}`}
+            key={deal.id}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+          <div className={styles.card} style={{ cursor: 'pointer' }}>
             <img
-              src={hotelImages[idx % hotelImages.length]}
-              alt={`Hotel room ${idx + 1}`}
+              src={getImageUrl(deal, idx)}
+              alt={deal.roomName}
               className={styles.hotelImage}
               style={{ objectFit: "cover", width: "100%", height: "175px" }}
             />
 
             <div className={styles.content}>
               <div className={styles.titleRow}>
-                <h3 className={styles.hotelTitle}>{deal.hotel}</h3>
-                <span className={styles.location}>{deal.location}</span>
+                <h3 className={styles.hotelTitle}>{deal.title}</h3>
+                <span className={styles.location}>{deal.roomType} Room</span>
               </div>
 
               <div className={styles.metaRow}>
                 <div className={styles.stars}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} className={styles.star}>
-                      <STAR_SVG filled={i < deal.rating} />
+                      <STAR_SVG filled={i < getRating()} />
                     </span>
                   ))}
                 </div>
                 <div className={styles.views}>
                   <span className={styles.eyeIcon}><EYE_SVG /></span>
-                  <span className={styles.viewCount}>{deal.views}</span>
+                  <span className={styles.viewCount}>{getViews()}</span>
                 </div>
               </div>
 
-              <p className={styles.nights}>{deal.nights}</p>
+              <p className={styles.nights}>
+                {deal.discountPercentage}% OFF • {deal.maxGuests} guests
+              </p>
 
               <div className={styles.pricing}>
-                <span className={styles.oldPrice}>{deal.oldPrice}</span>
-                <span className={styles.newPrice}>{deal.newPrice}</span>
+                <span className={styles.oldPrice}>R{deal.originalPrice.toFixed(0)}</span>
+                <span className={styles.newPrice}>R{deal.discountedPrice.toFixed(0)}</span>
               </div>
             </div>
           </div>
+          </Link>
         ))}
       </div>
 
