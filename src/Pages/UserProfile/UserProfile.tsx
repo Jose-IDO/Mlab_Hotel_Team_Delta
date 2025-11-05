@@ -32,7 +32,7 @@ interface Booking {
 }
 
 const UserProfile: React.FC = () => {
-  const { user, token, logout } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   
   // Active tab state

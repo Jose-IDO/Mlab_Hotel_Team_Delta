@@ -21,9 +21,6 @@ export const LoggedInNavbar = () => {
     navigate('/signup');
   };
 
-  const handleBrowseRooms = () => {
-    navigate('/hotel-details');
-  };
 
   return (
     <nav className={styles.navbar}>

@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 import './App.css';
 
 import { LandingPage } from './Pages/Landing_Page/LandingPage';
@@ -99,11 +101,13 @@ function AppContent() {
 function App() {
   const basename = import.meta.env.PROD ? '/Mlab_Hotel_Team_Delta' : '';
   return (
-    <AuthProvider>
-      <Router basename={basename}>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <Router basename={basename}>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </Provider>
   );
 }
 

@@ -1,4 +1,15 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useCallback, useMemo } from 'react';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { 
+  loginUser, 
+  signupUser, 
+  logout as logoutAction,
+  selectUser,
+  selectToken,
+  selectIsAuthenticated,
+  selectAuthLoading,
+  selectAuthError
+} from '../store/slices/authSlice';
 
 interface User {
   id: string;
@@ -7,8 +18,9 @@ interface User {
   lastName: string;
   phone?: string;
   profileImageUrl?: string;
-  emailVerified: boolean;
-  isActive: boolean;
+  emailVerified?: boolean;
+  isActive?: boolean;
+  role?: 'customer' | 'admin';
   roles?: Array<{ name: string; displayName: string }>;
 }
 
@@ -33,110 +45,56 @@ export const useAuth = () => {
   return context;
 };
 
+// AuthProvider now wraps Redux state and actions
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // Start with true to check localStorage first
-  const [error, setError] = useState<string | null>(null);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const token = useAppSelector(selectToken);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const loading = useAppSelector(selectAuthLoading);
+  const error = useAppSelector(selectAuthError);
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('hotel_user');
-    const savedToken = localStorage.getItem('hotel_token');
-    if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
-      setToken(savedToken);
-    }
-    setLoading(false); // Done checking localStorage
-  }, []);
-
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.ok) {
-        setError(data.error || 'Login failed');
-        setLoading(false);
-        return false;
-      }
-
-      const { user: userData, token: authToken } = data.data;
-      setUser(userData);
-      setToken(authToken);
-      localStorage.setItem('hotel_user', JSON.stringify(userData));
-      localStorage.setItem('hotel_token', authToken);
-      setLoading(false);
-      return true;
-    } catch (err: any) {
-      setError(err.message || 'Network error');
-      setLoading(false);
+      const result = await dispatch(loginUser({ email, password })).unwrap();
+      return !!result;
+    } catch (err) {
       return false;
     }
-  };
+  }, [dispatch]);
 
-  const signup = async (
+  const signup = useCallback(async (
     firstName: string,
     lastName: string,
     email: string,
     phone: string,
     password: string
   ): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ firstName, lastName, email, phone, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.ok) {
-        setError(data.error || 'Registration failed');
-        setLoading(false);
-        return false;
-      }
-
-      const { user: userData, token: authToken } = data.data;
-      setUser(userData);
-      setToken(authToken);
-      localStorage.setItem('hotel_user', JSON.stringify(userData));
-      localStorage.setItem('hotel_token', authToken);
-      setLoading(false);
-      return true;
-    } catch (err: any) {
-      setError(err.message || 'Network error');
-      setLoading(false);
+      const result = await dispatch(signupUser({ firstName, lastName, email, phone, password })).unwrap();
+      return !!result;
+    } catch (err) {
       return false;
     }
-  };
+  }, [dispatch]);
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('hotel_user');
-    localStorage.removeItem('hotel_token');
-  };
+  const logout = useCallback(() => {
+    dispatch(logoutAction());
+  }, [dispatch]);
 
-  const isAuthenticated = !!user && !!token;
+  const value = useMemo(() => ({
+    user,
+    token,
+    login,
+    signup,
+    logout,
+    isAuthenticated,
+    loading,
+    error
+  }), [user, token, login, signup, logout, isAuthenticated, loading, error]);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, logout, isAuthenticated, loading, error }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
