@@ -141,3 +141,91 @@ transition: background 0.18s ease;
 .viewAllBtn:hover {
 background: #d62639;
 }
+
+@media (max-width: 480px) {
+  .sectionone {
+    height: calc(100vh - 20px);
+  }
+
+  .sliderButton {
+    width: 28px;
+    height: 64px;
+    font-size: 20px;
+  }
+
+  .leftButton {
+    left: 10px;
+  }
+
+  .rightButton {
+    right: 10px;
+  }
+
+  .textContent {
+    padding: 24px 32px;
+    width: 90%;
+    max-width: 320px;
+  }
+
+  .textContent div {
+    font-size: 16px;
+    margin: 8px 0;
+  }
+
+  .textContent div:first-child {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .Head1 {
+    font-size: 28px;
+    padding: 0 16px;
+  }
+
+  .offerings {
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 60px;
+    padding: 0 16px;
+  }
+
+  .offerings1 {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .paragraph1 {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    padding: 0 16px;
+  }
+
+  .offerings1 img {
+    height: 120px;
+    width: 120px;
+  }
+}
+
+@media (max-width: 360px) {
+  .textContent {
+    padding: 20px 24px;
+  }
+
+  .textContent div {
+    font-size: 14px;
+  }
+
+  .textContent div:first-child {
+    font-size: 20px;
+  }
+
+  .Head1 {
+    font-size: 24px;
+  }
+
+  .offerings1 img {
+    height: 100px;
+    width: 100px;
+  }
+}

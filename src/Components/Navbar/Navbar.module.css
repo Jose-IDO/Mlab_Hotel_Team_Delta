@@ -178,3 +178,54 @@
 .homeIconWrapper::after {
   display: none;
 }
+
+@media (max-width: 480px) {
+  .navContainer {
+    padding: 10px 12px;
+    max-width: 100%;
+  }
+
+  .logo {
+    font-size: 32px;
+    gap: 6px;
+  }
+
+  .LogoCard {
+    height: 40px;
+    width: 40px;
+  }
+
+  .navLinks {
+    gap: 16px;
+    font-size: 13px;
+  }
+
+  .navLinks li {
+    padding: 4px 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .navContainer {
+    padding: 8px 10px;
+  }
+
+  .logo {
+    font-size: 28px;
+  }
+
+  .LogoCard {
+    height: 36px;
+    width: 36px;
+  }
+
+  .navLinks {
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  .redButton {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}

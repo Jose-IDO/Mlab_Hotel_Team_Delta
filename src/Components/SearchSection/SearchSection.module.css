@@ -74,3 +74,51 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .section {
+    margin: 24px 0;
+    padding: 0 12px;
+  }
+
+  .container {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .form {
+    gap: 10px;
+  }
+
+  .input,
+  .select {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .searchButton {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .section {
+    padding: 0 8px;
+  }
+
+  .container {
+    padding: 12px;
+  }
+
+  .input,
+  .select {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .searchButton {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

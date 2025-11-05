@@ -146,3 +146,121 @@
 .viewAllBtn:hover {
   background: #d62639;
 }
+
+@media (max-width: 480px) {
+  .hotelGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .hotelCard {
+    min-height: auto;
+    padding: 0.75rem;
+  }
+
+  .imagePlaceholder,
+  .hotelImage {
+    height: 200px;
+  }
+
+  .hotelName {
+    font-size: 0.95rem;
+  }
+
+  .stars svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .roomDetailsContainer {
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .roomIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .roomDetail span {
+    font-size: 0.8rem;
+  }
+
+  .price {
+    font-size: 1.1rem;
+    margin-top: 0.4rem;
+  }
+
+  .hotelLocation {
+    font-size: 0.85rem;
+  }
+
+  .amenitiesContainer svg {
+    width: 60px;
+    height: 26px;
+  }
+
+  .viewAllBtn {
+    margin-top: 1rem;
+    padding: 0.45rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .hotelGrid {
+    gap: 0.75rem;
+    padding: 0 0.25rem;
+  }
+
+  .hotelCard {
+    padding: 0.6rem;
+  }
+
+  .imagePlaceholder,
+  .hotelImage {
+    height: 180px;
+  }
+
+  .hotelName {
+    font-size: 0.9rem;
+  }
+
+  .stars svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .roomDetailsContainer {
+    gap: 0.5rem;
+  }
+
+  .roomIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .roomDetail span {
+    font-size: 0.75rem;
+  }
+
+  .price {
+    font-size: 1rem;
+  }
+
+  .hotelLocation {
+    font-size: 0.8rem;
+  }
+
+  .amenitiesContainer svg {
+    width: 55px;
+    height: 24px;
+  }
+
+  .viewAllBtn {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+  }
+}

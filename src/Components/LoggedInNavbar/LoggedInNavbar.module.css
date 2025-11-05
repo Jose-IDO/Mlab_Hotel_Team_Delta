@@ -241,3 +241,104 @@
   font-weight: 600;
   color: #fff;
 }
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.6rem 1rem;
+  }
+
+  .logoSection {
+    gap: 0.5rem;
+  }
+
+  .brandName {
+    font-size: 1rem;
+  }
+
+  .searchBar {
+    display: none;
+  }
+
+  .navLinks {
+    gap: 12px;
+    margin-left: 16px;
+  }
+
+  .navLink {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .userName {
+    font-size: 0.8rem;
+  }
+
+  .profileIcon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .profileInitials {
+    font-size: 0.8rem;
+  }
+
+  .flagIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .logoutBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .signInBtn,
+  .signUpBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .authButtons {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .navbar {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .brandName {
+    font-size: 0.9rem;
+  }
+
+  .navLinks {
+    gap: 8px;
+    margin-left: 12px;
+  }
+
+  .navLink {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .userName {
+    font-size: 0.75rem;
+  }
+
+  .profileIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .profileInitials {
+    font-size: 0.75rem;
+  }
+
+  .logoutBtn,
+  .signInBtn,
+  .signUpBtn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+  }
+}

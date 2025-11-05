@@ -184,3 +184,77 @@
   }
 }
 
+@media (max-width: 480px) {
+  .container {
+    min-height: 100vh;
+  }
+
+  .homeButton {
+    width: 50px;
+    height: 50px;
+    top: 15px;
+    left: 15px;
+  }
+
+  .homeIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .rightPanel {
+    padding: 32px 16px;
+  }
+
+  .formCard {
+    padding: 24px 20px;
+    max-width: 100%;
+  }
+
+  .formTitle {
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .welcomeTitle {
+    font-size: 1.8rem;
+  }
+
+  .welcomeText {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .homeButton {
+    width: 44px;
+    height: 44px;
+    top: 12px;
+    left: 12px;
+  }
+
+  .homeIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .rightPanel {
+    padding: 24px 12px;
+  }
+
+  .formCard {
+    padding: 20px 16px;
+  }
+
+  .formTitle {
+    font-size: 1.2rem;
+  }
+
+  .welcomeTitle {
+    font-size: 1.6rem;
+  }
+
+  .welcomeText {
+    font-size: 0.95rem;
+  }
+}
+

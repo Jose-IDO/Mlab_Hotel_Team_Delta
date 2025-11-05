@@ -412,3 +412,170 @@
   margin-bottom: 2rem;
 }
 
+@media (max-width: 480px) {
+  .landingPage > section:not(.footer) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .addressSection {
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .mapPlaceholder {
+    height: 200px;
+  }
+
+  .upcomingSection {
+    margin-top: 60px;
+    margin-bottom: 2rem;
+  }
+
+  .eventsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .eventCard {
+    height: auto;
+    min-height: 320px;
+  }
+
+  .eventImagePlaceholder {
+    height: 180px;
+  }
+
+  .eventDetails {
+    padding: 1rem;
+  }
+
+  .eventTitle {
+    font-size: 1rem;
+  }
+
+  .eventDate {
+    font-size: 0.9rem;
+  }
+
+  .eventDescription {
+    font-size: 0.85rem;
+  }
+
+  .footer {
+    padding: 1.5rem 1rem;
+    margin-top: 2rem;
+  }
+
+  .footerContent {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .footerColumn h4 {
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .footerColumn li {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .linkOverlay {
+    min-width: 300px;
+    max-width: 90vw;
+    padding: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .overlayTitle {
+    font-size: 1.1rem;
+  }
+
+  .overlayContent {
+    font-size: 0.9rem;
+  }
+
+  .modalContent {
+    padding: 2rem 1.5rem;
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+
+  .modalTitle {
+    font-size: 1.5rem;
+  }
+
+  .modalBody {
+    font-size: 1rem;
+  }
+
+  .modalCloseButton {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .destinationsSection {
+    margin-top: 50px;
+    padding-bottom: 50px;
+  }
+}
+
+@media (max-width: 360px) {
+  .landingPage > section:not(.footer) {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.2rem;
+  }
+
+  .addressSection {
+    padding: 1rem;
+  }
+
+  .mapPlaceholder {
+    height: 180px;
+  }
+
+  .eventCard {
+    min-height: 300px;
+  }
+
+  .eventImagePlaceholder {
+    height: 160px;
+  }
+
+  .footer {
+    padding: 1.2rem 0.75rem;
+  }
+
+  .linkOverlay {
+    min-width: 280px;
+    padding: 1.2rem;
+  }
+
+  .modalContent {
+    padding: 1.5rem 1rem;
+  }
+
+  .modalTitle {
+    font-size: 1.3rem;
+  }
+
+  .modalBody {
+    font-size: 0.95rem;
+  }
+}
+
