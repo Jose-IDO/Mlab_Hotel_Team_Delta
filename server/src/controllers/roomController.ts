@@ -4,6 +4,7 @@ import { validateRoomPayload } from '../utils/validators';
 import { RoomPayload } from '../types/room.types';
 
 export class RoomController {
+  // Get all rooms, optionally filtered by status
   async getAllRooms(req: Request, res: Response): Promise<void> {
     try {
       const status = req.query.status as 'active' | 'archived' | undefined;
@@ -14,6 +15,7 @@ export class RoomController {
     }
   }
 
+  // Get a room by ID
   async getRoomById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -30,18 +32,17 @@ export class RoomController {
     }
   }
 
+  // Create a new room
   async createRoom(req: Request, res: Response): Promise<void> {
     try {
       const body = req.body as Partial<RoomPayload>;
 
-      // Validate payload
       const validation = validateRoomPayload(body);
       if (!validation.valid) {
         res.status(400).json({ ok: false, error: validation.error });
         return;
       }
 
-      // Create room
       const newRoom = await roomService.createRoom(body as RoomPayload);
       res.status(201).json({ ok: true, data: newRoom });
     } catch (error) {
@@ -49,6 +50,7 @@ export class RoomController {
     }
   }
 
+  // Update a room
   async updateRoom(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -67,6 +69,7 @@ export class RoomController {
     }
   }
 
+  // Delete a room
   async deleteRoom(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -83,6 +86,7 @@ export class RoomController {
     }
   }
 
+  // Archive a room
   async archiveRoom(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -99,6 +103,7 @@ export class RoomController {
     }
   }
 
+  // Restore a room
   async restoreRoom(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -112,6 +117,42 @@ export class RoomController {
       res.json({ ok: true, data: restored });
     } catch (error) {
       res.status(500).json({ ok: false, error: 'Failed to restore room' });
+    }
+  }
+
+  // Fetch reviews for a specific room
+  async getRoomReviews(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const reviews = await roomService.getRoomReviews(id);
+
+      if (!reviews) {
+        res.status(404).json({ ok: false, error: 'No reviews found for this room' });
+        return;
+      }
+
+      res.json({ ok: true, data: reviews });
+    } catch (error) {
+      res.status(500).json({ ok: false, error: 'Failed to fetch room reviews' });
+    }
+  }
+
+  // Add a review to a room
+  async addRoomReview(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params; // room ID
+      const { name, rating, comment } = req.body;
+
+      if (!name || !rating || !comment) {
+        res.status(400).json({ ok: false, error: 'Name, rating, and comment are required' });
+        return;
+      }
+
+      const newReview = await roomService.addRoomReview(id, { name, rating, comment });
+      res.status(201).json({ ok: true, data: newReview });
+    } catch (error) {
+      console.error('Error adding room review:', error);
+      res.status(500).json({ ok: false, error: 'Failed to add room review' });
     }
   }
 }

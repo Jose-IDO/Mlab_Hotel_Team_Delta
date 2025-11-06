@@ -10,6 +10,7 @@ import hotelSettingsRoutes from './routes/hotelSettingsRoutes';
 import dealRoutes from './routes/dealRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './middleware/logger';
+import eventRoutes from "./routes/eventRoutes";
 
 const app = express();
 
@@ -32,8 +33,8 @@ app.use('/deals', dealRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/payments', paymentsRoutes);
 app.use('/settings', hotelSettingsRoutes);
+app.use("/admin/events", eventRoutes);
 
-// Error handling (must be last)
 app.use(errorHandler);
 
 export default app;

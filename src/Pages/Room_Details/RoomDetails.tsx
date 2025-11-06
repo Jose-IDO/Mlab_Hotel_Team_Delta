@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
 import styles from "./RoomDetails.module.css";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useAuth } from "../../contexts/AuthContext";
-import { 
-  Wifi, Wind, Tv, Wine, Palmtree, ConciergeBell, Waves, 
+import {
+  Wifi, Wind, Tv, Wine, Palmtree, ConciergeBell, Waves,
   CircleSlash2, PawPrint, Clock, Volume2, AlertCircle,
-  Sparkles, Coffee, Bath, Users, Bed, Maximize2
+  Calendar, Users, Sparkles, Coffee, Bath
 } from "lucide-react";
 
-// Room images (used to represent types)
+// Room images
 import room1 from "../../assets/room1.jpg";
 import room2 from "../../assets/room1B.jpg";
 import room3 from "../../assets/room1c.jpg";
 import room4 from "../../assets/room1d.jpg";
 import room5 from "../../assets/room1E.jpg";
 
+// Types
 type ApiRoom = {
   id: string;
   roomName: string;
@@ -27,14 +28,12 @@ type ApiRoom = {
   roomSizeSqm?: number;
   amenities?: string[];
   description?: string;
-  images?: string[]; // Add images array from Cloudinary
 };
 
 type UiRoom = {
   id: string;
   name: string;
   image: string;
-  images: string[]; // Add multiple images support
   price: number;
   adults: number;
   kids: number;
@@ -45,32 +44,66 @@ type UiRoom = {
   description?: string;
 };
 
+type ApiReview = {
+  id: string;
+  author: string;
+  comment: string;
+  rating: number;
+  timestamp: string;
+};
+
+type UiReview = {
+  id: string;
+  author: string;
+  comment: string;
+  rating: number;
+  date: string;
+};
+
+type AvailabilitySlot = {
+  date: string;
+  available: boolean;
+};
+
 const RoomDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [room, setRoom] = useState<UiRoom | null>(null);
 
-  // Get deal price from URL if present
-  const dealPrice = searchParams.get('dealPrice');
-  const dealId = searchParams.get('dealId');
-  const effectivePrice = dealPrice ? parseFloat(dealPrice) : null;
+  // Reviews
+  const [reviews, setReviews] = useState<UiReview[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
 
+  // Availability
+  const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
+
+  // New review
+  const [reviewName, setReviewName] = useState(
+    user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : ''
+  );
+  const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Helper: pick image
   const pickImage = (type?: string, name?: string) => {
     const t = (type || name || '').toLowerCase();
-    if (t.includes('presidential')) return room5;
-    if (t.includes('suite')) return room5;
+    if (t.includes('presidential') || t.includes('suite')) return room5;
     if (t.includes('family')) return room4;
     if (t.includes('superior')) return room3;
     if (t.includes('double')) return room2;
     return room1;
   };
 
-  // Map amenity names to icons
+  // Helper: amenity icons
   const getAmenityIcon = (amenity: string) => {
     const a = amenity.toLowerCase();
     if (a.includes('wifi')) return <Wifi size={32} />;
@@ -84,10 +117,10 @@ const RoomDetails: React.FC = () => {
     if (a.includes('toiletries')) return <Sparkles size={32} />;
     if (a.includes('kettle') || a.includes('coffee')) return <Coffee size={32} />;
     if (a.includes('bathtub') || a.includes('bath')) return <Bath size={32} />;
-    return <ConciergeBell size={32} />; // default icon
+    return <ConciergeBell size={32} />;
   };
 
-  // Map rule names to icons
+  // Helper: rule icons
   const getRuleIcon = (rule: string) => {
     const r = rule.toLowerCase();
     if (r.includes('smoking')) return <CircleSlash2 size={32} />;
@@ -95,16 +128,17 @@ const RoomDetails: React.FC = () => {
     if (r.includes('check')) return <Clock size={32} />;
     if (r.includes('quiet')) return <Volume2 size={32} />;
     if (r.includes('damage')) return <AlertCircle size={32} />;
-    return <AlertCircle size={32} />; // default icon
+    return <AlertCircle size={32} />;
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
+  // Scroll to top on room change
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
+  // Fetch room
   useEffect(() => {
     if (!id) return;
     const API_URL = (import.meta as any).env.VITE_API_URL as string;
+
     const run = async () => {
       setLoading(true);
       setError(null);
@@ -113,16 +147,10 @@ const RoomDetails: React.FC = () => {
         const json = await res.json();
         if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch room');
         const r = json.data as ApiRoom;
-        
-        // Use Cloudinary images if available, otherwise fallback to hardcoded images
-        const cloudinaryImages = Array.isArray(r.images) && r.images.length > 0 ? r.images : [];
-        const fallbackImage = pickImage(r.roomType, r.roomName);
-        
         const mapped: UiRoom = {
           id: r.id,
           name: r.roomName,
-          image: cloudinaryImages.length > 0 ? cloudinaryImages[0] : fallbackImage,
-          images: cloudinaryImages.length > 0 ? cloudinaryImages : [fallbackImage],
+          image: pickImage(r.roomType, r.roomName),
           price: Number(r.price) || 0,
           adults: r.maxGuests ?? 2,
           kids: 0,
@@ -143,15 +171,120 @@ const RoomDetails: React.FC = () => {
     run();
   }, [id]);
 
+  // Fetch reviews
+  useEffect(() => {
+    if (!id) return;
+    const API_URL = (import.meta as any).env.VITE_API_URL as string;
+
+    const fetchReviews = async () => {
+      setReviewsLoading(true);
+      setReviewsError(null);
+      try {
+        const res = await fetch(`${API_URL}/admin/rooms/${id}/reviews`);
+        const json = await res.json();
+        if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch reviews');
+
+        const mapped: UiReview[] = (json.data as ApiReview[]).map(r => ({
+          id: r.id,
+          author: r.author || 'Anonymous',
+          comment: r.comment,
+          rating: r.rating,
+          date: new Date(r.timestamp).toLocaleDateString(),
+        }));
+
+        setReviews(mapped);
+      } catch (e: any) {
+        setReviewsError(e.message || 'Failed to load reviews');
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [id]);
+
+  // Fetch availability
+  useEffect(() => {
+    if (!id) return;
+    const API_URL = (import.meta as any).env.VITE_API_URL as string;
+
+    const fetchAvailability = async () => {
+      setAvailabilityLoading(true);
+      setAvailabilityError(null);
+      try {
+        const res = await fetch(`${API_URL}/admin/rooms/${id}/availability`);
+        const json = await res.json();
+        if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch availability');
+
+        setAvailability(json.data as AvailabilitySlot[]);
+      } catch (e: any) {
+        setAvailabilityError(e.message || 'Failed to load availability');
+      } finally {
+        setAvailabilityLoading(false);
+      }
+    };
+
+    fetchAvailability();
+  }, [id]);
+
+  // Submit review
+  const submitReview = async () => {
+    if (!id || !isAuthenticated) {
+      setSubmitError("You must be logged in to submit a review.");
+      return;
+    }
+
+    const rating = Number(newReview.rating);
+    const comment = newReview.comment.trim();
+    const author = reviewName.trim();
+
+    if (!author || !comment || !(rating >= 1 && rating <= 5)) {
+      setSubmitError("Name, rating, and comment are required");
+      return;
+    }
+
+    setSubmittingReview(true);
+    setSubmitError(null);
+
+    const API_URL = (import.meta as any).env.VITE_API_URL as string;
+
+    try {
+      const res = await fetch(`${API_URL}/admin/rooms/${id}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: author, rating, comment }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || 'Failed to submit review');
+      }
+
+      setReviews([{
+        id: json.data.id,
+        author: json.data.author,
+        comment: json.data.comment,
+        rating: json.data.rating,
+        date: new Date(json.data.timestamp).toLocaleDateString(),
+      }, ...reviews]);
+
+      setNewReview({ rating: 5, comment: '' });
+      setReviewName('');
+    } catch (e: any) {
+      setSubmitError(e.message || 'Failed to submit review');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   const handleBookNow = () => {
     if (!room) return;
     const bookingData = {
-      roomId: room.id, // Include room ID for backend booking
       hotelName: "Delta Hotel",
       roomType: room.name,
       roomImage: room.image,
-      pricePerNight: effectivePrice || room.price, // Use deal price if available
-      dealId: dealId || undefined, // Include deal ID if booking from deal
+      pricePerNight: room.price,
     };
 
     if (!isAuthenticated) {
@@ -166,156 +299,158 @@ const RoomDetails: React.FC = () => {
     <>
       <LoggedInNavbar />
       <div className={styles.container}>
+        {loading && <div style={{ padding: 12 }}>Loading room…</div>}
+        {error && !loading && <div style={{ padding: 12, color: '#b00020' }}>{error}</div>}
 
-      {loading && <div style={{padding: 12}}>Loading room…</div>}
-      {error && !loading && (
-        <div style={{padding: 12, color:'#b00020'}}>
-          {error}
-          <div>
-            <button className={styles.bookNowBtn} style={{marginTop: 12}} onClick={() => navigate(-1)}>Go Back</button>
-          </div>
-        </div>
-      )}
-
-      {!loading && !error && room && (
-        <>
-          <div className={styles.gallery}>
-            <div className={styles.mainImage} onClick={() => setSelectedImage(selectedImage || room.image)}>
-              <img src={selectedImage || room.image} alt={room.name} />
-            </div>
-            <div className={styles.sideImages}>
-              {room.images.slice(0, 4).map((img, idx) => (
-                <img 
-                  key={idx} 
-                  src={img} 
-                  alt={`${room.name} ${idx + 1}`} 
-                  onClick={() => setSelectedImage(img)}
-                  className={selectedImage === img ? styles.activeThumb : ''}
-                />
-              ))}
-              {/* Fill remaining slots with placeholders if less than 4 images */}
-              {room.images.length < 4 && Array.from({ length: 4 - room.images.length }).map((_, idx) => (
-                <div key={`placeholder-${idx}`} className={styles.emptySlot}>
-                  <span>📷</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* INFO & BOOKING SECTION */}
-          <div className={styles.infoSection}>
-            <div className={styles.roomType}>
-              <h2>{room.name}</h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                {effectivePrice ? (
-                  <>
-                    <p className={styles.price} style={{ textDecoration: 'line-through', opacity: 0.6, fontSize: '1rem' }}>
-                      R {room.price.toLocaleString()}
-                    </p>
-                    <p className={styles.price} style={{ color: '#10B981', fontWeight: 700 }}>
-                      R {effectivePrice.toLocaleString()}
-                    </p>
-                    {dealId && (
-                      <span style={{ 
-                        background: 'linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%)', 
-                        color: 'white', 
-                        padding: '4px 12px', 
-                        borderRadius: '20px', 
-                        fontSize: '0.75rem',
-                        fontWeight: 700
-                      }}>
-                        DEAL
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  <p className={styles.price}>R {room.price.toLocaleString()}</p>
-                )}
+        {!loading && !error && room && (
+          <>
+            {/* Gallery */}
+            <div className={styles.gallery}>
+              <div className={styles.mainImage} onClick={() => setSelectedImage(room.image)}>
+                <img src={room.image} alt={room.name} />
+              </div>
+              <div className={styles.sideImages}>
+                <img src={room1} alt="Room 1" onClick={() => setSelectedImage(room1)} />
+                <img src={room2} alt="Room 2" onClick={() => setSelectedImage(room2)} />
+                <img src={room3} alt="Room 3" onClick={() => setSelectedImage(room3)} />
+                <img src={room4} alt="Room 4" onClick={() => setSelectedImage(room4)} />
               </div>
             </div>
 
-            <button className={styles.bookNowBtn} onClick={handleBookNow}>
-              {isAuthenticated ? 'Book Now' : 'Sign Up to Book'}
-            </button>
-          </div>
-
-          {/* ROOM DETAILS */}
-          <div className={styles.roomDetailsSection}>
-            <h2>Room Details</h2>
-            <div className={styles.detailsGrid}>
-              <div className={styles.detailItem}>
-                <Users size={32} className={styles.detailIcon} />
-                <div className={styles.detailContent}>
-                  <span className={styles.detailLabel}>Max Guests</span>
-                  <span className={styles.detailValue}>{room.adults} Guests</span>
-                </div>
+            {/* Info & Book */}
+            <div className={styles.infoSection}>
+              <div className={styles.roomType}>
+                <h2>{room.name}</h2>
+                <p className={styles.price}>R {room.price.toLocaleString()} PN</p>
               </div>
-              <div className={styles.detailItem}>
-                <Bed size={32} className={styles.detailIcon} />
-                <div className={styles.detailContent}>
-                  <span className={styles.detailLabel}>Bed Type</span>
-                  <span className={styles.detailValue}>{room.numberOfBeds} × {room.bedType}</span>
-                </div>
-              </div>
-              <div className={styles.detailItem}>
-                <Maximize2 size={32} className={styles.detailIcon} />
-                <div className={styles.detailContent}>
-                  <span className={styles.detailLabel}>Room Size</span>
-                  <span className={styles.detailValue}>{room.roomSize} m²</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* AMENITIES */}
-          <div className={styles.amenitiesSection}>
-            <h2>Amenities</h2>
-            <div className={styles.amenitiesContainer}>
-              {(room.amenities && room.amenities.length > 0 ? room.amenities : [
-                'Free WiFi','Air Conditioning','TV/Netflix','Mini Bar','Balcony View','Room Service','Spa Access','Swimming Pool'
-              ]).map((a) => (
-                <div key={a} className={styles.amenity}>
-                  {getAmenityIcon(a)}
-                  <span>{a}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* RULES */}
-          <div className={styles.rulesSection}>
-            <h2>Hotel Rules</h2>
-            <div className={styles.rulesContainer}>
-              {['No Smoking','No Pets Allowed','Check-in: 2:00pm | Check-out: 10:00pm','Quiet hours after 10pm','Damage to property will incur a fee'].map((r) => (
-                <div key={r} className={styles.rule}>
-                  {getRuleIcon(r)}
-                  <span>{r}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-        {/* ---------- IMAGE OVERLAY MODAL ---------- */}
-        {selectedImage && (
-          <div className={styles.imageOverlay} onClick={() => setSelectedImage(null)}>
-            <div className={styles.overlayContent} onClick={(e) => e.stopPropagation()}>
-              <button 
-                className={styles.closeButton} 
-                onClick={() => setSelectedImage(null)}
-                aria-label="Close image"
-              >
-                ✕
+              <button className={styles.bookNowBtn} onClick={handleBookNow}>
+                {isAuthenticated ? 'Book Now' : 'Sign Up to Book'}
               </button>
-              <img src={selectedImage} alt="Full size view" className={styles.fullImage} />
             </div>
-          </div>
-        )}
 
+            {/* Room details */}
+            <div className={styles.roomDetailsSection}>
+              <h2>Room Details</h2>
+              <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                  <span className={styles.detailIcon}>👥</span>
+                  <div className={styles.detailContent}>
+                    <span className={styles.detailLabel}>Max Guests</span>
+                    <span className={styles.detailValue}>{room.adults} Adults, {room.kids} Children</span>
+                  </div>
+                </div>
+                <div className={styles.detailItem}>
+                  <span className={styles.detailIcon}>🛏️</span>
+                  <div className={styles.detailContent}>
+                    <span className={styles.detailLabel}>Bed Type</span>
+                    <span className={styles.detailValue}>{room.numberOfBeds} × {room.bedType}</span>
+                  </div>
+                </div>
+                <div className={styles.detailItem}>
+                  <span className={styles.detailIcon}>📐</span>
+                  <div className={styles.detailContent}>
+                    <span className={styles.detailLabel}>Room Size</span>
+                    <span className={styles.detailValue}>{room.roomSize} m²</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Amenities */}
+            <div className={styles.amenitiesSection}>
+              <h2>Amenities</h2>
+              <div className={styles.amenitiesContainer}>
+                {(room.amenities && room.amenities.length > 0 ? room.amenities : [
+                  'Free WiFi', 'Air Conditioning', 'TV/Netflix', 'Mini Bar', 'Balcony View', 'Room Service', 'Spa Access', 'Swimming Pool'
+                ]).map(a => (
+                  <div key={a} className={styles.amenity}>
+                    {getAmenityIcon(a)}
+                    <span>{a}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Rules */}
+            <div className={styles.rulesSection}>
+              <h2>Hotel Rules</h2>
+              <div className={styles.rulesContainer}>
+                {['No Smoking', 'No Pets Allowed', 'Check-in: 2:00pm | Check-out: 10:00pm', 'Quiet hours after 10pm', 'Damage to property will incur a fee'].map(r => (
+                  <div key={r} className={styles.rule}>
+                    {getRuleIcon(r)}
+                    <span>{r}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Reviews */}
+            <div className={styles.reviewsSection}>
+              <h2>Guest Reviews</h2>
+              {reviewsLoading && <div>Loading reviews…</div>}
+              {reviewsError && <div style={{ color: 'red' }}>{reviewsError}</div>}
+              {!reviewsLoading && reviews.length === 0 && <div>No reviews yet for this room.</div>}
+              {reviews.length > 0 && (
+                <div className={styles.reviewsContainer}>
+                  {reviews.map(r => (
+                    <div key={r.id} className={styles.review}>
+                      <div className={styles.reviewHeader}>
+                        <strong>{r.author}</strong>
+                        <span className={styles.reviewRating}>⭐ {r.rating}/5</span>
+                      </div>
+                      <div className={styles.reviewComment}>{r.comment}</div>
+                      <div className={styles.reviewDate}>{r.date}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add review */}
+              <div className={styles.addReviewSection}>
+                <h3>Add Your Review</h3>
+                <div className={styles.reviewForm}>
+                  <input
+                    type="text"
+                    disabled
+                    hidden
+                    value={reviewName}
+                    onChange={(e) => setReviewName(e.target.value)}
+                  />
+                  <select
+                    value={newReview.rating}
+                    onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
+                  >
+                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                  </select>
+                  <textarea
+                    placeholder="Your comment"
+                    value={newReview.comment}
+                    onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                  />
+                  <button
+                    onClick={submitReview}
+                    disabled={submittingReview || !newReview.comment.trim() || !reviewName.trim()}
+                  >
+                    {submittingReview ? 'Submitting…' : 'Submit Review'}
+                  </button>
+                  {submitError && <div style={{ color: 'red' }}>{submitError}</div>}
+                </div>
+              </div>
+            </div>
+
+            {/* Image overlay */}
+            {selectedImage && (
+              <div className={styles.imageOverlay} onClick={() => setSelectedImage(null)}>
+                <div className={styles.overlayContent} onClick={(e) => e.stopPropagation()}>
+                  <button className={styles.closeButton} onClick={() => setSelectedImage(null)}>✕</button>
+                  <img src={selectedImage} alt="Full size view" className={styles.fullImage} />
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </>
   );
 };
-
 export default RoomDetails;

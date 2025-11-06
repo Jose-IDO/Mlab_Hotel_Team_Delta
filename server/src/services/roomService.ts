@@ -1,5 +1,6 @@
-import { Room, RoomPayload } from '../types/room.types';
+import { Review, Room, RoomPayload } from '../types/room.types';
 import { roomRepository } from '../repositories/roomRepository';
+import { reviewRepository } from '../repositories/reviewReposotory';
 
 export class RoomService {
   async getAllRooms(status?: 'active' | 'archived'): Promise<Room[]> {
@@ -28,6 +29,23 @@ export class RoomService {
 
   async restoreRoom(id: string): Promise<Room | null> {
     return roomRepository.restore(id);
+  }
+
+  async getRoomReviews(roomId: string): Promise<Review[]> {
+    return reviewRepository.findByRoomId(roomId);
+  }
+
+  async addRoomReview(
+    roomId: string,
+    review: { name: string; rating: number; comment: string } // <- use "name"
+  ): Promise<Review> {
+    return reviewRepository.create({
+      roomId,
+      name: review.name,          // must match repository
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: new Date(),      // required for timestamp
+    });
   }
 }
 

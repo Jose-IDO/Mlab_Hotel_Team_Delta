@@ -1,14 +1,139 @@
-.landingPage {
+/* ---------- GENERAL LAYOUT ---------- */
+.landingSections {
+  padding: 2rem;
   background-color: #f9f9f9;
-  font-family: "Inter", sans-serif;
+  font-family: 'Arial', sans-serif;
+}
+
+/* ---------- UPCOMING EVENTS ---------- */
+.upcomingSection {
+  margin: 6rem 0 4rem 0; /* top spacing increased to avoid overlap */
+  position: relative;
+  z-index: 1;
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.eventsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.eventCard {
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.eventCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.eventImagePlaceholder {
+  width: 100%;
+  height: 250px; /* adjust for desired card height */
+  overflow: hidden;
+}
+
+.eventImagePlaceholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fills container while preserving aspect ratio */
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.eventImagePlaceholder img:hover {
+  transform: scale(1.05);
+}
+
+.eventDetails {
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.eventTitle {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
   color: #222;
 }
 
-.landingPage > section:not(.footer) {
-  padding-left: 2rem;
-  padding-right: 2rem;
+.eventDate {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 0.5rem;
 }
 
+.eventDescription {
+  font-size: 1rem;
+  color: #555;
+  margin-top: auto;
+}
+
+/* ---------- WHY CHOOSE US SECTION ---------- */
+.section2 {
+  margin-top: 8rem; /* add spacing above this section */
+  padding: 2rem 0;
+}
+
+.Head1 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.offerings {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.offerings1 {
+  text-align: center;
+  max-width: 300px;
+}
+
+.offerings1 img {
+  margin-bottom: 1rem;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .eventImagePlaceholder {
+    height: 200px;
+  }
+  .offerings {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .eventImagePlaceholder {
+    height: 150px;
+  }
+  .sectionTitle,
+  .Head1 {
+    font-size: 1.5rem;
+  }
+}
 /* ---------- SECTION TITLES ---------- */
 .sectionTitle {
   font-size: 1.6rem;
@@ -171,85 +296,6 @@
   color: #F93448;
 }
 
-/* Footer Link with Overlay */
-.footerLink {
-  position: relative;
-  cursor: pointer;
-}
-
-.footerLinkNoHover {
-  cursor: pointer;
-}
-
-.linkOverlay {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  margin-bottom: 15px;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 2rem;
-  min-width: 420px;
-  max-width: 500px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 
-              0 4px 12px rgba(0, 0, 0, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  z-index: 1000;
-  animation: fadeInUp 0.3s ease;
-  pointer-events: none;
-}
-
-.overlayTitle {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid rgba(249, 52, 72, 0.8);
-}
-
-.overlayContent {
-  font-size: 1rem;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  line-height: 1.7;
-  margin: 0;
-  font-weight: 400;
-}
-
-.moreText {
-  color: #F93448;
-  font-weight: 600;
-  font-style: italic;
-  margin-left: 0.25rem;
-  text-shadow: 0 0 8px rgba(249, 52, 72, 0.5);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .footerColumn p {
   color: #fff;
   margin: 0.2rem 0;
@@ -271,14 +317,12 @@
   cursor: pointer;
   color: #555;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .iconPlaceholder:hover {
-  background: #F93448;
+  background: #2563eb;
   color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.4);
 }
 
 .footerBottom {
@@ -288,117 +332,6 @@
   padding-top: 1rem;
   font-size: 0.85rem;
   color: #fff;
-}
-
-/* ---------- MODAL OVERLAY STYLES ---------- */
-.modalBackdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 2rem;
-  animation: fadeIn 0.3s ease;
-}
-
-.modalContent {
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  padding: 3rem;
-  max-width: 800px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 
-              0 8px 20px rgba(0, 0, 0, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  animation: scaleIn 0.3s ease;
-}
-
-.modalCloseButton {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.modalCloseButton:hover {
-  background: #F93448;
-  border-color: #F93448;
-  transform: rotate(90deg);
-}
-
-.modalTitle {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  margin: 0 0 1.5rem 0;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid #F93448;
-}
-
-.modalBody {
-  color: #fff;
-  font-size: 1.1rem;
-  line-height: 1.8;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.modalBody p {
-  margin: 0;
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Custom scrollbar for modal */
-.modalContent::-webkit-scrollbar {
-  width: 8px;
-}
-
-.modalContent::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-
-.modalContent::-webkit-scrollbar-thumb {
-  background: rgba(249, 52, 72, 0.6);
-  border-radius: 10px;
-}
-
-.modalContent::-webkit-scrollbar-thumb:hover {
-  background: #F93448;
 }
 
 /* ---------- DESTINATIONS SECTION STYLES ---------- */
@@ -411,171 +344,3 @@
   text-align: center;
   margin-bottom: 2rem;
 }
-
-@media (max-width: 480px) {
-  .landingPage > section:not(.footer) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .sectionTitle {
-    font-size: 1.3rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .addressSection {
-    padding: 1.2rem;
-    margin-bottom: 2rem;
-  }
-
-  .mapPlaceholder {
-    height: 200px;
-  }
-
-  .upcomingSection {
-    margin-top: 60px;
-    margin-bottom: 2rem;
-  }
-
-  .eventsGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .eventCard {
-    height: auto;
-    min-height: 320px;
-  }
-
-  .eventImagePlaceholder {
-    height: 180px;
-  }
-
-  .eventDetails {
-    padding: 1rem;
-  }
-
-  .eventTitle {
-    font-size: 1rem;
-  }
-
-  .eventDate {
-    font-size: 0.9rem;
-  }
-
-  .eventDescription {
-    font-size: 0.85rem;
-  }
-
-  .footer {
-    padding: 1.5rem 1rem;
-    margin-top: 2rem;
-  }
-
-  .footerContent {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .footerColumn h4 {
-    font-size: 1rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .footerColumn li {
-    font-size: 0.9rem;
-    margin-bottom: 0.3rem;
-  }
-
-  .linkOverlay {
-    min-width: 300px;
-    max-width: 90vw;
-    padding: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .overlayTitle {
-    font-size: 1.1rem;
-  }
-
-  .overlayContent {
-    font-size: 0.9rem;
-  }
-
-  .modalContent {
-    padding: 2rem 1.5rem;
-    max-width: 95vw;
-    max-height: 85vh;
-  }
-
-  .modalTitle {
-    font-size: 1.5rem;
-  }
-
-  .modalBody {
-    font-size: 1rem;
-  }
-
-  .modalCloseButton {
-    width: 32px;
-    height: 32px;
-    font-size: 1.2rem;
-    top: 1rem;
-    right: 1rem;
-  }
-
-  .destinationsSection {
-    margin-top: 50px;
-    padding-bottom: 50px;
-  }
-}
-
-@media (max-width: 360px) {
-  .landingPage > section:not(.footer) {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-
-  .sectionTitle {
-    font-size: 1.2rem;
-  }
-
-  .addressSection {
-    padding: 1rem;
-  }
-
-  .mapPlaceholder {
-    height: 180px;
-  }
-
-  .eventCard {
-    min-height: 300px;
-  }
-
-  .eventImagePlaceholder {
-    height: 160px;
-  }
-
-  .footer {
-    padding: 1.2rem 0.75rem;
-  }
-
-  .linkOverlay {
-    min-width: 280px;
-    padding: 1.2rem;
-  }
-
-  .modalContent {
-    padding: 1.5rem 1rem;
-  }
-
-  .modalTitle {
-    font-size: 1.3rem;
-  }
-
-  .modalBody {
-    font-size: 0.95rem;
-  }
-}
-
