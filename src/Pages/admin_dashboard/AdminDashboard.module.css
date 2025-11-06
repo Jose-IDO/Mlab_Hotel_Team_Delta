@@ -1,0 +1,76 @@
+@import url(../../Components/AdminSidebar/AdminSidebar.module.css);
+
+.pageContent {
+    display: flex;
+    padding: 0;
+    padding-top: 60px;
+    background: transparent;
+    min-height: 100vh;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.pageContent::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url(../../assets/background-image.jpg) center/cover no-repeat fixed;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.sidebar {
+    width: 260px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 24px 0;
+    flex-shrink: 0;
+    box-shadow: 
+        0 8px 32px 0 rgba(31, 38, 135, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    border-radius: 0 16px 16px 0;
+}
+
+.mainContent {
+    flex: 1;
+    padding: 30px;
+    padding-right: 30px;
+    overflow-x: auto;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar styling */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(0, 147, 233, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 147, 233, 0.5);
+}

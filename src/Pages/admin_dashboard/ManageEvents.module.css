@@ -1,0 +1,84 @@
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h2, h3 {
+  color: #1a202c;
+}
+
+.addEventForm {
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f5f5f5;
+}
+
+.addEventForm input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.addEventForm button {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0093e9;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.addEventForm button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.eventCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background-color: #ffffff;
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+}
+
+.eventInfo {
+  max-width: 80%;
+}
+
+.eventInfo strong {
+  font-size: 16px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.eventInfo p {
+  font-size: 14px;
+  color: #4a5568;
+  margin-top: 5px;
+}
+
+.eventActions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #e53e3e;
+  color: white;
+  cursor: pointer;
+}

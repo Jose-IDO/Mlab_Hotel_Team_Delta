@@ -1,0 +1,58 @@
+export interface HotelSettings {
+  id: string;
+  hotelName: string;
+  tagline?: string;
+  description?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  stateProvince?: string;
+  postalCode?: string;
+  country: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
+  amenities?: string[];
+  logoUrl?: string;
+  heroImageUrl?: string;
+  galleryImages?: string[];
+  taxRate?: number;
+  currency: string;
+  cancellationPolicy?: string;
+  termsAndConditions?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateHotelSettingsDTO {
+  hotelName?: string;
+  tagline?: string;
+  description?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  stateProvince?: string;
+  postalCode?: string;
+  country?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
+  amenities?: string[];
+  logoUrl?: string;
+  heroImageUrl?: string;
+  galleryImages?: string[];
+  taxRate?: number;
+  currency?: string;
+  cancellationPolicy?: string;
+  termsAndConditions?: string;
+}

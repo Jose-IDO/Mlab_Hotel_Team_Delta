@@ -1,0 +1,117 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 8px 32px 0 rgba(31, 38, 135, 0.10),
+        inset 0 -1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+.navContainer {
+    margin: 0;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.leftSection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.leftSection > span {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0093E9 0%, #00B4DB 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.homeIconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.homeIconWrapper:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.homeIcon {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) saturate(100%) invert(51%) sepia(92%) saturate(1234%) hue-rotate(169deg) brightness(98%) contrast(101%);
+    transition: filter 0.3s ease;
+}
+
+.homeIcon:hover {
+    filter: brightness(0) saturate(100%) invert(51%) sepia(92%) saturate(1234%) hue-rotate(169deg) brightness(98%) contrast(101%) drop-shadow(0 0 8px #F93448) drop-shadow(0 0 12px #F93448);
+}
+
+.profileSection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.1);
+    transition: all 0.3s;
+}
+
+.profileSection:hover {
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 6px 20px rgba(31, 38, 135, 0.15);
+}
+
+.profilePicture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(0, 147, 233, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 147, 233, 0.3);
+}
+
+.profileSection > span {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.logoutButton {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #F2994A 0%, #F2C94C 100%);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(242, 153, 74, 0.3);
+}
+
+.logoutButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(242, 153, 74, 0.4);
+}
+
+.logoutButton:active {
+    transform: translateY(0);
+}

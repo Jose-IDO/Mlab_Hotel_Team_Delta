@@ -1,0 +1,205 @@
+.container {
+    padding: 20px;
+}
+
+.headerBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 16px;
+    padding: 16px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px 0 rgba(31, 38, 135, 0.10),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+}
+    
+.title {
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.addButton {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #0093E9 0%, #00B4DB 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 147, 233, 0.3);
+}
+
+.addButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 147, 233, 0.4);
+}
+
+.adminSection {
+    margin-bottom: 40px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px rgba(31, 38, 135, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(31, 38, 135, 0.1);
+}
+
+.table thead {
+    background: rgba(0, 147, 233, 0.50);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white;
+}
+
+.table thead th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+    transition: background-color 0.2s;
+    backdrop-filter: blur(5px);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 147, 233, 0.05);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody td {
+    padding: 15px;
+    color: #333;
+    font-size: 14px;
+}
+
+.table tbody td:first-child {
+    font-weight: 600;
+    color: #0093E9;
+}
+
+/* Admin Type badges */
+.typeBadge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.superAdmin {
+    background: rgba(225, 190, 231, 0.8);
+    color: #4A148C;
+}
+
+.admin {
+    background: rgba(187, 222, 251, 0.8);
+    color: #0D47A1;
+}
+
+.moderator {
+    background: rgba(200, 230, 201, 0.8);
+    color: #1B5E20;
+}
+
+/* Buttons */
+button {
+    padding: 6px 12px;
+    margin-right: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.editBtn {
+    background: rgba(255, 152, 0, 0.9);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.editBtn:hover {
+    background: rgba(230, 137, 0, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+.deactivateBtn {
+    background: rgba(244, 67, 54, 0.9);
+    color: white;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+.deactivateBtn:hover {
+    background: rgba(218, 25, 11, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+.approveBtn {
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.approveBtn:hover {
+    background: rgba(69, 160, 73, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.rejectBtn {
+    background: rgba(244, 67, 54, 0.9);
+    color: white;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+.rejectBtn:hover {
+    background: rgba(218, 25, 11, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}

@@ -1,0 +1,238 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import styles from './Settings.module.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+export const Settings: React.FC = () => {
+  const { token } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [form, setForm] = useState({
+    hotelName: '',
+    tagline: '',
+    description: '',
+    email: '',
+    phone: '',
+    website: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    stateProvince: '',
+    postalCode: '',
+    country: 'South Africa',
+    checkInTime: '14:00',
+    checkOutTime: '11:00',
+    currency: 'ZAR',
+    taxRate: 15,
+    cancellationPolicy: '',
+    termsAndConditions: '',
+  });
+
+  useEffect(() => {
+    loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${API_URL}/settings/public`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Failed to load settings');
+      
+      const s = data.data;
+      setForm({
+        hotelName: s.hotelName || '',
+        tagline: s.tagline || '',
+        description: s.description || '',
+        email: s.email || '',
+        phone: s.phone || '',
+        website: s.website || '',
+        addressLine1: s.addressLine1 || '',
+        addressLine2: s.addressLine2 || '',
+        city: s.city || '',
+        stateProvince: s.stateProvince || '',
+        postalCode: s.postalCode || '',
+        country: s.country || 'South Africa',
+        checkInTime: s.checkInTime || '14:00',
+        checkOutTime: s.checkOutTime || '11:00',
+        currency: s.currency || 'ZAR',
+        taxRate: s.taxRate || 15,
+        cancellationPolicy: s.cancellationPolicy || '',
+        termsAndConditions: s.termsAndConditions || '',
+      });
+    } catch (e: any) {
+      setError(e.message || 'Failed to load settings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: name === 'taxRate' ? Number(value) : value }));
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setSaving(true);
+    setError(null);
+    setSuccess(false);
+    try {
+      const res = await fetch(`${API_URL}/settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Failed to save settings');
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (e: any) {
+      setError(e.message || 'Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.headerBar}>
+        <h1 className={styles.title}>Hotel Settings</h1>
+        <button className={styles.saveTopBtn} form="settingsForm" type="submit" disabled={saving || loading}>
+          {saving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
+
+      {loading && <div className={styles.section}><p>Loading settings...</p></div>}
+      {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
+      {success && <div className={styles.successAlert}>Settings saved successfully!</div>}
+
+      {!loading && (
+        <form id="settingsForm" className={styles.form} onSubmit={onSubmit}>
+          <section className={styles.section}>
+            <h3 className={styles.subtitle}>Basic Information</h3>
+            <div className={styles.grid}>
+              <div className={styles.formGroup}>
+                <label>Hotel Name *</label>
+                <input name="hotelName" value={form.hotelName} onChange={onChange} placeholder="Delta Hotel" required />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Tagline</label>
+                <input name="tagline" value={form.tagline} onChange={onChange} placeholder="Your Comfort, Our Priority" />
+              </div>
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <label>Description</label>
+                <textarea name="description" rows={3} value={form.description} onChange={onChange} placeholder="Brief description of your hotel..." />
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.section}>
+            <h3 className={styles.subtitle}>Contact Information</h3>
+            <div className={styles.grid}>
+              <div className={styles.formGroup}>
+                <label>Email</label>
+                <input type="email" name="email" value={form.email} onChange={onChange} placeholder="info@deltahotel.com" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Phone</label>
+                <input name="phone" value={form.phone} onChange={onChange} placeholder="+27 12 345 6789" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Website</label>
+                <input type="url" name="website" value={form.website} onChange={onChange} placeholder="https://www.deltahotel.com" />
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.section}>
+            <h3 className={styles.subtitle}>Address</h3>
+            <div className={styles.grid}>
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <label>Address Line 1</label>
+                <input name="addressLine1" value={form.addressLine1} onChange={onChange} placeholder="1 Mark Shuttleworth Street" />
+              </div>
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <label>Address Line 2</label>
+                <input name="addressLine2" value={form.addressLine2} onChange={onChange} placeholder="Lynwood" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>City</label>
+                <input name="city" value={form.city} onChange={onChange} placeholder="Pretoria" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>State/Province</label>
+                <input name="stateProvince" value={form.stateProvince} onChange={onChange} placeholder="Gauteng" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Postal Code</label>
+                <input name="postalCode" value={form.postalCode} onChange={onChange} placeholder="0087" />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Country</label>
+                <input name="country" value={form.country} onChange={onChange} placeholder="South Africa" />
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.section}>
+            <h3 className={styles.subtitle}>Operational Settings</h3>
+            <div className={styles.grid}>
+              <div className={styles.formGroup}>
+                <label>Check-in Time</label>
+                <input type="time" name="checkInTime" value={form.checkInTime} onChange={onChange} />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Check-out Time</label>
+                <input type="time" name="checkOutTime" value={form.checkOutTime} onChange={onChange} />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Currency</label>
+                <select name="currency" value={form.currency} onChange={onChange}>
+                  <option value="ZAR">ZAR (South African Rand)</option>
+                  <option value="USD">USD (US Dollar)</option>
+                  <option value="EUR">EUR (Euro)</option>
+                  <option value="GBP">GBP (British Pound)</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Tax Rate (%)</label>
+                <input type="number" name="taxRate" min={0} max={100} step="0.01" value={form.taxRate} onChange={onChange} />
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.section}>
+            <h3 className={styles.subtitle}>Policies</h3>
+            <div className={styles.grid}>
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <label>Cancellation Policy</label>
+                <textarea name="cancellationPolicy" rows={4} value={form.cancellationPolicy} onChange={onChange} placeholder="Describe your cancellation terms..." />
+              </div>
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <label>Terms and Conditions</label>
+                <textarea name="termsAndConditions" rows={12} value={form.termsAndConditions} onChange={onChange} placeholder="Enter your hotel's complete terms and conditions here. This will be displayed to users when they click 'Terms & Conditions' in the footer." />
+              </div>
+            </div>
+          </section>
+
+          <div className={styles.formActions}>
+            <button className={styles.cancelBtn} type="button" onClick={loadSettings} disabled={saving || loading}>Reset</button>
+            <button className={styles.submitBtn} type="submit" disabled={saving || loading}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+};

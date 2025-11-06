@@ -1,0 +1,80 @@
+.inputWrapper {
+  margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.inputContainer {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  border: 1.5px solid rgba(244, 164, 168, 0.9);
+  border-radius: 12px;
+  padding: 14px;
+  padding-right: 40px;
+  background: white;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(244, 67, 105, 0.06);
+  border-color: #F44369;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.eyeButton:focus {
+  outline: none;
+}
+
+.eyeIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.iconHidden {
+  color: #9ca3af;
+}
+
+.iconHidden:hover {
+  color: #F44369;
+}
+
+.iconVisible {
+  color: #F44369;
+}
+
+.iconVisible:hover {
+  color: #d62639;
+}
+
+.error {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+

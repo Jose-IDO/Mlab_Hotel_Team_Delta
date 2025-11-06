@@ -1,0 +1,231 @@
+.sectionone {
+    width: 100%;
+    height: calc(100vh - 30px);
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out;
+}
+
+.searchsection{
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.sliderButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 84px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.sliderButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.leftButton {
+    left: 20px;
+}
+
+.rightButton {
+    right: 20px;
+}
+
+.slideContainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.slide {
+    min-width: 100%;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.textContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 40px 60px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.textContent div {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.textContent div:first-child {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.section2{
+display: flex;
+justify-content: center; 
+align-items: center; 
+flex-direction: column;   
+}
+
+.Head1{
+display:flex;
+justify-content: center; 
+align-items: center;
+font-size: 40px;
+font-weight: 400; 
+
+}
+
+.offerings{
+display: flex;
+/* justify-content: space-between;  */
+align-items: center; 
+flex-direction: row;
+margin-top:130px;
+gap: 65px
+}
+
+.offerings1{
+display: flex;
+align-items: center; 
+flex-direction: row;
+flex-direction: column;
+
+}
+
+.paragraph1{
+    height: 30px;
+    width: 280px;
+}
+
+
+.viewAllBtn {
+margin-top: 120px;
+background: #F93448;
+color: #fff;
+border: none;
+padding: 0.75rem 2rem;
+border-radius: 4px;
+font-weight: bold;
+cursor: pointer;
+font-size: 1rem;
+transition: background 0.18s ease;
+}
+
+.viewAllBtn:hover {
+background: #d62639;
+}
+
+@media (max-width: 480px) {
+  .sectionone {
+    height: calc(100vh - 20px);
+  }
+
+  .sliderButton {
+    width: 28px;
+    height: 64px;
+    font-size: 20px;
+  }
+
+  .leftButton {
+    left: 10px;
+  }
+
+  .rightButton {
+    right: 10px;
+  }
+
+  .textContent {
+    padding: 24px 32px;
+    width: 90%;
+    max-width: 320px;
+  }
+
+  .textContent div {
+    font-size: 16px;
+    margin: 8px 0;
+  }
+
+  .textContent div:first-child {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .Head1 {
+    font-size: 28px;
+    padding: 0 16px;
+  }
+
+  .offerings {
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 60px;
+    padding: 0 16px;
+  }
+
+  .offerings1 {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .paragraph1 {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    padding: 0 16px;
+  }
+
+  .offerings1 img {
+    height: 120px;
+    width: 120px;
+  }
+}
+
+@media (max-width: 360px) {
+  .textContent {
+    padding: 20px 24px;
+  }
+
+  .textContent div {
+    font-size: 14px;
+  }
+
+  .textContent div:first-child {
+    font-size: 20px;
+  }
+
+  .Head1 {
+    font-size: 24px;
+  }
+
+  .offerings1 img {
+    height: 100px;
+    width: 100px;
+  }
+}

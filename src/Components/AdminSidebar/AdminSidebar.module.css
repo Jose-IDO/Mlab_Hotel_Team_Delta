@@ -1,0 +1,93 @@
+.sidebar {
+    width: 250px;
+    background-color: transparent; /* Remove red background */
+    border-right: none; /* Remove border - handled by AdminDashboard.module.css */
+    flex-shrink: 0; 
+    padding-top: 0; /* Remove padding - navbar handles spacing */
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0 12px;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 4px;
+}
+
+.sidebar ul li a {
+    padding: 12px 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    font-size: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar ul li a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(135deg, #0093E9 0%, #00B4DB 100%);
+    transform: scaleY(0);
+    transition: transform 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #0093E9;
+    transform: translateX(8px);
+    box-shadow: 0 2px 8px rgba(0, 147, 233, 0.1);
+}
+
+.sidebar ul li a:hover::before {
+    transform: scaleY(1);
+}
+
+.sidebar ul li a span {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 147, 233, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.sidebar ul li a:hover span {
+    background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+    transform: scale(1.1);
+}
+
+/* Active link style */
+.sidebar ul li a.active {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    color: #0093E9;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 147, 233, 0.15);
+}
+
+.sidebar ul li a.active::before {
+    transform: scaleY(1);
+}
