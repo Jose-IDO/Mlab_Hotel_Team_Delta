@@ -290,6 +290,7 @@ const RoomDetails: React.FC = () => {
 
     const bookingData = {
       hotelName: "Delta Hotel",
+      roomId: room.id || id,
       roomType: room.name,
       roomImage: room.image,
       pricePerNight: room.price,
