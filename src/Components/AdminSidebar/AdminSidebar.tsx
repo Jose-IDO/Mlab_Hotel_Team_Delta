@@ -1,5 +1,4 @@
-import { Link, NavLink } from 'react-router-dom';
-import styles from "./AdminSidebar.module.css";
+import { Link } from 'react-router-dom';
 
 export const AdminSidebar = () => {
   return (

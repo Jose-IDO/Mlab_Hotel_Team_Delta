@@ -5,7 +5,7 @@ import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import styles from "./UserProfile.module.css";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 interface Booking {
   id: string;
@@ -33,31 +33,33 @@ interface Booking {
 }
 
 const UserProfile: React.FC = () => {
-  const { user, token } = useAuth();
-  const navigate = useNavigate();
+  const { user, token, logout } = useAuth();
   const { favorites, toggleFavorite } = useFavorites();
-  
-  // Active tab state
-  const [activeTab, setActiveTab] = useState<'personal' | 'bookings' | 'favourites'>('personal');
-  
-  // Personal details state
+  const navigate = useNavigate();
+
+  // Tabs
+  const [activeTab, setActiveTab] = useState<
+    "personal" | "bookings" | "favourites"
+  >("personal");
+
+  // Personal details
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [phone, setPhone] = useState(user?.phone || "");
   const [address, setAddress] = useState("");
-  
-  // Password change state
+
+  // Password change
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  
-  // Bookings state
+
+  // Bookings
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
-  
+
   // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,33 +67,24 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     if (!user || !token) {
-      navigate('/signin');
+      navigate("/signin");
       return;
     }
-    
-    // Fetch user bookings when bookings tab is active
-    if (activeTab === 'bookings') {
-      fetchBookings();
-    }
+    if (activeTab === "bookings") fetchBookings();
   }, [user, token, navigate, activeTab]);
 
   const fetchBookings = async () => {
     try {
       setLoadingBookings(true);
       const response = await fetch(`${API_URL}/bookings/my-bookings`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       if (response.ok) {
         const data = await response.json();
         setBookings(data.data || []);
-      } else {
-        console.error('Failed to fetch bookings');
       }
     } catch (err) {
-      console.error('Error fetching bookings:', err);
+      console.error(err);
     } finally {
       setLoadingBookings(false);
     }
@@ -101,39 +94,25 @@ const UserProfile: React.FC = () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
-
     try {
       const response = await fetch(`${API_URL}/users/profile`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          phone,
-          address
-        })
+        body: JSON.stringify({ firstName, lastName, phone, address }),
       });
-
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to update profile");
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to update profile');
-      }
-
-      // Update local storage
       const updatedUser = { ...user, firstName, lastName, phone };
-      localStorage.setItem('hotel_user', JSON.stringify(updatedUser));
-      
-      setSuccess('Profile updated successfully!');
+      localStorage.setItem("hotel_user", JSON.stringify(updatedUser));
+      setSuccess("Profile updated successfully!");
       setIsEditing(false);
-      
-      // Refresh page to update navbar
       setTimeout(() => window.location.reload(), 1500);
     } catch (err: any) {
-      setError(err.message || 'Failed to update profile');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -143,58 +122,45 @@ const UserProfile: React.FC = () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
-
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
+      setError("New passwords do not match");
       setLoading(false);
       return;
     }
-
     if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError("Password must be at least 8 characters");
       setLoading(false);
       return;
     }
-
     try {
       const response = await fetch(`${API_URL}/users/change-password`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword
-        })
+        body: JSON.stringify({ currentPassword, newPassword }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to change password');
-      }
-
-      setSuccess('Password changed successfully!');
+      if (!response.ok) throw new Error(data.error || "Failed to change password");
+      setSuccess("Password changed successfully!");
       setShowPasswordChange(false);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {
-      setError(err.message || 'Failed to change password');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleBookAgain = (booking: Booking) => {
-    // Navigate to booking page with pre-filled data (excluding booking ID/reference)
-    navigate('/booking', {
+    navigate("/booking", {
       state: {
         roomId: booking.roomId,
         roomType: booking.roomType,
         hotelName: booking.hotelName,
-        // Don't pre-fill dates - let user select new dates
         adults: booking.adults || booking.guests || 2,
         children: booking.children || 0,
         guestDetails: booking.guestDetails || {
@@ -202,52 +168,54 @@ const UserProfile: React.FC = () => {
           lastName: user?.lastName || "",
           email: user?.email || "",
           phone: user?.phone || "",
-          country: "South Africa"
-        }
-      }
+          country: "South Africa",
+        },
+      },
     });
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  };
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'confirmed':
+      case "confirmed":
         return styles.statusConfirmed;
-      case 'pending':
+      case "pending":
         return styles.statusPending;
-      case 'cancelled':
+      case "cancelled":
         return styles.statusCancelled;
-      case 'completed':
+      case "completed":
         return styles.statusCompleted;
       default:
-        return '';
+        return "";
     }
   };
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <>
       <LoggedInNavbar />
       <div className={styles.container}>
         <div className={styles.profileWrapper}>
-          
           {/* Profile Header */}
           <div className={styles.profileHeader}>
             <div className={styles.avatarSection}>
               <div className={styles.avatar}>
                 <span className={styles.avatarInitials}>
-                  {user.firstName?.charAt(0).toUpperCase()}{user.lastName?.charAt(0).toUpperCase()}
+                  {user.firstName?.charAt(0).toUpperCase()}
+                  {user.lastName?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className={styles.headerInfo}>
-                <h1 className={styles.userName}>{user.firstName} {user.lastName}</h1>
+                <h1 className={styles.userName}>
+                  {user.firstName} {user.lastName}
+                </h1>
                 <p className={styles.userEmail}>{user.email}</p>
               </div>
             </div>
@@ -256,8 +224,10 @@ const UserProfile: React.FC = () => {
           {/* Tabs */}
           <div className={styles.tabs}>
             <button
-              className={`${styles.tab} ${activeTab === 'personal' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('personal')}
+              className={`${styles.tab} ${
+                activeTab === "personal" ? styles.activeTab : ""
+              }`}
+              onClick={() => setActiveTab("personal")}
             >
               <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -265,9 +235,12 @@ const UserProfile: React.FC = () => {
               </svg>
               Personal Details
             </button>
+
             <button
-              className={`${styles.tab} ${activeTab === 'bookings' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('bookings')}
+              className={`${styles.tab} ${
+                activeTab === "bookings" ? styles.activeTab : ""
+              }`}
+              onClick={() => setActiveTab("bookings")}
             >
               <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -277,9 +250,12 @@ const UserProfile: React.FC = () => {
               </svg>
               Booking History
             </button>
+
             <button
-              className={`${styles.tab} ${activeTab === 'favourites' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('favourites')}
+              className={`${styles.tab} ${
+                activeTab === "favourites" ? styles.activeTab : ""
+              }`}
+              onClick={() => setActiveTab("favourites")}
             >
               <svg className={styles.tabIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -289,22 +265,13 @@ const UserProfile: React.FC = () => {
           </div>
 
           {/* Messages */}
-          {error && (
-            <div className={styles.errorMessage}>
-              ⚠️ {error}
-            </div>
-          )}
-          {success && (
-            <div className={styles.successMessage}>
-              ✓ {success}
-            </div>
-          )}
+          {error && <div className={styles.errorMessage}>Warning: {error}</div>}
+          {success && <div className={styles.successMessage}>Check: {success}</div>}
 
           {/* Tab Content */}
           <div className={styles.tabContent}>
-            
-            {/* Personal Details Tab */}
-            {activeTab === 'personal' && (
+            {/* ─────── PERSONAL ─────── */}
+            {activeTab === "personal" && (
               <div className={styles.personalSection}>
                 <div className={styles.sectionHeader}>
                   <h2 className={styles.sectionTitle}>Personal Information</h2>
@@ -315,7 +282,6 @@ const UserProfile: React.FC = () => {
                   )}
                 </div>
 
-                {/* Profile Form */}
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>First Name</label>
@@ -327,7 +293,6 @@ const UserProfile: React.FC = () => {
                       disabled={!isEditing}
                     />
                   </div>
-
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Last Name</label>
                     <input
@@ -338,18 +303,11 @@ const UserProfile: React.FC = () => {
                       disabled={!isEditing}
                     />
                   </div>
-
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Email Address</label>
-                    <input
-                      type="email"
-                      className={styles.input}
-                      value={user.email}
-                      disabled
-                    />
+                    <input type="email" className={styles.input} value={user.email} disabled />
                     <span className={styles.helperText}>Email cannot be changed</span>
                   </div>
-
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Phone Number</label>
                     <input
@@ -361,8 +319,7 @@ const UserProfile: React.FC = () => {
                       placeholder="+27 00 000 0000"
                     />
                   </div>
-
-                  <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <div className={styles.formGroup} style={{ gridColumn: "1 / -1" }}>
                     <label className={styles.label}>Address</label>
                     <input
                       type="text"
@@ -393,7 +350,7 @@ const UserProfile: React.FC = () => {
                       onClick={handleUpdateProfile}
                       disabled={loading}
                     >
-                      {loading ? 'Saving...' : 'Save Changes'}
+                      {loading ? "Saving..." : "Save Changes"}
                     </button>
                   </div>
                 )}
@@ -429,7 +386,6 @@ const UserProfile: React.FC = () => {
                           placeholder="Enter current password"
                         />
                       </div>
-
                       <div className={styles.formGroup}>
                         <label className={styles.label}>New Password</label>
                         <input
@@ -440,7 +396,6 @@ const UserProfile: React.FC = () => {
                           placeholder="Enter new password (min 8 characters)"
                         />
                       </div>
-
                       <div className={styles.formGroup}>
                         <label className={styles.label}>Confirm New Password</label>
                         <input
@@ -451,7 +406,6 @@ const UserProfile: React.FC = () => {
                           placeholder="Confirm new password"
                         />
                       </div>
-
                       <div className={styles.formActions}>
                         <button
                           className={styles.cancelButton}
@@ -469,7 +423,7 @@ const UserProfile: React.FC = () => {
                           onClick={handleChangePassword}
                           disabled={loading}
                         >
-                          {loading ? 'Changing...' : 'Change Password'}
+                          {loading ? "Changing..." : "Change Password"}
                         </button>
                       </div>
                     </div>
@@ -478,11 +432,10 @@ const UserProfile: React.FC = () => {
               </div>
             )}
 
-            {/* Booking History Tab */}
-            {activeTab === 'bookings' && (
+            {/* ─────── BOOKINGS ─────── */}
+            {activeTab === "bookings" && (
               <div className={styles.bookingsSection}>
                 <h2 className={styles.sectionTitle}>My Bookings</h2>
-                
                 {loadingBookings ? (
                   <div className={styles.loadingState}>
                     <div className={styles.spinner}></div>
@@ -490,20 +443,23 @@ const UserProfile: React.FC = () => {
                   </div>
                 ) : bookings.length === 0 ? (
                   <div className={styles.emptyState}>
-                    <div className={styles.emptyIcon}>📅</div>
+                    <div className={styles.emptyIcon}>Calendar</div>
                     <h3>No Bookings Yet</h3>
                     <p>You haven't made any bookings. Start exploring our rooms!</p>
-                    <button className={styles.browseButton} onClick={() => navigate('/hotel-details')}>
+                    <button
+                      className={styles.browseButton}
+                      onClick={() => navigate("/hotel-details")}
+                    >
                       Browse Rooms
                     </button>
                   </div>
                 ) : (
                   <div className={styles.bookingsList}>
                     {bookings.map((booking) => (
-                      <div 
-                        key={booking.id || booking.bookingId} 
+                      <div
+                        key={booking.id || booking.bookingId}
                         className={styles.bookingCard}
-                        onMouseEnter={() => setHoveredBooking(booking.id || booking.bookingId || '')}
+                        onMouseEnter={() => setHoveredBooking(booking.id || booking.bookingId || "")}
                         onMouseLeave={() => setHoveredBooking(null)}
                       >
                         <div className={styles.bookingHeader}>
@@ -511,15 +467,21 @@ const UserProfile: React.FC = () => {
                             <h3 className={styles.bookingHotel}>{booking.hotelName}</h3>
                             <p className={styles.bookingRoom}>{booking.roomType}</p>
                           </div>
-                          <span className={`${styles.bookingStatus} ${getStatusColor(booking.status)}`}>
+                          <span
+                            className={`${styles.bookingStatus} ${getStatusColor(
+                              booking.status
+                            )}`}
+                          >
                             {booking.status}
                           </span>
                         </div>
-                        
+
                         <div className={styles.bookingDetails}>
                           <div className={styles.bookingDetail}>
                             <span className={styles.detailLabel}>Booking ID:</span>
-                            <span className={styles.detailValue}>{booking.bookingId || booking.id}</span>
+                            <span className={styles.detailValue}>
+                              {booking.bookingId || booking.id}
+                            </span>
                           </div>
                           <div className={styles.bookingDetail}>
                             <span className={styles.detailLabel}>Check-in:</span>
@@ -535,7 +497,9 @@ const UserProfile: React.FC = () => {
                           </div>
                           <div className={styles.bookingDetail}>
                             <span className={styles.detailLabel}>Total Price:</span>
-                            <span className={styles.detailPrice}>R{booking.totalPrice.toLocaleString()}</span>
+                            <span className={styles.detailPrice}>
+                              R{booking.totalPrice.toLocaleString()}
+                            </span>
                           </div>
                           {booking.createdAt && (
                             <div className={styles.bookingDetail}>
@@ -545,13 +509,24 @@ const UserProfile: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Book Again Button - slides down on hover */}
-                        <div className={`${styles.bookAgainContainer} ${hoveredBooking === (booking.id || booking.bookingId) ? styles.showBookAgain : ''}`}>
+                        <div
+                          className={`${styles.bookAgainContainer} ${
+                            hoveredBooking === (booking.id || booking.bookingId)
+                              ? styles.showBookAgain
+                              : ""
+                          }`}
+                        >
                           <button
                             className={styles.bookAgainButton}
                             onClick={() => handleBookAgain(booking)}
                           >
-                            <svg className={styles.bookAgainIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <svg
+                              className={styles.bookAgainIcon}
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
                               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                               <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
@@ -565,14 +540,14 @@ const UserProfile: React.FC = () => {
               </div>
             )}
 
-            {/* Favourites Tab */}
-            {activeTab === 'favourites' && (
+            {/* ─────── FAVOURITES ─────── */}
+            {activeTab === "favourites" && (
               <div className={styles.favouritesSection}>
                 <h2 className={styles.sectionTitle}>My Favourites</h2>
 
                 {favorites.length === 0 ? (
                   <div className={styles.emptyState}>
-                    <div className={styles.emptyIcon}>❤️</div>
+                    <div className={styles.emptyIcon}>Heart</div>
                     <h3>No favourites yet</h3>
                     <p>Start adding hotels or rooms you love!</p>
                     <button
@@ -618,4 +593,3 @@ const UserProfile: React.FC = () => {
 };
 
 export default UserProfile;
-

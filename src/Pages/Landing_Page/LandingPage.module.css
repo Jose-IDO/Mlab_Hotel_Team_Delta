@@ -9,8 +9,10 @@
 }
 
 .searchsection{
-  margin-top: 0;
+  margin-top: -85px;
   padding-top: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .sliderButton {

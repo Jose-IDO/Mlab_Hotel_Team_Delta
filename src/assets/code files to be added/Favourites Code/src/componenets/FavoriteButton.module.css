@@ -1,0 +1,23 @@
+.favBtn {
+  background: linear-gradient(180deg, #f44369, #e33a5e);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.favBtn:hover:not(.filled) {
+  opacity: 0.9;
+}
+.favBtn.filled {
+  background: linear-gradient(180deg, #e33a5e, #c32f52);
+}
+.favBtn:active {
+  transform: scale(0.94);
+}

@@ -10,10 +10,12 @@ import SignIn from './Pages/Auth/SignIn';
 import SignUp from './Pages/Auth/SignUp';
 import OAuthCallback from './Pages/Auth/OAuthCallback';
 import { AuthProvider } from './contexts/AuthContext';
+import { FavoritesProvider } from './contexts/FavoritesContext';
 import { ProtectedRoute } from './Components/ProtectedRoute/ProtectedRoute';
 import { Navbar } from './Components/Navbar/Navbar';
 import RoomDetails from "./Pages/Room_Details/RoomDetails";
 import HotelDetails from "./Pages/HotelDetails/HotelDetails";
+import ErrorBoundary from './Components/ErrorBoundary';
 
 // Import BookingPage from the correct folder
 import BookingPage from './Pages/Booking_Page/BookingPage';
@@ -103,13 +105,17 @@ function AppContent() {
 function App() {
   const basename = import.meta.env.PROD ? '/Mlab_Hotel_Team_Delta' : '';
   return (
-    <Provider store={store}>
-      <AuthProvider>
-        <Router basename={basename}>
-          <AppContent />
-        </Router>
-      </AuthProvider>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <AuthProvider>
+          <FavoritesProvider>
+            <Router basename={basename}>
+              <AppContent />
+            </Router>
+          </FavoritesProvider>
+        </AuthProvider>
+      </Provider>
+    </ErrorBoundary>
   );
 }
 
