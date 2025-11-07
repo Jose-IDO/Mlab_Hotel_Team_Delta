@@ -8,9 +8,11 @@
     transition: background-image 0.5s ease-in-out;
 }
 
-.searchsection{
-  margin-top: 0;
-  padding-top: 0;
+.searchsection {
+  position: relative;
+  z-index: 30;
+  margin-top: -80px;  /* Pull it up to overlap hero section */
+  margin-bottom: 40px;
 }
 
 .sliderButton {

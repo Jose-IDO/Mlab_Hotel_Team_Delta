@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styles from "./RoomDetails.module.css";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   Wifi, Wind, Tv, Wine, Palmtree, ConciergeBell, Waves,
   CircleSlash2, PawPrint, Clock, Volume2, AlertCircle,
-  Calendar, Users, Sparkles, Coffee, Bath
+  Sparkles, Coffee, Bath
 } from "lucide-react";
 
 // Room images
@@ -60,14 +60,10 @@ type UiReview = {
   date: string;
 };
 
-type AvailabilitySlot = {
-  date: string;
-  available: boolean;
-};
-
 const RoomDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuth();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -79,11 +75,6 @@ const RoomDetails: React.FC = () => {
   const [reviews, setReviews] = useState<UiReview[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewsError, setReviewsError] = useState<string | null>(null);
-
-  // Availability
-  const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
-  const [availabilityLoading, setAvailabilityLoading] = useState(false);
-  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
 
   // New review
   const [reviewName, setReviewName] = useState(
@@ -202,31 +193,6 @@ const RoomDetails: React.FC = () => {
 
     fetchReviews();
   }, [id]);
-
-  // Fetch availability
-  useEffect(() => {
-    if (!id) return;
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
-
-    const fetchAvailability = async () => {
-      setAvailabilityLoading(true);
-      setAvailabilityError(null);
-      try {
-        const res = await fetch(`${API_URL}/admin/rooms/${id}/availability`);
-        const json = await res.json();
-        if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch availability');
-
-        setAvailability(json.data as AvailabilitySlot[]);
-      } catch (e: any) {
-        setAvailabilityError(e.message || 'Failed to load availability');
-      } finally {
-        setAvailabilityLoading(false);
-      }
-    };
-
-    fetchAvailability();
-  }, [id]);
-
   // Submit review
   const submitReview = async () => {
     if (!id || !isAuthenticated) {
@@ -280,11 +246,20 @@ const RoomDetails: React.FC = () => {
 
   const handleBookNow = () => {
     if (!room) return;
+    
+    // Get dates and guests from URL params (from search)
+    const checkIn = searchParams.get('checkIn') || '';
+    const checkOut = searchParams.get('checkOut') || '';
+    const guests = searchParams.get('guests') || '';
+    
     const bookingData = {
       hotelName: "Delta Hotel",
       roomType: room.name,
       roomImage: room.image,
       pricePerNight: room.price,
+      checkIn,
+      checkOut,
+      guests: guests ? parseInt(guests) : undefined,
     };
 
     if (!isAuthenticated) {

@@ -1,5 +1,4 @@
-import { Link, NavLink } from 'react-router-dom';
-import styles from "./AdminSidebar.module.css";
+import { Link } from 'react-router-dom';
 
 export const AdminSidebar = () => {
   return (
@@ -23,11 +22,17 @@ export const AdminSidebar = () => {
         </Link>
       </li>
       <li>
+        <Link to="/admin/deals">
+          <span></span>
+          Manage Deals
+        </Link>
+      </li>
+      {/* <li>
         <Link to="/admin/stats">
           <span></span>
           View Stats/Reports
         </Link>
-      </li>
+      </li> */}
       <li>
         <Link to="/admin/calendar">
           <span></span>
@@ -53,5 +58,5 @@ export const AdminSidebar = () => {
         </Link>
       </li>
     </ul>
-  );
-};
+  )
+}

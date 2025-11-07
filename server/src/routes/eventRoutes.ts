@@ -1,5 +1,5 @@
 import express, { Request } from "express";
-import { getAllEvents, createEvent, deleteEvent } from "../controllers/eventController";
+import { getAllEvents, createEvent, deleteEvent, updateEvent } from "../controllers/eventController";
 import multer, { FileFilterCallback } from "multer";
 import path from "path";
 
@@ -30,6 +30,7 @@ const upload = multer({ storage, fileFilter });
 // Routes
 router.get("/", getAllEvents);
 router.post("/", upload.single("image"), createEvent);
+router.put("/:id", upload.single("image"), updateEvent);
 router.delete("/:id", deleteEvent);
 
 export default router;

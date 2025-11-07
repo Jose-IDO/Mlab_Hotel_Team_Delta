@@ -55,41 +55,55 @@ const SearchSection: React.FC = () => {
     <section className={styles.section}>
       <div className={styles.container}>
         <form className={styles.form} onSubmit={handleSearch}>
-          <select 
-            value={selectedRoomType}
-            onChange={(e) => setSelectedRoomType(e.target.value)}
-          >
-            <option value="all">All Room Types</option>
-            {roomTypes.map((type) => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Room Type</label>
+            <select 
+              className={styles.select}
+              value={selectedRoomType}
+              onChange={(e) => setSelectedRoomType(e.target.value)}
+            >
+              <option value="all">All Room Types</option>
+              {roomTypes.map((type) => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
           
-          <input 
-            type="date" 
-            placeholder="Check-in"
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-            min={today}
-          />
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Check-in</label>
+            <input 
+              className={styles.input}
+              type="date" 
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              min={today}
+            />
+          </div>
           
-          <input 
-            type="date" 
-            placeholder="Check-out"
-            value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-            min={minCheckOut}
-          />
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Check-out</label>
+            <input 
+              className={styles.input}
+              type="date" 
+              value={checkOut}
+              onChange={(e) => setCheckOut(e.target.value)}
+              min={minCheckOut}
+            />
+          </div>
           
-          <input 
-            type="number" 
-            placeholder="Guests" 
-            value={guests}
-            onChange={(e) => setGuests(e.target.value)}
-            min="1"
-          />
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Guests</label>
+            <input 
+              className={styles.input}
+              type="number" 
+              placeholder="Number of guests" 
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              min="1"
+            />
+          </div>
           
-          <button type="submit">Search Room</button>
+          <button className={styles.searchButton} type="submit">Search Room</button>
         </form>
       </div>
     </section>

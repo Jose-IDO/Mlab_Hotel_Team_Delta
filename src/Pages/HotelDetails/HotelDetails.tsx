@@ -52,9 +52,16 @@ const HotelDetails: React.FC = () => {
     price: number;
     rating: number;
     amenities: string[];
+    totalUnits?: number; // Add total units for availability check
   }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bookedDates, setBookedDates] = useState<Array<{
+    roomId: string;
+    checkIn: string;
+    checkOut: string;
+    roomCount: number;
+  }>>([]);
   const [hotelSettings, setHotelSettings] = useState<{
     hotelName: string;
     tagline: string;
@@ -103,7 +110,10 @@ const HotelDetails: React.FC = () => {
   };
 
   const handleRoomClick = (roomId: string) => {
-    navigate(`/room-details/${roomId}`);
+    // Preserve search params when navigating to room details
+    const params = new URLSearchParams(searchParams);
+    const queryString = params.toString();
+    navigate(`/room-details/${roomId}${queryString ? `?${queryString}` : ''}`);
     window.scrollTo(0, 0);
   };
 
@@ -182,6 +192,7 @@ const HotelDetails: React.FC = () => {
           maxGuests: number;
           amenities: string[];
           images?: string[]; // Add images from Cloudinary
+          units?: Array<any>; // Add units array
         }>;
 
         const pickImage = (type: string, name: string) => {
@@ -208,7 +219,8 @@ const HotelDetails: React.FC = () => {
             kids: 0,
             price: Number(r.price) || 0,
             rating: 4,
-            amenities: Array.isArray(r.amenities) ? r.amenities : []
+            amenities: Array.isArray(r.amenities) ? r.amenities : [],
+            totalUnits: Array.isArray(r.units) ? r.units.length : 1 // Count active units
           };
         });
         setRoomsData(mapped);
@@ -221,6 +233,32 @@ const HotelDetails: React.FC = () => {
 
     fetchRooms();
   }, []);
+
+  // Fetch booked dates when check-in/check-out dates are provided
+  useEffect(() => {
+    const checkIn = searchParams.get("checkIn");
+    const checkOut = searchParams.get("checkOut");
+    
+    if (!checkIn || !checkOut) {
+      setBookedDates([]);
+      return;
+    }
+
+    const API_URL = (import.meta as any).env.VITE_API_URL as string;
+    const fetchBookedDates = async () => {
+      try {
+        const res = await fetch(`${API_URL}/bookings/booked-dates?start=${checkIn}&end=${checkOut}`);
+        const json = await res.json();
+        if (res.ok && json.ok) {
+          setBookedDates(json.data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch booked dates:', e);
+      }
+    };
+
+    fetchBookedDates();
+  }, [searchParams]);
 
   // List of all amenities - dynamically extracted from rooms
   const allAmenities = useMemo(() => {
@@ -258,6 +296,8 @@ const HotelDetails: React.FC = () => {
   const filteredRooms = useMemo(() => {
     const guestsParam = searchParams.get("guests");
     const minGuests = guestsParam ? parseInt(guestsParam, 10) : 0;
+    const checkInParam = searchParams.get("checkIn");
+    const checkOutParam = searchParams.get("checkOut");
     
     return roomsData.filter(room => {
       // Room Type filter
@@ -268,6 +308,25 @@ const HotelDetails: React.FC = () => {
       // Guest capacity filter (from search)
       if (minGuests > 0 && room.adults < minGuests) {
         return false;
+      }
+
+      // Date availability filter - only apply if both dates are provided
+      if (checkInParam && checkOutParam && bookedDates.length > 0) {
+        // Count how many rooms of this type are booked for the selected date range
+        const bookedUnitsForRoom = bookedDates
+          .filter(booking => booking.roomId === room.id)
+          .reduce((total, booking) => {
+            // Check if booking overlaps with search dates
+            // Overlap occurs if: (booking.checkIn < searchCheckOut) AND (searchCheckIn < booking.checkOut)
+            const overlaps = booking.checkIn < checkOutParam && checkInParam < booking.checkOut;
+            return overlaps ? total + booking.roomCount : total;
+          }, 0);
+
+        // If all units are booked, filter out this room
+        const totalUnits = room.totalUnits || 1;
+        if (bookedUnitsForRoom >= totalUnits) {
+          return false;
+        }
       }
 
       // Price Range filter
@@ -297,7 +356,7 @@ const HotelDetails: React.FC = () => {
 
       return true;
     });
-  }, [roomsData, selectedRoomType, selectedPriceRange, selectedRating, checkedAmenities, searchParams]);
+  }, [roomsData, selectedRoomType, selectedPriceRange, selectedRating, checkedAmenities, searchParams, bookedDates]);
 
   // FAQ data - dynamically including check-in/check-out times from settings
   const faqData = [

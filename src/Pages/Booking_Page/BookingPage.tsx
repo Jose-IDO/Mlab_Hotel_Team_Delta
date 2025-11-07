@@ -47,8 +47,7 @@ const BookingPage: React.FC = () => {
     nextWeek.setDate(nextWeek.getDate() + 4);
     return nextWeek.toISOString().split('T')[0];
   });
-  const [adults, setAdults] = useState(state?.adults || 2);
-  const [children, setChildren] = useState(state?.children || 0);
+  const [guests, setGuests] = useState(state?.guests || state?.adults || 2);
   const [roomCount, setRoomCount] = useState(1);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,6 +78,14 @@ const BookingPage: React.FC = () => {
     fetchSettings();
   }, []);
 
+  // Auto-adjust guests if they exceed the new maximum when room count changes
+  useEffect(() => {
+    const maxAllowed = maxGuests * roomCount;
+    if (guests > maxAllowed) {
+      setGuests(maxAllowed);
+    }
+  }, [roomCount, maxGuests, guests]);
+
   // Calculate nights and total price
   const calculateNights = () => {
     const start = new Date(checkIn);
@@ -89,7 +96,7 @@ const BookingPage: React.FC = () => {
   };
 
   const nights = calculateNights();
-  const totalGuests = adults + children;
+  const totalGuests = guests;
   const maxAllowedGuests = maxGuests * roomCount;
   const totalPrice = initialPricePerNight * nights * roomCount;
 
@@ -162,8 +169,6 @@ const BookingPage: React.FC = () => {
           email: guest.email,
           country: guest.country,
           phone: guest.phone,
-          adults,
-          children,
         }
       };
 
@@ -205,8 +210,7 @@ const BookingPage: React.FC = () => {
         checkIn,
         checkOut,
         nights,
-        adults,
-        children,
+        guests,
         pricePerNight: initialPricePerNight,
         totalPrice,
         guest,
@@ -257,7 +261,7 @@ const BookingPage: React.FC = () => {
 
               <div className={styles.summaryRow}>
                 <span className={styles.label}>Guests:</span>
-                <span className={styles.value}>{adults} Adult{adults > 1 ? 's' : ''}{children > 0 ? `, ${children} Child${children > 1 ? 'ren' : ''}` : ''}</span>
+                <span className={styles.value}>{guests} Guest{guests > 1 ? 's' : ''}</span>
               </div>
 
               <div className={styles.summaryRow}>
@@ -324,28 +328,19 @@ const BookingPage: React.FC = () => {
 
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Adults</label>
+                  <label className={styles.formLabel}>Guests</label>
                   <select
-                    value={adults}
-                    onChange={(e) => setAdults(Number(e.target.value))}
+                    value={guests}
+                    onChange={(e) => setGuests(Number(e.target.value))}
                     className={styles.selectInput}
                   >
-                    {[1, 2, 3, 4, 5, 6].map(num => (
+                    {Array.from({ length: maxAllowedGuests }, (_, i) => i + 1).map(num => (
                       <option key={num} value={num}>{num}</option>
                     ))}
                   </select>
-                </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Children</label>
-                  <select
-                    value={children}
-                    onChange={(e) => setChildren(Number(e.target.value))}
-                    className={styles.selectInput}
-                  >
-                    {[0, 1, 2, 3, 4].map(num => (
-                      <option key={num} value={num}>{num}</option>
-                    ))}
-                  </select>
+                  <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                    Max {maxGuests} guest{maxGuests > 1 ? 's' : ''} per room
+                  </small>
                 </div>
                 <div className={styles.formGroup}>
                   <label className={styles.formLabel}>Number of rooms</label>
