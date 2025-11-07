@@ -20,6 +20,8 @@ import BookingPage from './Pages/Booking_Page/BookingPage';
 import PaymentPage from './Pages/Payment/PaymentPage';
 import BookingConfirmation from './Pages/BookingConfirmation/BookingConfirmation';
 import UserProfile from './Pages/UserProfile/UserProfile';
+import { Notifications } from './Pages/Notification/Notifications';
+
 
 function AppContent() {
   const location = useLocation();
@@ -38,6 +40,7 @@ function AppContent() {
         <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route path="/hotel-details" element={<HotelDetails />} />
         <Route path="/room-details/:id" element={<RoomDetails />} />
+        <Route path="/notifications" element={<Notifications />} />
 
         {/* Protected Booking Flow */}
         <Route
