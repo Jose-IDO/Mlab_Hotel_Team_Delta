@@ -2,13 +2,28 @@ import { Request, Response } from 'express';
 import { bookingService } from '../services/bookingService';
 import { bookingRepository } from '../repositories/bookingRepository';
 import { roomRepository } from '../repositories/roomRepository';
+import { getIO } from "../utils/socket";
+import { notificationRepository } from "../repositories/notificationRepository";
 
 export const bookingController = {
   create: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).user?.id;
       const result = await bookingService.createPending(userId, req.body);
-      res.status(201).json({ ok: true, data: result });
+
+      const booking: any = (result as any).booking || result;
+      const bookingId = booking?.id;
+      const roomNumber = booking?.roomNumber || "unknown";
+
+      await notificationRepository.create(userId, `New booking created for room ${roomNumber}`, bookingId);
+
+      const io = getIO();
+      io.emit("newBooking", {
+        message: `New booking created by user ${userId}`,
+        booking,
+      });
+
+      res.status(201).json({ ok: true, data: booking });
     } catch (e: any) {
       res.status(400).json({ ok: false, error: e.message });
     }
@@ -28,27 +43,22 @@ export const bookingController = {
     try {
       const userId = (req as any).user?.id;
       const { reference } = req.params;
-      
+
       const booking = await bookingRepository.findByPaymentReference(reference);
-      if (!booking) {
-        return res.status(404).json({ ok: false, error: 'Booking not found' });
-      }
+      if (!booking) return res.status(404).json({ ok: false, error: 'Booking not found' });
 
-      // Verify the booking belongs to the current user
-      if (booking.userId !== userId) {
+      if (booking.userId !== userId)
         return res.status(403).json({ ok: false, error: 'Access denied' });
-      }
 
-      // Get room details for additional info
       const room = await roomRepository.findById(booking.roomId);
 
-      res.json({ 
-        ok: true, 
+      res.json({
+        ok: true,
         booking: {
           ...booking,
           roomType: room?.roomType || 'Room',
           hotelName: 'Delta Hotel',
-        }
+        },
       });
     } catch (e: any) {
       res.status(400).json({ ok: false, error: e.message });
@@ -60,7 +70,8 @@ export const bookingController = {
       const userId = (req as any).user?.id;
       const { id } = req.params;
       const cancelled = await bookingService.cancelBooking(id, userId);
-      if (!cancelled) return res.status(404).json({ ok: false, error: 'Booking not found or cannot be cancelled' });
+      if (!cancelled)
+        return res.status(404).json({ ok: false, error: 'Booking not found or cannot be cancelled' });
       res.json({ ok: true, data: cancelled });
     } catch (e: any) {
       res.status(400).json({ ok: false, error: e.message });
@@ -79,7 +90,7 @@ export const bookingController = {
   updateStatus: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const { status } = req.body as { status: 'pending'|'confirmed'|'cancelled' };
+      const { status } = req.body as { status: 'pending' | 'confirmed' | 'cancelled' };
       const updated = await bookingService.updateStatus(id, status);
       if (!updated) return res.status(404).json({ ok: false, error: 'Not found' });
       res.json({ ok: true, data: updated });
@@ -88,103 +99,77 @@ export const bookingController = {
     }
   },
 
-  // Admin availability for a date range (default current month)
   availability: async (req: Request, res: Response) => {
     try {
-      const start = (req.query.start as string) || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10);
-      const end = (req.query.end as string) || new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().slice(0,10);
-      const fmt = (d: Date) => {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}`;
-      };
+      const start = (req.query.start as string) || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10);
+      const end = (req.query.end as string) || new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().slice(0, 10);
+      const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
-      // Fetch active rooms with unit counts
       const rooms = await roomRepository.findAll('active');
       const roomUnits: Record<string, number> = {};
-      rooms.forEach(r => { roomUnits[r.id] = (r.units?.length || 0); });
+      rooms.forEach(r => { roomUnits[r.id] = r.units?.length || 0; });
 
-      // Fetch bookings overlapping range
       const bookings = await bookingRepository.findInRange(start, end);
 
-      // Build list of all dates from start to end inclusive
       const dates: string[] = [];
-      {
-        const s = new Date(start);
-        const e = new Date(end);
-        for (let d = new Date(s.getFullYear(), s.getMonth(), s.getDate()); d <= e; d.setDate(d.getDate() + 1)) {
-          dates.push(fmt(d));
-        }
+      for (let d = new Date(start); d <= new Date(end); d.setDate(d.getDate() + 1)) {
+        dates.push(fmt(d));
       }
 
-      // Initialize map: for each room, for each date, status 'available'
       const result = rooms.map(r => ({
         roomId: r.id,
         roomName: r.roomName,
         roomType: r.roomType,
         totalUnits: roomUnits[r.id] || 0,
-        dates: {} as Record<string, 'available' | 'booked'>,
+        dates: {} as Record<string,'available'|'booked'>
       }));
+
       const byRoom: Record<string, typeof result[number]> = Object.fromEntries(result.map(r => [r.roomId, r]));
+      dates.forEach(date => result.forEach(r => { r.dates[date]='available'; }));
 
-      dates.forEach(date => {
-        result.forEach(r => { r.dates[date] = 'available'; });
-      });
-
-      // For each booking, mark covered nights as 'booked' when occupancy reaches full
-      // We'll tally occupancy per room per date
-      const occ: Record<string, Record<string, number>> = {};
+      const occ: Record<string, Record<string,number>> = {};
       bookings.forEach(b => {
-        if (!occ[b.roomId]) occ[b.roomId] = {};
+        if(!occ[b.roomId]) occ[b.roomId]={};
         const ci = new Date(b.checkIn);
         const co = new Date(b.checkOut);
-        // Nights from ci to co - 1 day
-        for (let d = new Date(ci.getFullYear(), ci.getMonth(), ci.getDate()); d < co; d.setDate(d.getDate() + 1)) {
+        for(let d=new Date(ci); d<co; d.setDate(d.getDate()+1)){
           const day = fmt(d);
-          // Only within requested range
-          if (day < dates[0] || day > dates[dates.length-1]) continue;
-          occ[b.roomId][day] = (occ[b.roomId][day] || 0) + (b.roomCount || 1);
+          if(day<dates[0] || day>dates[dates.length-1]) continue;
+          occ[b.roomId][day] = (occ[b.roomId][day]||0) + (b.roomCount||1);
         }
       });
 
-      // Compare occ to totalUnits to set status
-      Object.entries(occ).forEach(([roomId, map]) => {
-        const total = roomUnits[roomId] || 0;
+      Object.entries(occ).forEach(([roomId,map])=>{
+        const total = roomUnits[roomId]||0;
         const target = byRoom[roomId];
-        if (!target) return;
-        Object.entries(map).forEach(([day, count]) => {
-          if (total > 0 && count >= total) {
-            target.dates[day] = 'booked';
-          }
+        if(!target) return;
+        Object.entries(map).forEach(([day,count])=>{
+          if(total>0 && count>=total) target.dates[day]='booked';
         });
       });
 
       return res.json({ ok: true, data: result, range: { start, end } });
-    } catch (e: any) {
-      return res.status(400).json({ ok: false, error: e.message });
+    } catch(e: any) {
+      return res.status(400).json({ ok:false, error:e.message });
     }
   },
 
-  // Public: get booked date ranges (overlapping bookings) for all rooms or a specific room
   bookedDates: async (req: Request, res: Response) => {
     try {
       const now = new Date();
-      const defaultStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-      const defaultEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+      const defaultStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
+      const defaultEnd = new Date(now.getFullYear(), now.getMonth()+1,0).toISOString().slice(0,10);
 
       const start = (req.query.start as string) || defaultStart;
       const end = (req.query.end as string) || defaultEnd;
       const roomId = (req.query.roomId as string) || undefined;
 
-      // Fetch overlapping bookings in range (pending and confirmed)
       const bookings = await bookingRepository.findInRange(start, end);
+      const filtered = roomId ? bookings.filter(b => b.roomId===roomId) : bookings;
 
-      const filtered = roomId ? bookings.filter(b => b.roomId === roomId) : bookings;
-
-      return res.json({ ok: true, data: filtered, range: { start, end }, filter: { roomId } });
-    } catch (e: any) {
-      return res.status(400).json({ ok: false, error: e.message });
+      return res.json({ ok:true, data:filtered, range:{start,end}, filter:{roomId} });
+    } catch(e:any){
+      return res.status(400).json({ ok:false, error:e.message });
     }
   }
 };

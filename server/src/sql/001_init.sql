@@ -22,6 +22,52 @@ CREATE TABLE IF NOT EXISTS room_units (
   unit_number TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'active'
 );
+-- ==========================
+-- Drop table if exists
+-- ==========================
+DROP TABLE IF EXISTS reviews CASCADE;
+
+-- ==========================
+-- Table: reviews
+-- ==========================
+CREATE TABLE reviews (
+    id SERIAL PRIMARY KEY,
+    room_id UUID NOT NULL,               -- Match rooms.id type
+    author VARCHAR(100) DEFAULT 'Anonymous',
+    comment TEXT NOT NULL,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+);
+
+
+--===========================
+-- Table: events
+--===========================
+CREATE TABLE IF NOT EXISTS events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(255) NOT NULL,
+  date DATE NOT NULL,
+  description TEXT NOT NULL,
+  image_url TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+--==========
+--notifications
+--==========
+
+CREATE TABLE notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    booking_id INT,
+    read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+
 
 -- Index for faster lookups
 CREATE INDEX IF NOT EXISTS idx_room_units_room ON room_units(room_id);

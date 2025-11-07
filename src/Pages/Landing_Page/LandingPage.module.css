@@ -12,7 +12,10 @@
   margin-top: -85px;
   padding-top: 0;
   position: relative;
-  z-index: 10;
+  z-index: 30;
+  margin-top: -80px;  /* Pull it up to overlap hero section */
+  margin-bottom: 40px;
+>>>>>>> 725f79c2ae6fbe3270e207ad74d8453c33cccab0
 }
 
 .sliderButton {

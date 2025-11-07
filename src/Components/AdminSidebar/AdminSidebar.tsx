@@ -22,11 +22,17 @@ export const AdminSidebar = () => {
         </Link>
       </li>
       <li>
+        <Link to="/admin/deals">
+          <span></span>
+          Manage Deals
+        </Link>
+      </li>
+      {/* <li>
         <Link to="/admin/stats">
           <span></span>
           View Stats/Reports
         </Link>
-      </li>
+      </li> */}
       <li>
         <Link to="/admin/calendar">
           <span></span>
@@ -52,5 +58,5 @@ export const AdminSidebar = () => {
         </Link>
       </li>
     </ul>
-  );
-};
+  )
+}

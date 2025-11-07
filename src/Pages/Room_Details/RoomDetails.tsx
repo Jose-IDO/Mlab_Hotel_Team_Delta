@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./RoomDetails.module.css";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 import FavoriteButton from "../../Components/Shared/FavoriteButton";
@@ -17,6 +17,7 @@ import room2 from "../../assets/room1B.jpg";
 import room3 from "../../assets/room1c.jpg";
 import room4 from "../../assets/room1d.jpg";
 import room5 from "../../assets/room1E.jpg";
+import { parse } from "path";
 
 // Types
 type ApiRoom = {
@@ -70,6 +71,7 @@ type UiReview = {
 const RoomDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuth();
   const { toggleFavorite, isFavorite } = useFavorites();
 
@@ -283,11 +285,20 @@ const RoomDetails: React.FC = () => {
 
   const handleBookNow = () => {
     if (!room) return;
+
+    // Get dates and guests from URL params (from search)
+    const checkIn = searchParams.get('checkIn') || '';
+    const checkOut = searchParams.get('checkOut') || '';
+    const guests = searchParams.get('guests') || '';
+
     const bookingData = {
       hotelName: "Delta Hotel",
       roomType: room.name,
       roomImage: room.image,
       pricePerNight: room.price,
+      checkIn,
+      checkOut,
+      guests: guests ? parseInt(guests) : undefined,
     };
 
     if (!isAuthenticated) {

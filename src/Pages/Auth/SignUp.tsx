@@ -173,8 +173,14 @@ const SignUp: React.FC = () => {
 
           <div className={styles.divider}>Or</div>
           <GoogleButton onClick={() => {
-            const API_URL = (import.meta as any).env.VITE_API_URL as string;
-            window.location.href = `${API_URL}/auth/google`;
+            try {
+              const API_URL = (import.meta as any).env.VITE_API_URL as string;
+              console.log('Initiating Google OAuth, redirecting to:', `${API_URL}/auth/google`);
+              window.location.href = `${API_URL}/auth/google`;
+            } catch (err) {
+              console.error('Google OAuth redirect error:', err);
+              alert('Failed to initiate Google sign in. Please try again.');
+            }
           }} />
         </div>
       </div>
