@@ -3,10 +3,12 @@ import styles from "./RoomDetails.module.css";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useAuth } from "../../contexts/AuthContext";
+import FavoriteButton from "../../Components/Shared/FavoriteButton";
+import { useFavorites } from "../../contexts/FavoritesContext";
 import {
   Wifi, Wind, Tv, Wine, Palmtree, ConciergeBell, Waves,
   CircleSlash2, PawPrint, Clock, Volume2, AlertCircle,
-  Calendar, Users, Sparkles, Coffee, Bath
+  Sparkles, Coffee, Bath
 } from "lucide-react";
 
 // Room images
@@ -61,16 +63,17 @@ type UiReview = {
   date: string;
 };
 
-type AvailabilitySlot = {
-  date: string;
-  available: boolean;
-};
+// type AvailabilitySlot = {
+//   date: string;
+//   available: boolean;
+// };
 
 const RoomDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuth();
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -82,10 +85,10 @@ const RoomDetails: React.FC = () => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewsError, setReviewsError] = useState<string | null>(null);
 
-  // Availability
-  const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
-  const [availabilityLoading, setAvailabilityLoading] = useState(false);
-  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
+  // Availability (currently unused but kept for future use)
+  // const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
+  // const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  // const [availabilityError, setAvailabilityError] = useState<string | null>(null);
 
   // New review
   const [reviewName, setReviewName] = useState(
@@ -205,29 +208,29 @@ const RoomDetails: React.FC = () => {
     fetchReviews();
   }, [id]);
 
-  // Fetch availability
-  useEffect(() => {
-    if (!id) return;
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
+  // Fetch availability (currently unused but kept for future use)
+  // useEffect(() => {
+  //   if (!id) return;
+  //   const API_URL = (import.meta as any).env.VITE_API_URL as string;
 
-    const fetchAvailability = async () => {
-      setAvailabilityLoading(true);
-      setAvailabilityError(null);
-      try {
-        const res = await fetch(`${API_URL}/admin/rooms/${id}/availability`);
-        const json = await res.json();
-        if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch availability');
+  //   const fetchAvailability = async () => {
+  //     setAvailabilityLoading(true);
+  //     setAvailabilityError(null);
+  //     try {
+  //       const res = await fetch(`${API_URL}/admin/rooms/${id}/availability`);
+  //       const json = await res.json();
+  //       if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch availability');
 
-        setAvailability(json.data as AvailabilitySlot[]);
-      } catch (e: any) {
-        setAvailabilityError(e.message || 'Failed to load availability');
-      } finally {
-        setAvailabilityLoading(false);
-      }
-    };
+  //       setAvailability(json.data as AvailabilitySlot[]);
+  //     } catch (e: any) {
+  //       setAvailabilityError(e.message || 'Failed to load availability');
+  //     } finally {
+  //       setAvailabilityLoading(false);
+  //     }
+  //   };
 
-    fetchAvailability();
-  }, [id]);
+  //   fetchAvailability();
+  // }, [id]);
 
   // Submit review
   const submitReview = async () => {
@@ -335,9 +338,24 @@ const RoomDetails: React.FC = () => {
                 <h2>{room.name}</h2>
                 <p className={styles.price}>R {room.price.toLocaleString()} PN</p>
               </div>
-              <button className={styles.bookNowBtn} onClick={handleBookNow}>
-                {isAuthenticated ? 'Book Now' : 'Sign Up to Book'}
-              </button>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <FavoriteButton
+                  id={room.id}
+                  isFavorite={isFavorite(room.id)}
+                  onToggle={(id, next) => {
+                    toggleFavorite({
+                      id,
+                      type: "room",
+                      name: room.name,
+                      price: room.price,
+                      image: room.image,
+                    });
+                  }}
+                />
+                <button className={styles.bookNowBtn} onClick={handleBookNow}>
+                  {isAuthenticated ? 'Book Now' : 'Sign Up to Book'}
+                </button>
+              </div>
             </div>
 
             {/* Room details */}

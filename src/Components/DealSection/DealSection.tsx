@@ -1,7 +1,28 @@
-import React from "react";
-import styles from "./DealSection.module.css"; 
+import React, { useState, useEffect } from "react";
+import styles from "./DealSection.module.css";
+import ShareModal from "../Shared/ShareModal";
+import shareIcon from "../../assets/share-1-svgrepo-com.svg"; 
 
-type Deal = {
+type DealWithRoom = {
+  id: number;
+  roomId: string;
+  title: string;
+  description?: string;
+  discountPercentage: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  createdAt: string;
+  roomName: string;
+  roomType: string;
+  originalPrice: number;
+  discountedPrice: number;
+  images?: string[];
+  maxGuests: number;
+  bedType: string;
+};
+
+type DisplayDeal = {
   id: string;
   hotel: string;
   location: string;
@@ -10,6 +31,8 @@ type Deal = {
   views: number;
   oldPrice: string;
   newPrice: string;
+  image?: string;
+  roomId: string;
 };
 
 const STAR_SVG = ({ filled }: { filled: boolean }) => (
@@ -49,46 +72,158 @@ const EYE_SVG = () => (
   </svg>
 );
 
-const baseDeals: Deal[] = [
-  {
-    id: "d-1",
-    hotel: "Delta Hotel",
-    location: "Waterkloof, South Africa",
-    nights: "2 nights",
-    rating: 4,
-    views: 1134,
-    oldPrice: 'R1850',
-    newPrice: 'R1250',
-  },
-  {
-    id: "d-2",
-    hotel: "Delta Hotel",
-    location: "Waterkloof, South Africa",
-    nights: "2 nights",
-    rating: 5,
-    views: 550,
-    oldPrice: 'R2200',
-    newPrice: 'R1800',
-  },
-  {
-    id: "d-3",
-    hotel: "Delta Hotel",
-    location: "Waterkloof, South Africa",
-    nights: "1 night",
-    rating: 3,
-    views: 777,
-    oldPrice: 'R1100',
-    newPrice: 'R700',
-  },
-];
-
 import hotelRoom1 from "../../assets/Hotel-Room-1.jpg";
 import hotelRoom2 from "../../assets/Hotel-Room-2.jpg";
 import hotelRoom3 from "../../assets/Hotel-Room-3.jpg";
 
 const hotelImages = [hotelRoom1, hotelRoom2, hotelRoom3];
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const DealsSection: React.FC = () => {
+  const [deals, setDeals] = useState<DisplayDeal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [shareModal, setShareModal] = useState<{ isOpen: boolean; dealId: string | null; dealName: string }>({
+    isOpen: false,
+    dealId: null,
+    dealName: "",
+  });
+
+  useEffect(() => {
+    const fetchDeals = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`${API_URL}/deals/active`);
+        const json = await response.json();
+
+        if (!response.ok || !json.ok) {
+          throw new Error(json.error || "Failed to fetch deals");
+        }
+
+        const dealsData: DealWithRoom[] = json.data || [];
+        
+        // Transform API data to display format
+        const displayDeals: DisplayDeal[] = dealsData.map((deal, idx) => {
+          // Calculate nights from date range
+          const startDate = new Date(deal.startDate);
+          const endDate = new Date(deal.endDate);
+          const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const nights = diffDays === 1 ? "1 night" : `${diffDays} nights`;
+
+          // Get image from deal images or use fallback
+          let imageUrl: string | undefined;
+          if (deal.images) {
+            let imagesArray: string[] = [];
+            
+            // Handle different image formats
+            if (Array.isArray(deal.images)) {
+              imagesArray = deal.images;
+            } else if (typeof deal.images === 'string') {
+              try {
+                // Try to parse as JSON if it's a string
+                imagesArray = JSON.parse(deal.images);
+              } catch {
+                // If not JSON, treat as single image string
+                imagesArray = [deal.images];
+              }
+            }
+            
+            if (imagesArray.length > 0) {
+              const firstImage = imagesArray[0];
+              imageUrl = firstImage.startsWith('http') 
+                ? firstImage 
+                : `${API_URL}/uploads/${firstImage}`;
+            }
+          }
+          
+          // Fallback to default images if no image found
+          if (!imageUrl) {
+            imageUrl = hotelImages[idx % hotelImages.length];
+          }
+
+          return {
+            id: deal.id.toString(),
+            hotel: deal.roomName || deal.title || "Delta Hotel",
+            location: "1 Mark Shuttleworth Street, Lynwood, Pretoria, 0087, South Africa",
+            nights,
+            rating: 4, // Default rating, can be enhanced later
+            views: Math.floor(Math.random() * 1000) + 100, // Placeholder views
+            oldPrice: `R${Math.round(deal.originalPrice).toLocaleString()}`,
+            newPrice: `R${Math.round(deal.discountedPrice).toLocaleString()}`,
+            image: imageUrl,
+            roomId: deal.roomId,
+          };
+        });
+
+        setDeals(displayDeals);
+      } catch (err: any) {
+        console.error("Error fetching deals:", err);
+        setError(err.message || "Failed to load deals");
+        // Fallback to empty array on error
+        setDeals([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDeals();
+  }, []);
+
+  const handleShare = (e: React.MouseEvent, dealId: string, dealName: string) => {
+    e.stopPropagation();
+    setShareModal({ isOpen: true, dealId, dealName });
+  };
+
+  const getShareUrl = (dealId: string | null) => {
+    if (!dealId) return "";
+    const baseUrl = window.location.origin;
+    const basename = import.meta.env.PROD ? '/Mlab_Hotel_Team_Delta' : '';
+    // Link to hotel-details page
+    return `${baseUrl}${basename}/hotel-details`;
+  };
+
+  if (loading) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.headerRow}>
+          <h2 className={styles.heading}>Deals For The Weekend</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <p>Loading deals...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.headerRow}>
+          <h2 className={styles.heading}>Deals For The Weekend</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '40px', color: '#F93448' }}>
+          <p>Error loading deals: {error}</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (deals.length === 0) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.headerRow}>
+          <h2 className={styles.heading}>Deals For The Weekend</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <p>No active deals available at the moment.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={styles.section}>
       <div className={styles.headerRow}>
@@ -96,14 +231,27 @@ const DealsSection: React.FC = () => {
       </div>
 
       <div className={styles.grid}>
-        {baseDeals.map((deal, idx) => (
+        {deals.map((deal, idx) => (
           <div className={styles.card} key={deal.id}>
-            <img
-              src={hotelImages[idx % hotelImages.length]}
-              alt={`Hotel room ${idx + 1}`}
-              className={styles.hotelImage}
-              style={{ objectFit: "cover", width: "100%", height: "175px" }}
-            />
+            <div className={styles.imageContainer}>
+              <img
+                src={deal.image || hotelImages[idx % hotelImages.length]}
+                alt={deal.hotel}
+                className={styles.hotelImage}
+                style={{ objectFit: "cover", width: "100%", height: "175px" }}
+                onError={(e) => {
+                  // Fallback to default image on error
+                  (e.target as HTMLImageElement).src = hotelImages[idx % hotelImages.length];
+                }}
+              />
+              <button
+                className={styles.shareButton}
+                onClick={(e) => handleShare(e, deal.id, deal.hotel)}
+                aria-label="Share deal"
+              >
+                <img src={shareIcon} alt="Share" className={styles.shareIcon} />
+              </button>
+            </div>
 
             <div className={styles.content}>
               <div className={styles.titleRow}>
@@ -141,6 +289,14 @@ const DealsSection: React.FC = () => {
           View All
         </button>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={shareModal.isOpen}
+        onClose={() => setShareModal({ isOpen: false, dealId: null, dealName: "" })}
+        shareUrl={getShareUrl(shareModal.dealId)}
+        roomName={shareModal.dealName}
+      />
     </section>
   );
 };

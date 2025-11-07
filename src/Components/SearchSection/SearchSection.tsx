@@ -103,7 +103,7 @@ const SearchSection: React.FC = () => {
             />
           </div>
           
-          <button className={styles.searchButton} type="submit">Search Room</button>
+          <button type="submit" className={styles.searchButton}>Search Rooms</button>
         </form>
       </div>
     </section>

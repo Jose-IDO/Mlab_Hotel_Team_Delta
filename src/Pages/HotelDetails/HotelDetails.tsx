@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import styles from "./HotelDetails.module.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
+import FavoriteButton from "../../Components/Shared/FavoriteButton";
+import { useFavorites } from "../../contexts/FavoritesContext";
+import ShareModal from "../../Components/Shared/ShareModal";
+import shareIcon from "../../assets/share-1-svgrepo-com.svg";
 
 // Star rating component
 const STAR_SVG = ({ filled }: { filled: boolean }) => (
@@ -35,7 +39,14 @@ const HotelDetails: React.FC = () => {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const hotelFavoriteId = "hotel";
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [shareModal, setShareModal] = useState<{ isOpen: boolean; roomId: string | null; roomName: string }>({
+    isOpen: false,
+    roomId: null,
+    roomName: "",
+  });
   const [selectedRoomType, setSelectedRoomType] = useState<string>("all");
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>("all");
   const [selectedRating, setSelectedRating] = useState<string>("all");
@@ -115,6 +126,18 @@ const HotelDetails: React.FC = () => {
     const queryString = params.toString();
     navigate(`/room-details/${roomId}${queryString ? `?${queryString}` : ''}`);
     window.scrollTo(0, 0);
+  };
+
+  const handleShare = (e: React.MouseEvent, roomId: string, roomName: string) => {
+    e.stopPropagation();
+    setShareModal({ isOpen: true, roomId, roomName });
+  };
+
+  const getShareUrl = (roomId: string | null) => {
+    if (!roomId) return "";
+    const baseUrl = window.location.origin;
+    const basename = import.meta.env.PROD ? '/Mlab_Hotel_Team_Delta' : '';
+    return `${baseUrl}${basename}/room-details/${roomId}`;
   };
 
   const scrollToMap = () => {
@@ -506,7 +529,18 @@ const HotelDetails: React.FC = () => {
           </div>
           <div className={styles.headerActions}>
             <button className={styles.mapBtn} onClick={scrollToMap}>View on Map</button>
-            <button className={styles.favoriteBtn}>♡ Added to favorites</button>
+            <FavoriteButton
+              id={hotelFavoriteId}
+              isFavorite={isFavorite(hotelFavoriteId)}
+              onToggle={(id, next) => {
+                toggleFavorite({
+                  id,
+                  type: "hotel",
+                  name: hotelData.name,
+                  image: hotelData.mainImage,
+                });
+              }}
+            />
           </div>
         </header>
 
@@ -551,6 +585,30 @@ const HotelDetails: React.FC = () => {
                   </div>
                   <p>{room.adults} guests</p>
                   <p className={styles.price}>Price per night: R {room.price.toLocaleString()}</p>
+                  <div className={styles.roomActions}>
+                    <button
+                      className={styles.shareButton}
+                      onClick={(e) => handleShare(e, room.id, room.name)}
+                      aria-label="Share room"
+                    >
+                      <img src={shareIcon} alt="Share" className={styles.shareIcon} />
+                    </button>
+                    <div className={styles.roomFavWrapper}>
+                      <FavoriteButton
+                        id={room.id}
+                        isFavorite={isFavorite(room.id)}
+                        onToggle={(id, next) => {
+                          toggleFavorite({
+                            id,
+                            type: "room",
+                            name: room.name,
+                            price: room.price,
+                            image: room.image,
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )) : (
@@ -644,6 +702,14 @@ const HotelDetails: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* ---------- SHARE MODAL ---------- */}
+        <ShareModal
+          isOpen={shareModal.isOpen}
+          onClose={() => setShareModal({ isOpen: false, roomId: null, roomName: "" })}
+          shareUrl={getShareUrl(shareModal.roomId)}
+          roomName={shareModal.roomName}
+        />
       </div>
     </>
   );
