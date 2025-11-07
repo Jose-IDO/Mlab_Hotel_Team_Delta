@@ -45,28 +45,3 @@ export const deleteEvent = async (req: Request, res: Response) => {
     res.status(500).json({ ok: false, error: (error as Error).message });
   }
 };
-
-// UPDATE an event
-export const updateEvent = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
-    const { title, date, description } = req.body;
-    const image = req.file?.filename; // new image if uploaded, undefined otherwise
-
-    // Validate required fields
-    if (!title || !date || !description) {
-      return res.status(400).json({ ok: false, error: "Title, date, and description are required" });
-    }
-
-    const updatedEvent = await eventRepository.update(id, {
-      title,
-      date,
-      description,
-      imageUrl: image, // if undefined, repository will keep existing image
-    });
-
-    res.json({ ok: true, data: updatedEvent });
-  } catch (error) {
-    res.status(500).json({ ok: false, error: (error as Error).message });
-  }
-};

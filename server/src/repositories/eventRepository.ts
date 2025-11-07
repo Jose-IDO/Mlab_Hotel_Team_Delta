@@ -27,20 +27,4 @@ export const eventRepository = {
   delete: async (id: string) => {
     await pool.query("DELETE FROM events WHERE id = $1", [id]);
   },
-
-  update: async (id: string, event: EventInput) => {
-    const { title, date, description, imageUrl } = event;
-    
-    // If imageUrl is provided, update it; otherwise keep existing
-    const query = imageUrl
-      ? `UPDATE events SET title = $1, date = $2, description = $3, image_url = $4 WHERE id = $5 RETURNING *`
-      : `UPDATE events SET title = $1, date = $2, description = $3 WHERE id = $4 RETURNING *`;
-    
-    const params = imageUrl
-      ? [title, date, description, imageUrl, id]
-      : [title, date, description, id];
-    
-    const { rows } = await pool.query(query, params);
-    return rows[0];
-  },
 };
