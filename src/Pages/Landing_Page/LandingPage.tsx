@@ -3,6 +3,8 @@ import styles from './LandingPage.module.css'
 import SearchSection from "../../Components/SearchSection/SearchSection"
 import DealsSection from '../../Components/DealSection/DealSection'
 import LandingSections from "../../Components/LandingSections/LandingSections"
+import PopiaOverlay from '../../Components/Popia/PopiaOverlay'
+import { usePopia } from '../../contexts/PopiaContext'
 import santorini1 from '../../assets/Santorini_1.jpg'
 import santorini2 from '../../assets/Santorini_2.jpg'
 import santorini3 from '../../assets/Santorini_3.jpg'
@@ -17,23 +19,30 @@ import wifi from '../../assets/wifi-signal.png'
 
 export const LandingPage = () => {
   const [currentImage, setCurrentImage] = useState(0)
+  const { isAccepted } = usePopia()
   const images = [santorini1, santorini2, santorini3, santorini4, santorini5, santorini6, santorini7]
 
   const nextImage = () => {
+    if (!isAccepted) return
     setCurrentImage(current => current === images.length - 1 ? 0 : current + 1)
   }
 
   const prevImage = () => {
+    if (!isAccepted) return
     setCurrentImage(current => current === 0 ? images.length - 1 : current - 1)
   }
 
   useEffect(() => {
-    const timer = setInterval(nextImage, 5000)
+    if (!isAccepted) return
+    const timer = setInterval(() => {
+      setCurrentImage(current => current === images.length - 1 ? 0 : current + 1)
+    }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [isAccepted, images.length])
 
   return (
     <div>
+      <PopiaOverlay />
       <div className={styles.sectionone}>
         <div className={styles.slideContainer} style={{ transform: `translateX(-${currentImage * 100}%)` }}>
           {images.map((img, index) => (
@@ -44,8 +53,22 @@ export const LandingPage = () => {
             />
           ))}
         </div>
-        <button onClick={prevImage} className={styles.sliderButton + ' ' + styles.leftButton}>&lt;</button>
-        <button onClick={nextImage} className={styles.sliderButton + ' ' + styles.rightButton}>&gt;</button>
+        <button 
+          onClick={prevImage} 
+          className={styles.sliderButton + ' ' + styles.leftButton}
+          disabled={!isAccepted}
+          style={{ opacity: isAccepted ? 1 : 0.5, cursor: isAccepted ? 'pointer' : 'not-allowed' }}
+        >
+          &lt;
+        </button>
+        <button 
+          onClick={nextImage} 
+          className={styles.sliderButton + ' ' + styles.rightButton}
+          disabled={!isAccepted}
+          style={{ opacity: isAccepted ? 1 : 0.5, cursor: isAccepted ? 'pointer' : 'not-allowed' }}
+        >
+          &gt;
+        </button>
         <div className={styles.textContent}>
           <div>Welcome to Delta's Signature Stays.</div>
           <div>Where comfort meets elegance.</div>

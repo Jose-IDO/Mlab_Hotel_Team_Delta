@@ -5,16 +5,31 @@ import Logo from "../../assets/Logo.png";
 import HomeIcon from "../../assets/home-icon-silhouette-svgrepo-com.svg";
 import { FaBell } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
+import { usePopia } from "../../contexts/PopiaContext";
 import { socket } from "../../utils/socket"; // make sure socket.ts exports a connected socket
 
 export const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const { user, logout, isAuthenticated } = useAuth();
+  const { isAccepted, setShowOverlay } = usePopia();
   const navigate = useNavigate();
 
-  const handleLoginClick = () => navigate("/signin");
-  const handleSignupClick = () => navigate("/signup");
+  const handleLoginClick = () => {
+    if (!isAccepted) {
+      setShowOverlay(true);
+      return;
+    }
+    navigate("/signin");
+  };
+
+  const handleSignupClick = () => {
+    if (!isAccepted) {
+      setShowOverlay(true);
+      return;
+    }
+    navigate("/signup");
+  };
   const handleLogout = () => {
     logout();
     setMenuOpen(false);
@@ -24,11 +39,14 @@ export const Navbar: React.FC = () => {
     const hasAdminRole = user?.roles?.some((r: any) => (typeof r === "string" ? r : r?.name) && adminRoles.includes(r));
     navigate(hasAdminRole ? "/admin" : "/dashboard");
   };
-  const handleRoomsClick = () => navigate("/hotel-details");
+  const handleRoomsClick = () => {
+    if (!isAccepted) return;
+    navigate("/hotel-details");
+  };
 
   // Listen for real-time notifications
   useEffect(() => {
-    socket.on("newBooking", (data) => {
+    socket.on("newBooking", (data: any) => {
       setNotifications((prev) => [data, ...prev]);
     });
 
@@ -73,7 +91,15 @@ export const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                <li onClick={handleRoomsClick}>Rooms</li>
+                <li 
+                  onClick={handleRoomsClick}
+                  style={{ 
+                    opacity: isAccepted ? 1 : 0.5, 
+                    cursor: isAccepted ? 'pointer' : 'not-allowed'
+                  }}
+                >
+                  Rooms
+                </li>
                 <li className={styles.redButton} onClick={handleLoginClick}>Sign In</li>
                 <li className={styles.redButton} onClick={handleSignupClick}>Sign Up</li>
               </>

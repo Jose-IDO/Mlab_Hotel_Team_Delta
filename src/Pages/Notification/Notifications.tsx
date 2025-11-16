@@ -22,7 +22,7 @@ export const Notifications: React.FC = () => {
 
     fetchNotifications();
 
-    socket.on("newBooking", (data) => {
+    socket.on("newBooking", (data: any) => {
       // Ensure `data` has booking object + message
       const notif = {
         message: data.message,

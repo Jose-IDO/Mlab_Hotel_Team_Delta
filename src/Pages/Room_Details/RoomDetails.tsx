@@ -17,7 +17,6 @@ import room2 from "../../assets/room1B.jpg";
 import room3 from "../../assets/room1c.jpg";
 import room4 from "../../assets/room1d.jpg";
 import room5 from "../../assets/room1E.jpg";
-import { parse } from "path";
 
 // Types
 type ApiRoom = {
@@ -341,7 +340,7 @@ const RoomDetails: React.FC = () => {
                 <FavoriteButton
                   id={room.id}
                   isFavorite={isFavorite(room.id)}
-                  onToggle={(id, next) => {
+                  onToggle={(id) => {
                     toggleFavorite({
                       id,
                       type: "room",

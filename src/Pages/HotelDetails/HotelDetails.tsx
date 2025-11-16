@@ -532,7 +532,7 @@ const HotelDetails: React.FC = () => {
             <FavoriteButton
               id={hotelFavoriteId}
               isFavorite={isFavorite(hotelFavoriteId)}
-              onToggle={(id, next) => {
+              onToggle={(id) => {
                 toggleFavorite({
                   id,
                   type: "hotel",
@@ -597,7 +597,7 @@ const HotelDetails: React.FC = () => {
                       <FavoriteButton
                         id={room.id}
                         isFavorite={isFavorite(room.id)}
-                        onToggle={(id, next) => {
+                        onToggle={(id) => {
                           toggleFavorite({
                             id,
                             type: "room",

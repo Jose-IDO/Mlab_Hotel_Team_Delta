@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styles from "./DealSection.module.css";
 import ShareModal from "../Shared/ShareModal";
-import shareIcon from "../../assets/share-1-svgrepo-com.svg"; 
+import shareIcon from "../../assets/share-1-svgrepo-com.svg";
+import { usePopia } from "../../contexts/PopiaContext"; 
 
 type DealWithRoom = {
   id: number;
@@ -81,6 +82,7 @@ const hotelImages = [hotelRoom1, hotelRoom2, hotelRoom3];
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const DealsSection: React.FC = () => {
+  const { isAccepted } = usePopia();
   const [deals, setDeals] = useState<DisplayDeal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -174,6 +176,7 @@ const DealsSection: React.FC = () => {
 
   const handleShare = (e: React.MouseEvent, dealId: string, dealName: string) => {
     e.stopPropagation();
+    if (!isAccepted) return;
     setShareModal({ isOpen: true, dealId, dealName });
   };
 
@@ -232,7 +235,15 @@ const DealsSection: React.FC = () => {
 
       <div className={styles.grid}>
         {deals.map((deal, idx) => (
-          <div className={styles.card} key={deal.id}>
+          <div 
+            className={styles.card} 
+            key={deal.id}
+            style={{ 
+              opacity: isAccepted ? 1 : 0.5, 
+              cursor: isAccepted ? 'pointer' : 'not-allowed',
+              pointerEvents: isAccepted ? 'auto' : 'none'
+            }}
+          >
             <div className={styles.imageContainer}>
               <img
                 src={deal.image || hotelImages[idx % hotelImages.length]}
@@ -248,6 +259,12 @@ const DealsSection: React.FC = () => {
                 className={styles.shareButton}
                 onClick={(e) => handleShare(e, deal.id, deal.hotel)}
                 aria-label="Share deal"
+                disabled={!isAccepted}
+                style={{ 
+                  opacity: isAccepted ? 1 : 0.5, 
+                  cursor: isAccepted ? 'pointer' : 'not-allowed',
+                  pointerEvents: isAccepted ? 'auto' : 'none'
+                }}
               >
                 <img src={shareIcon} alt="Share" className={styles.shareIcon} />
               </button>
@@ -285,7 +302,14 @@ const DealsSection: React.FC = () => {
       </div>
 
       <div className={styles.buttonRow}>
-        <button className={styles.viewAllBtn}>
+        <button 
+          className={styles.viewAllBtn}
+          disabled={!isAccepted}
+          style={{ 
+            opacity: isAccepted ? 1 : 0.5, 
+            cursor: isAccepted ? 'pointer' : 'not-allowed'
+          }}
+        >
           View All
         </button>
       </div>
