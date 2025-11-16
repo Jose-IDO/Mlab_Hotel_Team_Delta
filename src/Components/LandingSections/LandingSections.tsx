@@ -10,10 +10,14 @@ type Event = {
   imageUrl?: string; // frontend-friendly URL
 };
 
+type LinkType = 'about' | 'contact' | 'privacy' | null;
+
 const LandingSections: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hoveredLink, setHoveredLink] = useState<LinkType>(null);
+  const [openModal, setOpenModal] = useState<LinkType>(null);
 
   const API_URL = import.meta.env.VITE_API_URL; // e.g., http://localhost:3000
 
@@ -124,11 +128,55 @@ const LandingSections: React.FC = () => {
           <div className={styles.footerColumn}>
             <h4>Useful Links</h4>
             <ul>
-              <li>About Us</li>
-              <li>Contact Us</li>
-              <li>Terms & Conditions</li>
-              <li>Privacy & Cookies</li>
-              <li>Human Rights Statement</li>
+              <li
+                className={styles.footerLink}
+                onMouseEnter={() => setHoveredLink('about')}
+                onMouseLeave={() => setHoveredLink(null)}
+                onClick={() => setOpenModal('about')}
+              >
+                About Us
+                {hoveredLink === 'about' && (
+                  <div className={styles.linkOverlay}>
+                    <h5 className={styles.overlayTitle}>About Us</h5>
+                    <p className={styles.overlayContent}>
+                      Delta Hotel is a premier hospitality destination located in the heart of Pretoria, South Africa. We offer world-class accommodation, exceptional service, and unforgettable experiences for both business and leisure travelers...more
+                    </p>
+                  </div>
+                )}
+              </li>
+              <li
+                className={styles.footerLink}
+                onMouseEnter={() => setHoveredLink('contact')}
+                onMouseLeave={() => setHoveredLink(null)}
+                onClick={() => setOpenModal('contact')}
+              >
+                Contact Us
+                {hoveredLink === 'contact' && (
+                  <div className={styles.linkOverlay}>
+                    <h5 className={styles.overlayTitle}>Contact Us</h5>
+                    <p className={styles.overlayContent}>
+                      Get in touch with our friendly team. We're here to assist you with reservations, inquiries, or any special requests. Reach us via phone, email, or visit us at our location in Pretoria...more
+                    </p>
+                  </div>
+                )}
+              </li>
+              <li className={styles.footerLinkNoHover}>Terms & Conditions</li>
+              <li
+                className={styles.footerLink}
+                onMouseEnter={() => setHoveredLink('privacy')}
+                onMouseLeave={() => setHoveredLink(null)}
+                onClick={() => setOpenModal('privacy')}
+              >
+                Privacy & Cookies
+                {hoveredLink === 'privacy' && (
+                  <div className={styles.linkOverlay}>
+                    <h5 className={styles.overlayTitle}>Privacy & Cookies</h5>
+                    <p className={styles.overlayContent}>
+                      We are committed to protecting your privacy in accordance with POPIA. Our privacy policy explains how we collect, use, and safeguard your personal information. We use cookies to enhance your browsing experience...more
+                    </p>
+                  </div>
+                )}
+              </li>
             </ul>
           </div>
 
@@ -154,6 +202,69 @@ const LandingSections: React.FC = () => {
           <p>© 2025 Delta Hotel. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Modal Overlays */}
+      {openModal === 'about' && (
+        <div className={styles.modalBackdrop} onClick={() => setOpenModal(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalCloseButton} onClick={() => setOpenModal(null)}>✕</button>
+            <h2 className={styles.modalTitle}>About Us</h2>
+            <div className={styles.modalBody}>
+              <p>Delta Hotel is a premier hospitality destination located in the heart of Pretoria, South Africa. We offer world-class accommodation, exceptional service, and unforgettable experiences for both business and leisure travelers.</p>
+              <p>Our hotel features elegantly designed rooms and suites, state-of-the-art facilities, and a commitment to excellence that has made us a trusted name in the hospitality industry.</p>
+              <p>At Delta Hotel, we believe in creating memorable experiences for our guests. Whether you're visiting for business or pleasure, our dedicated team is here to ensure your stay is comfortable, enjoyable, and exceeds your expectations.</p>
+              <p>We pride ourselves on our attention to detail, personalized service, and commitment to sustainability. Our hotel combines modern amenities with warm hospitality, creating the perfect environment for relaxation and productivity.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {openModal === 'contact' && (
+        <div className={styles.modalBackdrop} onClick={() => setOpenModal(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalCloseButton} onClick={() => setOpenModal(null)}>✕</button>
+            <h2 className={styles.modalTitle}>Contact Us</h2>
+            <div className={styles.modalBody}>
+              <p>We're here to help! Get in touch with our friendly team for reservations, inquiries, or any special requests.</p>
+              <div style={{ marginTop: '1.5rem' }}>
+                <p><strong>Address:</strong></p>
+                <p>1 Mark Shuttleworth Street<br />Lynwood, Pretoria<br />0087, South Africa</p>
+              </div>
+              <div style={{ marginTop: '1.5rem' }}>
+                <p><strong>Phone:</strong></p>
+                <p>+27 (0) 12 345 6789</p>
+              </div>
+              <div style={{ marginTop: '1.5rem' }}>
+                <p><strong>Email:</strong></p>
+                <p>info@deltahotel.co.za</p>
+              </div>
+              <div style={{ marginTop: '1.5rem' }}>
+                <p><strong>Business Hours:</strong></p>
+                <p>Monday - Sunday: 24/7<br />Reception: 24 hours</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {openModal === 'privacy' && (
+        <div className={styles.modalBackdrop} onClick={() => setOpenModal(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalCloseButton} onClick={() => setOpenModal(null)}>✕</button>
+            <h2 className={styles.modalTitle}>Privacy & Cookies</h2>
+            <div className={styles.modalBody}>
+              <p>We are committed to protecting your privacy in accordance with the Protection of Personal Information Act (POPIA) of South Africa.</p>
+              <p><strong>How We Use Your Information:</strong></p>
+              <p>We collect and use your personal information to provide our services, process bookings, communicate with you, and improve your experience. We do not sell your personal information to third parties.</p>
+              <p><strong>Cookies:</strong></p>
+              <p>We use cookies and similar technologies to enhance your browsing experience, analyze site usage, and assist in our marketing efforts. You can control cookie preferences through your browser settings.</p>
+              <p><strong>Your Rights:</strong></p>
+              <p>Under POPIA, you have the right to access, correct, or delete your personal information. You can also object to processing or withdraw consent at any time.</p>
+              <p>For more detailed information, please refer to our full Privacy Policy available in the POPIA consent overlay.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

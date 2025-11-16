@@ -290,10 +290,23 @@
   color: #fff;
   cursor: pointer;
   transition: color 0.25s ease;
+  position: relative;
 }
 
 .footerColumn li:hover {
   color: #F93448;
+}
+
+.footerLink {
+  position: relative;
+}
+
+.footerLinkNoHover {
+  cursor: default;
+}
+
+.footerLinkNoHover:hover {
+  color: #fff;
 }
 
 .footerColumn p {
@@ -321,7 +334,7 @@
 }
 
 .iconPlaceholder:hover {
-  background: #2563eb;
+  background: #F93448;
   color: #fff;
 }
 
@@ -343,4 +356,189 @@
 .destinationsSection .sectionTitle {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+/* Footer Link Overlays */
+.linkOverlay {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 10px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 300px;
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.3s ease-out;
+  pointer-events: none;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.overlayTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #F93448;
+  margin: 0 0 0.5rem 0;
+  border-bottom: 1px solid rgba(249, 52, 72, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.overlayContent {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #fff;
+  margin: 0;
+}
+
+/* Modal Overlays */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease-in-out;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 700px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+  position: relative;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.modalCloseButton:hover {
+  background: rgba(249, 52, 72, 0.8);
+  transform: rotate(90deg);
+}
+
+.modalTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 1.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #F93448;
+  padding-bottom: 1rem;
+}
+
+.modalBody {
+  color: #fff;
+  line-height: 1.6;
+}
+
+.modalBody p {
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.modalBody strong {
+  color: #F93448;
+}
+
+/* Custom Scrollbar for Modal */
+.modalContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: rgba(249, 52, 72, 0.5);
+  border-radius: 10px;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 52, 72, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .linkOverlay {
+    width: 250px;
+    font-size: 0.85rem;
+  }
+
+  .modalContent {
+    padding: 1.5rem;
+    max-width: 95%;
+  }
+
+  .modalTitle {
+    font-size: 1.5rem;
+  }
 }
