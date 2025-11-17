@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminNavbar.module.css";
 import { useAuth } from "../../contexts/AuthContext";
-import profileicon from "../../Assets/profile-icon.png";
+import profileIcon from "../../assets/profile-icon.png";
 import HomeIcon from "../../assets/home-icon-silhouette-svgrepo-com.svg";
 
 export const AdminNavbar: React.FC = () => {
