@@ -29,7 +29,7 @@ export const AdminNavbar: React.FC = () => {
         </div>
         <div className={styles.profileSection}>
           <img 
-            src={profileicon} 
+            src={profileIcon}   {/* FIXED: capital I */}
             alt="Admin Profile" 
             className={styles.profilePicture}
           />  
