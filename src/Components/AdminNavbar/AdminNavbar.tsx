@@ -29,8 +29,8 @@ export const AdminNavbar: React.FC = () => {
         </div>
         <div className={styles.profileSection}>
           <img 
-            src={profileIcon}   {/* FIXED: capital I */}
-            alt="Admin Profile" 
+            src={profileIcon}
+            alt="Admin Profile"
             className={styles.profilePicture}
           />  
           <span>{(user as any)?.name || 'Admin'}</span>
