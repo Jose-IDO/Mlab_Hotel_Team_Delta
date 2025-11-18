@@ -3,14 +3,15 @@
   color: white;
   border: none;
   border-radius: 8px;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.25s ease, transform 0.15s;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .favBtn:hover {
