@@ -289,20 +289,34 @@
   background: #d62639;
 }
 
-.roomActions {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.roomFavWrapper {
+.roomCard {
   position: relative;
 }
 
-.roomCard {
+.roomImagePlaceholder {
+  background: #e5e7eb;
+  height: 200px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.roomActions {
+  position: absolute;
+  top: 8px;
+  right: 4px;
+  display: flex;
+  gap: 0.1rem;
+  align-items: center;
+  z-index: 5;
+}
+
+.roomFavWrapper {
   position: relative;
 }
 
@@ -310,8 +324,8 @@
   background: rgba(0, 0, 0, 0.6);
   border: none;
   border-radius: 8px;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -424,18 +438,6 @@
 .roomCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.roomImagePlaceholder {
-  background: #e5e7eb;
-  height: 200px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #555;
-  margin-bottom: 0.75rem;
-  overflow: hidden;
 }
 
 .roomImagePlaceholder img {

@@ -575,16 +575,6 @@ const HotelDetails: React.FC = () => {
               >
                 <div className={styles.roomImagePlaceholder}>
                   <img src={room.image} alt={room.name} />
-                </div>
-                <div className={styles.roomDetails}>
-                  <h3 className={styles.roomName}>{room.name}</h3>
-                  <div className={styles.starRating}>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <STAR_SVG key={star} filled={star <= room.rating} />
-                    ))}
-                  </div>
-                  <p>{room.adults} guests</p>
-                  <p className={styles.price}>Price per night: R {room.price.toLocaleString()}</p>
                   <div className={styles.roomActions}>
                     <button
                       className={styles.shareButton}
@@ -609,6 +599,16 @@ const HotelDetails: React.FC = () => {
                       />
                     </div>
                   </div>
+                </div>
+                <div className={styles.roomDetails}>
+                  <h3 className={styles.roomName}>{room.name}</h3>
+                  <div className={styles.starRating}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <STAR_SVG key={star} filled={star <= room.rating} />
+                    ))}
+                  </div>
+                  <p>{room.adults} guests</p>
+                  <p className={styles.price}>Price per night: R {room.price.toLocaleString()}</p>
                 </div>
               </div>
             )) : (
