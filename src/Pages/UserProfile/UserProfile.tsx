@@ -57,6 +57,12 @@ const UserProfile: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'all'|'pending'|'confirmed'|'cancelled'>('all');
+  const [dateFrom, setDateFrom] = useState<string>(''); // YYYY-MM-DD
+  const [dateTo, setDateTo] = useState<string>('');     // YYYY-MM-DD
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
   
   // UI state
   const [loading, setLoading] = useState(false);
@@ -78,7 +84,14 @@ const UserProfile: React.FC = () => {
   const fetchBookings = async () => {
     try {
       setLoadingBookings(true);
-      const response = await fetch(`${API_URL}/bookings/my-bookings`, {
+      const params = new URLSearchParams();
+      params.set('page', String(page));
+      params.set('limit', String(limit));
+      if (statusFilter !== 'all') params.set('status', statusFilter);
+      if (dateFrom) params.set('start', dateFrom);
+      if (dateTo) params.set('end', dateTo);
+
+      const response = await fetch(`${API_URL}/bookings/my-bookings?${params.toString()}` , {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -86,7 +99,18 @@ const UserProfile: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setBookings(data.data || []);
+        const items: Booking[] = Array.isArray(data.data) ? data.data : [];
+        items.sort((a, b) => {
+          const aTs = new Date(a.createdAt || a.checkIn).getTime();
+          const bTs = new Date(b.createdAt || b.checkIn).getTime();
+          return bTs - aTs; // most recent first
+        });
+        setBookings(items);
+        if (data.paging) {
+          setTotalPages(data.paging.totalPages || 1);
+        } else {
+          setTotalPages(1);
+        }
       } else {
         console.error('Failed to fetch bookings');
       }
@@ -482,6 +506,66 @@ const UserProfile: React.FC = () => {
             {activeTab === 'bookings' && (
               <div className={styles.bookingsSection}>
                 <h2 className={styles.sectionTitle}>My Bookings</h2>
+                {/* Filters */}
+                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap', margin: '12px 0 16px' }}>
+                  <div>
+                    <label className={styles.label}>Status </label>
+                    <select
+                      className={styles.input}
+                      value={statusFilter}
+                      onChange={(e) => { setStatusFilter(e.target.value as any); setPage(1); }}
+                    >
+                      <option value="all">All</option>
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={styles.label}>From </label>
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={dateFrom}
+                      onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
+                    />
+                  </div>
+                  <div>
+                    <label className={styles.label}>To </label>
+                    <input
+                      type="date"
+                      className={styles.input}
+                      value={dateTo}
+                      onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
+                    />
+                  </div>
+                  <div>
+                    <label className={styles.label}>Page size </label>
+                    <select
+                      className={styles.input}
+                      value={limit}
+                      onChange={(e) => { setLimit(parseInt(e.target.value)); setPage(1); }}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      className={styles.saveButton}
+                      onClick={() => { setPage(1); fetchBookings(); }}
+                    >
+                      Apply
+                    </button>
+                    <button
+                      className={styles.cancelButton}
+                      onClick={() => { setStatusFilter('all'); setDateFrom(''); setDateTo(''); setLimit(10); setPage(1); fetchBookings(); }}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
                 
                 {loadingBookings ? (
                   <div className={styles.loadingState}>
@@ -560,6 +644,27 @@ const UserProfile: React.FC = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {/* Pagination */}
+                {!loadingBookings && bookings.length > 0 && (
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'flex-end', marginTop: 12 }}>
+                    <button
+                      className={styles.cancelButton}
+                      disabled={page <= 1}
+                      onClick={() => { setPage(p => Math.max(1, p - 1)); setTimeout(fetchBookings, 0); }}
+                    >
+                      Previous
+                    </button>
+                    <span style={{ color: '#666' }}>Page {page} of {totalPages}</span>
+                    <button
+                      className={styles.saveButton}
+                      disabled={page >= totalPages}
+                      onClick={() => { setPage(p => Math.min(totalPages, p + 1)); setTimeout(fetchBookings, 0); }}
+                    >
+                      Next
+                    </button>
                   </div>
                 )}
               </div>

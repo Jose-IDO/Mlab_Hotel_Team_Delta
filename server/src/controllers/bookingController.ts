@@ -32,8 +32,37 @@ export const bookingController = {
   myBookings: async (req: Request, res: Response) => {
     try {
       const userId = (req as any).user?.id;
-      const bookings = await bookingService.myBookings(userId);
-      res.json({ ok: true, data: bookings });
+      const limit = Math.max(1, Math.min(parseInt(String(req.query.limit ?? '20'), 10), 100));
+      const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10));
+      const statusParam = (req.query.status as string | undefined) || undefined; 
+      const status = statusParam ? (statusParam.split(',').map(s => s.trim()).filter(Boolean) as Array<'pending'|'confirmed'|'cancelled'>) : undefined;
+      const start = (req.query.start as string | undefined) || undefined; // YYYY-MM-DD
+      const end = (req.query.end as string | undefined) || undefined;   // YYYY-MM-DD
+
+      const { rows, paging } = await bookingService.myBookings(userId, { limit, page, status, start, end });
+
+      const enriched = await Promise.all(rows.map(async (b) => {
+        const room = await roomRepository.findById(b.roomId);
+        const ci = new Date(b.checkIn);
+        const co = new Date(b.checkOut);
+        const nights = Math.max(1, Math.ceil((co.getTime() - ci.getTime()) / (1000*60*60*24)));
+        return {
+          id: b.id,
+          bookingId: b.id,
+          hotelName: 'Delta Hotel',
+          roomType: room?.roomType || 'Room',
+          roomId: b.roomId,
+          checkIn: b.checkIn,
+          checkOut: b.checkOut,
+          nights,
+          totalPrice: b.totalPrice,
+          status: b.status,
+          createdAt: b.createdAt,
+          paymentReference: b.paymentReference,
+        };
+      }));
+
+      res.json({ ok: true, data: enriched, paging });
     } catch (e: any) {
       res.status(400).json({ ok: false, error: e.message });
     }

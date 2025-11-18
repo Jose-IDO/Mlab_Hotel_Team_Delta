@@ -9,6 +9,7 @@ const router = Router();
 // Customer
 router.post('/', authenticate, bookingController.create);
 router.get('/me', authenticate, bookingController.myBookings);
+router.get('/my-bookings', authenticate, bookingController.myBookings);
 router.get('/by-reference/:reference', authenticate, bookingController.getByReference);
 router.patch('/:id/cancel', authenticate, bookingController.cancelBooking);
 
