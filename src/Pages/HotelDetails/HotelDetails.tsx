@@ -529,18 +529,6 @@ const HotelDetails: React.FC = () => {
           </div>
           <div className={styles.headerActions}>
             <button className={styles.mapBtn} onClick={scrollToMap}>View on Map</button>
-            <FavoriteButton
-              id={hotelFavoriteId}
-              isFavorite={isFavorite(hotelFavoriteId)}
-              onToggle={(id) => {
-                toggleFavorite({
-                  id,
-                  type: "hotel",
-                  name: hotelData.name,
-                  image: hotelData.mainImage,
-                });
-              }}
-            />
           </div>
         </header>
 
