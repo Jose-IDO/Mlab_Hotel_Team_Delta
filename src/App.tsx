@@ -11,6 +11,7 @@ import SignUp from './Pages/Auth/SignUp';
 import OAuthCallback from './Pages/Auth/OAuthCallback';
 import { AuthProvider } from './contexts/AuthContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
+import { PopiaProvider } from './contexts/PopiaContext';
 import { ProtectedRoute } from './Components/ProtectedRoute/ProtectedRoute';
 import { Navbar } from './Components/Navbar/Navbar';
 import RoomDetails from "./Pages/Room_Details/RoomDetails";
@@ -23,6 +24,7 @@ import PaymentPage from './Pages/Payment/PaymentPage';
 import BookingConfirmation from './Pages/BookingConfirmation/BookingConfirmation';
 import UserProfile from './Pages/UserProfile/UserProfile';
 import { Notifications } from './Pages/Notification/Notifications';
+import PopiaRouteGuard from './Components/Popia/PopiaRouteGuard';
 
 
 function AppContent() {
@@ -37,8 +39,22 @@ function AppContent() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route
+          path="/signin"
+          element={
+            <PopiaRouteGuard>
+              <SignIn />
+            </PopiaRouteGuard>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PopiaRouteGuard>
+              <SignUp />
+            </PopiaRouteGuard>
+          }
+        />
         <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route path="/hotel-details" element={<HotelDetails />} />
         <Route path="/room-details/:id" element={<RoomDetails />} />
@@ -110,13 +126,15 @@ function App() {
   return (
     <ErrorBoundary>
       <Provider store={store}>
-        <AuthProvider>
-          <FavoritesProvider>
-            <Router basename={basename}>
-              <AppContent />
-            </Router>
-          </FavoritesProvider>
-        </AuthProvider>
+        <PopiaProvider>
+          <AuthProvider>
+            <FavoritesProvider>
+              <Router basename={basename}>
+                <AppContent />
+              </Router>
+            </FavoritesProvider>
+          </AuthProvider>
+        </PopiaProvider>
       </Provider>
     </ErrorBoundary>
   );

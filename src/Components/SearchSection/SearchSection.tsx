@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./SearchSection.module.css";
+import { usePopia } from "../../contexts/PopiaContext";
 
 const API_URL = (import.meta as any).env.VITE_API_URL as string;
 
 const SearchSection: React.FC = () => {
   const navigate = useNavigate();
+  const { isAccepted } = usePopia();
   const [roomTypes, setRoomTypes] = useState<string[]>([]);
   const [selectedRoomType, setSelectedRoomType] = useState<string>("all");
   const [checkIn, setCheckIn] = useState<string>("");
@@ -36,6 +38,8 @@ const SearchSection: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!isAccepted) return;
+    
     // Navigate to hotel details page with search params
     const searchParams = new URLSearchParams();
     if (selectedRoomType !== "all") searchParams.set("roomType", selectedRoomType);
@@ -61,6 +65,7 @@ const SearchSection: React.FC = () => {
               className={styles.select}
               value={selectedRoomType}
               onChange={(e) => setSelectedRoomType(e.target.value)}
+              disabled={!isAccepted}
             >
               <option value="all">All Room Types</option>
               {roomTypes.map((type) => (
@@ -77,6 +82,7 @@ const SearchSection: React.FC = () => {
               value={checkIn}
               onChange={(e) => setCheckIn(e.target.value)}
               min={today}
+              disabled={!isAccepted}
             />
           </div>
           
@@ -88,6 +94,7 @@ const SearchSection: React.FC = () => {
               value={checkOut}
               onChange={(e) => setCheckOut(e.target.value)}
               min={minCheckOut}
+              disabled={!isAccepted}
             />
           </div>
           
@@ -100,10 +107,18 @@ const SearchSection: React.FC = () => {
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
               min="1"
+              disabled={!isAccepted}
             />
           </div>
           
-          <button type="submit" className={styles.searchButton}>Search Rooms</button>
+          <button 
+            type="submit" 
+            className={styles.searchButton}
+            disabled={!isAccepted}
+            style={{ opacity: isAccepted ? 1 : 0.5, cursor: isAccepted ? 'pointer' : 'not-allowed' }}
+          >
+            Search Rooms
+          </button>
         </form>
       </div>
     </section>

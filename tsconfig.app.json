@@ -25,5 +25,5 @@
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"],
-  "exclude": ["src/assets/hotel_auth_completed/**"]
+  "exclude": ["src/assets/hotel_auth_completed/**", "src/assets/code files to be added/**"]
 }
