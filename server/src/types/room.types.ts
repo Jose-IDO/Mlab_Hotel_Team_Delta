@@ -24,9 +24,8 @@ export interface ApiResponse<T = any> {
   ok: boolean;
   data?: T;
   error?: string;
-<<<<<<< HEAD
-=======
 }
+
 export interface Review {
   id?: string;
   roomId: string;
@@ -34,5 +33,4 @@ export interface Review {
   comment: string;
   rating: number;
   timestamp: string;
->>>>>>> master
 }

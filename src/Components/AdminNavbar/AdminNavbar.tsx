@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminNavbar.module.css";
 import { useAuth } from "../../contexts/AuthContext";
-import profileicon from "../../Assets/profile-icon.png";
+import profileIcon from "../../assets/profile-icon.png";
 import HomeIcon from "../../assets/home-icon-silhouette-svgrepo-com.svg";
 
 export const AdminNavbar: React.FC = () => {
@@ -29,8 +29,8 @@ export const AdminNavbar: React.FC = () => {
         </div>
         <div className={styles.profileSection}>
           <img 
-            src={profileicon} 
-            alt="Admin Profile" 
+            src={profileIcon}
+            alt="Admin Profile"
             className={styles.profilePicture}
           />  
           <span>{(user as any)?.name || 'Admin'}</span>
