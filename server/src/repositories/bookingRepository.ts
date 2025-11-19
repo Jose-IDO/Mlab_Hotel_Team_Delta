@@ -79,6 +79,87 @@ export class BookingRepository {
     return rows.map(rowToBooking);
   }
 
+  async findByUserFiltered(
+    userId: string,
+    options: {
+      status?: Array<'pending' | 'confirmed' | 'cancelled'>;
+      start?: string; // ISO (YYYY-MM-DD) for check_in >= start
+      end?: string;   // ISO (YYYY-MM-DD) for check_out <= end
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<Booking[]> {
+    const clauses: string[] = ['user_id = $1'];
+    const values: any[] = [userId];
+    let idx = 2;
+
+    if (options.status && options.status.length) {
+      clauses.push(`status = ANY($${idx}::text[])`);
+      values.push(options.status);
+      idx++;
+    }
+    if (options.start) {
+      clauses.push(`check_in >= $${idx}`);
+      values.push(options.start);
+      idx++;
+    }
+    if (options.end) {
+      clauses.push(`check_out <= $${idx}`);
+      values.push(options.end);
+      idx++;
+    }
+
+    const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+    const limit = Math.max(1, Math.min(options.limit ?? 20, 100));
+    const offset = Math.max(0, options.offset ?? 0);
+
+    const sql = `
+      SELECT *
+      FROM bookings
+      ${where}
+      ORDER BY created_at DESC
+      LIMIT $${idx} OFFSET $${idx + 1}
+    `;
+    values.push(limit, offset);
+
+    const { rows } = await pool.query(sql, values);
+    return rows.map(rowToBooking);
+  }
+
+  async countByUserFiltered(
+    userId: string,
+    options: {
+      status?: Array<'pending' | 'confirmed' | 'cancelled'>;
+      start?: string;
+      end?: string;
+    }
+  ): Promise<number> {
+    const clauses: string[] = ['user_id = $1'];
+    const values: any[] = [userId];
+    let idx = 2;
+
+    if (options.status && options.status.length) {
+      clauses.push(`status = ANY($${idx}::text[])`);
+      values.push(options.status);
+      idx++;
+    }
+    if (options.start) {
+      clauses.push(`check_in >= $${idx}`);
+      values.push(options.start);
+      idx++;
+    }
+    if (options.end) {
+      clauses.push(`check_out <= $${idx}`);
+      values.push(options.end);
+      idx++;
+    }
+
+    const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+    const sql = `SELECT COUNT(*)::int AS cnt FROM bookings ${where}`;
+    const { rows } = await pool.query(sql, values);
+    return rows[0]?.cnt ?? 0;
+  }
+
   async findById(id: string): Promise<Booking | null> {
     const { rows } = await pool.query(
       'SELECT * FROM bookings WHERE id = $1',

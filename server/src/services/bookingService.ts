@@ -79,8 +79,44 @@ export class BookingService {
     return bookingRepository.cancelExpiredPendings(new Date().toISOString());
   }
 
-  async myBookings(userId: string) {
-    return bookingRepository.findByUser(userId);
+  async myBookings(
+    userId: string,
+    options?: {
+      status?: Array<'pending'|'confirmed'|'cancelled'>;
+      start?: string;
+      end?: string;
+      limit?: number;
+      page?: number;
+    }
+  ) {
+    const limit = Math.max(1, Math.min(options?.limit ?? 20, 100));
+    const page = Math.max(1, options?.page ?? 1);
+    const offset = (page - 1) * limit;
+
+    const [rows, total] = await Promise.all([
+      bookingRepository.findByUserFiltered(userId, {
+        status: options?.status,
+        start: options?.start,
+        end: options?.end,
+        limit,
+        offset,
+      }),
+      bookingRepository.countByUserFiltered(userId, {
+        status: options?.status,
+        start: options?.start,
+        end: options?.end,
+      })
+    ]);
+
+    return {
+      rows,
+      paging: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit))
+      }
+    };
   }
 
   async cancelBooking(bookingId: string, userId: string) {

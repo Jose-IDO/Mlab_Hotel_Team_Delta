@@ -8,7 +8,7 @@ import { useFavorites } from "../../contexts/FavoritesContext";
 import {
   Wifi, Wind, Tv, Wine, Palmtree, ConciergeBell, Waves,
   CircleSlash2, PawPrint, Clock, Volume2, AlertCircle,
-  Sparkles, Coffee, Bath
+  Sparkles, Coffee, Bath, AirVent
 } from "lucide-react";
 
 // Room images
@@ -111,6 +111,7 @@ const RoomDetails: React.FC = () => {
   const getAmenityIcon = (amenity: string) => {
     const a = amenity.toLowerCase();
     if (a.includes('wifi')) return <Wifi size={32} />;
+    if (a.includes('hairdryer') || a.includes('hair dryer') || a.includes('dryer')) return <AirVent size={32} />;
     if (a.includes('air') || a.includes('conditioning')) return <Wind size={32} />;
     if (a.includes('tv') || a.includes('netflix')) return <Tv size={32} />;
     if (a.includes('bar') || a.includes('mini')) return <Wine size={32} />;
@@ -292,6 +293,7 @@ const RoomDetails: React.FC = () => {
 
     const bookingData = {
       hotelName: "Delta Hotel",
+      roomId: room.id || id,
       roomType: room.name,
       roomImage: room.image,
       pricePerNight: room.price,
@@ -361,21 +363,44 @@ const RoomDetails: React.FC = () => {
               <h2>Room Details</h2>
               <div className={styles.detailsGrid}>
                 <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>👥</span>
+                  <span className={styles.detailIcon}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                  </span>
                   <div className={styles.detailContent}>
                     <span className={styles.detailLabel}>Max Guests</span>
                     <span className={styles.detailValue}>{room.adults} Adults, {room.kids} Children</span>
                   </div>
                 </div>
                 <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>🛏️</span>
+                  <span className={styles.detailIcon}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 4v16"></path>
+                      <path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+                      <path d="M2 17h20"></path>
+                      <path d="M6 8v9"></path>
+                    </svg>
+                  </span>
                   <div className={styles.detailContent}>
                     <span className={styles.detailLabel}>Bed Type</span>
                     <span className={styles.detailValue}>{room.numberOfBeds} × {room.bedType}</span>
                   </div>
                 </div>
                 <div className={styles.detailItem}>
-                  <span className={styles.detailIcon}>📐</span>
+                  <span className={styles.detailIcon}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                      <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                      <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                  </span>
                   <div className={styles.detailContent}>
                     <span className={styles.detailLabel}>Room Size</span>
                     <span className={styles.detailValue}>{room.roomSize} m²</span>

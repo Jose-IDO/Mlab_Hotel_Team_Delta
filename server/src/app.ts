@@ -4,6 +4,7 @@ import passport from './config/passport';
 import roomRoutes from './routes/roomRoutes';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import profileRoutes from './routes/profileRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import paymentsRoutes from './routes/paymentsRoutes';
 import hotelSettingsRoutes from './routes/hotelSettingsRoutes';
@@ -28,6 +29,7 @@ app.get('/health', (_req, res) => {
 app.use('/auth', authRoutes);
 app.use('/admin/rooms', roomRoutes);
 app.use('/admin/users', userRoutes);
+app.use('/users', profileRoutes);
 app.use('/admin/deals', dealRoutes);
 app.use('/deals', dealRoutes);
 app.use('/bookings', bookingRoutes);

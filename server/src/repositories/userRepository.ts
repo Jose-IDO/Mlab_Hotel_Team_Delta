@@ -169,6 +169,46 @@ class UserRepository {
     const { rows } = await pool.query(sql);
     return rows.map(rowToUser);
   }
+
+  async updateProfile(userId: string, fields: { firstName?: string; lastName?: string; phone?: string | null; profileImageUrl?: string | null; }): Promise<User | null> {
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (typeof fields.firstName !== 'undefined') {
+      values.push(fields.firstName);
+      updates.push(`first_name = $${values.length}`);
+    }
+    if (typeof fields.lastName !== 'undefined') {
+      values.push(fields.lastName);
+      updates.push(`last_name = $${values.length}`);
+    }
+    if (typeof fields.phone !== 'undefined') {
+      values.push(fields.phone);
+      updates.push(`phone = $${values.length}`);
+    }
+    if (typeof fields.profileImageUrl !== 'undefined') {
+      values.push(fields.profileImageUrl);
+      updates.push(`profile_image_url = $${values.length}`);
+    }
+
+    if (updates.length === 0) {
+      return this.findById(userId);
+    }
+
+    values.push(userId);
+    const sql = `UPDATE users SET ${updates.join(', ')}, updated_at = NOW() WHERE id = $${values.length}`;
+    await pool.query(sql, values);
+    return this.findById(userId);
+  }
+
+  async getPasswordHashById(userId: string): Promise<string | null> {
+    const { rows } = await pool.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+    return rows[0]?.password_hash || null;
+  }
+
+  async updatePasswordHash(userId: string, passwordHash: string): Promise<void> {
+    await pool.query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [passwordHash, userId]);
+  }
 }
 
 export const userRepository = new UserRepository();
