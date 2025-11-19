@@ -33,13 +33,8 @@ const LandingSections: React.FC = () => {
         throw new Error(json.error || "Failed to fetch events");
       }
 
-      // Map DB snake_case to camelCase & prepend uploads path
-      const mappedEvents = json.data.map((ev: any) => ({
-        ...ev,
-        imageUrl: ev.image_url ? `uploads/${ev.image_url}` : undefined,
-      }));
-
-      setEvents(mappedEvents);
+      // Events now use Cloudinary URLs directly (no mapping needed)
+      setEvents(json.data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -68,7 +63,7 @@ const LandingSections: React.FC = () => {
               {event.imageUrl && (
                 <div className={styles.eventImagePlaceholder}>
                   <img
-                    src={`${API_URL}/${event.imageUrl}`}
+                    src={event.imageUrl}
                     alt={event.title}
                     className={styles.eventImage}
                   />

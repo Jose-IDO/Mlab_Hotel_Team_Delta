@@ -1,0 +1,18 @@
+.container { background: rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(14px) saturate(170%); -webkit-backdrop-filter:blur(14px) saturate(170%); border-radius:16px; padding:14px 16px; box-shadow:0 8px 24px rgba(31,38,135,0.12), inset 0 1px 0 rgba(255,255,255,0.6); }
+.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.title { font-size:14px; font-weight:700; color:#333; margin:0; }
+.imageSlot { border:2px dashed rgba(102,126,234,0.5); border-radius:12px; padding:24px; text-align:center; cursor:pointer; transition:border-color .2s, background .2s; position:relative; }
+.imageSlot:hover { border-color:#667eea; background:rgba(102,126,234,0.08); }
+.input { display:none; }
+.preview { position:relative; }
+.preview img { width:100%; max-height:220px; object-fit:cover; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.25); }
+.replaceBtn { position:absolute; bottom:10px; right:10px; background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:12px; cursor:pointer; box-shadow:0 2px 8px rgba(102,126,234,0.4); }
+.replaceBtn:hover { transform:translateY(-2px); }
+.removeBtn { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.55); color:#fff; border:none; width:28px; height:28px; border-radius:50%; font-size:16px; cursor:pointer; }
+.removeBtn:hover { background:rgba(0,0,0,0.75); }
+.hint { font-size:11px; color:#555; margin-top:6px; }
+.error { background:rgba(254,226,226,0.85); color:#991b1b; padding:8px 12px; border-radius:8px; font-size:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.closeError { background:none; border:none; color:#991b1b; font-size:16px; cursor:pointer; }
+.uploading { opacity:.65; pointer-events:none; }
+.progressBar { height:6px; background:rgba(0,0,0,0.15); border-radius:4px; margin-top:10px; overflow:hidden; }
+.progressFill { height:100%; background:linear-gradient(90deg,#667eea,#764ba2); width:0; transition:width .25s; }

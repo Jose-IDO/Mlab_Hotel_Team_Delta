@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./ManageEvents.module.css";
 import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
+import { EventImageUpload } from "../../Components/EventImageUpload/EventImageUpload";
 
 type Event = {
   id: number;
@@ -27,6 +28,7 @@ export const ManageEvents: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
+  const editingEvent = editingId ? events.find(e => e.id === editingId) : null;
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -47,7 +49,8 @@ export const ManageEvents: React.FC = () => {
     fetchEvents();
   }, []);
 
-  const addEvent = async () => {
+  const addEvent = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!newEvent.title || !newEvent.date || !newEvent.description) {
       setErrorMessage("Title, date, and description are required!");
       setTimeout(() => setErrorMessage(null), 5000);
@@ -163,67 +166,71 @@ export const ManageEvents: React.FC = () => {
       {/* Header Bar */}
       <div className={styles.headerBar}>
         <h2 className={styles.title}>Manage Events</h2>
-        <button 
+        <button
           className={styles.addButton}
-          onClick={() => showForm ? handleCancelEdit() : setShowForm(true)}
+          onClick={() => setShowForm(true)}
         >
-          {showForm ? 'Cancel' : '+ Add Event'}
+          + Add Event
         </button>
       </div>
 
       {/* Add new event form */}
       {showForm && (
-        <div className={styles.formSection}>
-          <h3 className={styles.subtitle}>{editingId ? 'Edit Event' : 'Add New Event'}</h3>
-          <div className={styles.formGrid}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Event Title</label>
-              <input 
-                type="text" 
-                className={styles.input}
-                placeholder="Enter event title" 
-                value={newEvent.title} 
-                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })} 
-              />
+        <div className={styles.overlay}>
+          <div className={styles.formContainer}>
+            <div className={styles.formHeader}>
+              <h2 className={styles.formTitle}>{editingId ? 'Edit Event' : 'Add New Event'}</h2>
+              <button className={styles.closeFormBtn} type="button" onClick={handleCancelEdit}>×</button>
             </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Event Date</label>
-              <input 
-                type="date" 
-                className={styles.input}
-                value={newEvent.date} 
-                onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} 
-              />
-            </div>
-            <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-              <label className={styles.label}>Description</label>
-              <textarea
-                className={styles.textarea}
-                placeholder="Enter event description" 
-                value={newEvent.description} 
-                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                rows={3}
-              />
-            </div>
-            <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-              <label className={styles.label}>
-                Event Image {editingId && <span style={{ color: '#666', fontWeight: 'normal' }}>(Leave empty to keep current image)</span>}
-              </label>
-              <input 
-                type="file" 
-                className={styles.fileInput}
-                accept="image/*" 
-                onChange={(e) => e.target.files && setNewEvent({ ...newEvent, file: e.target.files[0] })} 
-              />
-            </div>
+            <form onSubmit={addEvent} className={styles.formBody}>
+              <div className={styles.formGrid}>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Event Title</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="Enter event title"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Event Date</label>
+                  <input
+                    type="date"
+                    className={styles.input}
+                    value={newEvent.date}
+                    onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                  />
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label className={styles.label}>Description</label>
+                  <textarea
+                    className={styles.textarea}
+                    placeholder="Enter event description"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <div style={{ marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#333' }}>
+                    Image {editingId && <span style={{ fontWeight: 400, color: '#555' }}>(Leave unchanged to keep current)</span>}
+                  </div>
+                  <EventImageUpload
+                    currentImage={editingEvent?.imageUrl || undefined}
+                    onChange={(file) => setNewEvent(ev => ({ ...ev, file: file || undefined }))}
+                  />
+                </div>
+              </div>
+              <div className={styles.formActions}>
+                <button type="button" className={styles.cancelBtn} onClick={handleCancelEdit}>Cancel</button>
+                <button type="submit" className={styles.primaryBtn} disabled={submitting}>
+                  {submitting ? (editingId ? 'Updating...' : 'Adding...') : (editingId ? 'Update Event' : 'Add Event')}
+                </button>
+              </div>
+            </form>
           </div>
-          <button 
-            className={styles.submitButton}
-            onClick={addEvent} 
-            disabled={submitting}
-          >
-            {submitting ? (editingId ? "Updating..." : "Adding...") : (editingId ? "Update Event" : "Add Event")}
-          </button>
         </div>
       )}
 
@@ -251,7 +258,7 @@ export const ManageEvents: React.FC = () => {
                   <td>
                     {e.imageUrl ? (
                       <img 
-                        src={`${API_URL}/uploads/${e.imageUrl}`} 
+                        src={e.imageUrl} 
                         alt={e.title} 
                         className={styles.eventImage}
                       />
