@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import styles from "./ManageRooms.module.css";
+import styles from "./ManageDeals.module.css";
+import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
 
 interface Deal {
   id: number;
@@ -30,6 +31,8 @@ export const ManageDeals: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingDealId, setEditingDealId] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     roomId: "",
     title: "",
@@ -88,13 +91,15 @@ export const ManageDeals: React.FC = () => {
     e.preventDefault();
 
     if (!formData.roomId || !formData.title || !formData.discountPercentage || !formData.startDate || !formData.endDate) {
-      alert('Please fill in all required fields');
+      setErrorMessage('Please fill in all required fields');
+      setTimeout(() => setErrorMessage(null), 5000);
       return;
     }
 
     const discount = parseInt(formData.discountPercentage);
     if (isNaN(discount) || discount < 1 || discount > 100) {
-      alert('Discount percentage must be between 1 and 100');
+      setErrorMessage('Discount percentage must be between 1 and 100');
+      setTimeout(() => setErrorMessage(null), 5000);
       return;
     }
 
@@ -125,7 +130,8 @@ export const ManageDeals: React.FC = () => {
       const data = await res.json();
       
       if (data.ok) {
-        alert(editingDealId ? 'Deal updated successfully!' : 'Deal created successfully!');
+        setSuccessMessage(editingDealId ? 'Deal updated successfully!' : 'Deal created successfully!');
+        setTimeout(() => setSuccessMessage(null), 3000);
         setShowForm(false);
         setEditingDealId(null);
         setFormData({
@@ -138,11 +144,12 @@ export const ManageDeals: React.FC = () => {
         });
         fetchDeals();
       } else {
-        alert(`Error: ${data.error}`);
+        setErrorMessage(`Error: ${data.error}`);
+        setTimeout(() => setErrorMessage(null), 5000);
       }
-    } catch (err) {
-      console.error('Failed to save deal:', err);
-      alert('Failed to save deal');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to save deal');
+      setTimeout(() => setErrorMessage(null), 5000);
     }
   };
 
@@ -178,29 +185,49 @@ export const ManageDeals: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this deal?')) {
-      return;
-    }
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: 'danger' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    variant: 'warning'
+  });
 
-    try {
-      const token = localStorage.getItem('hotel_token');
-      const res = await fetch(`${API_URL}/admin/deals/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
+  const handleDelete = (id: number) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Deal',
+      message: 'Are you sure you want to delete this deal? This action cannot be undone.',
+      variant: 'danger',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const token = localStorage.getItem('hotel_token');
+          const res = await fetch(`${API_URL}/admin/deals/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          const data = await res.json();
+          if (data.ok) {
+            setSuccessMessage('Deal deleted successfully!');
+            setTimeout(() => setSuccessMessage(null), 3000);
+            fetchDeals();
+          }
+        } catch (err: any) {
+          setErrorMessage(err.message || 'Failed to delete deal');
+          setTimeout(() => setErrorMessage(null), 5000);
         }
-      });
-
-      const data = await res.json();
-      if (data.ok) {
-        alert('Deal deleted successfully!');
-        fetchDeals();
       }
-    } catch (err) {
-      console.error('Failed to delete deal:', err);
-      alert('Failed to delete deal');
-    }
+    });
   };
 
   const handleCancel = () => {
@@ -245,6 +272,9 @@ export const ManageDeals: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {successMessage && <div className={styles.successAlert}>✓ {successMessage}</div>}
+      {errorMessage && <div className={styles.errorAlert}>⚠️ {errorMessage}</div>}
+      
       <div className={styles.headerBar}>
         <h1 className={styles.title}>Manage Deals & Discounts</h1>
         <button 
@@ -452,6 +482,17 @@ export const ManageDeals: React.FC = () => {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

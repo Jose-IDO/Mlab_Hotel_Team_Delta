@@ -40,7 +40,7 @@ const HotelDetails: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toggleFavorite, isFavorite } = useFavorites();
-  const hotelFavoriteId = "hotel";
+  //const hotelFavoriteId = "hotel";
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [shareModal, setShareModal] = useState<{ isOpen: boolean; roomId: string | null; roomName: string }>({
     isOpen: false,

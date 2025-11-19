@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./ManageEvents.module.css";
+import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
 
 type Event = {
   id: number;
@@ -15,6 +16,8 @@ export const ManageEvents: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [newEvent, setNewEvent] = useState<{ title: string; date: string; description: string; file?: File }>({
     title: "",
@@ -46,13 +49,15 @@ export const ManageEvents: React.FC = () => {
 
   const addEvent = async () => {
     if (!newEvent.title || !newEvent.date || !newEvent.description) {
-      alert("Title, date, and description are required!");
+      setErrorMessage("Title, date, and description are required!");
+      setTimeout(() => setErrorMessage(null), 5000);
       return;
     }
 
     // For new events, require image
     if (!editingId && !newEvent.file) {
-      alert("Image is required for new events!");
+      setErrorMessage("Image is required for new events!");
+      setTimeout(() => setErrorMessage(null), 5000);
       return;
     }
 
@@ -85,9 +90,12 @@ export const ManageEvents: React.FC = () => {
       setNewEvent({ title: "", date: "", description: "" });
       setEditingId(null);
       setShowForm(false);
+      setSuccessMessage(`Event ${editingId ? 'updated' : 'created'} successfully!`);
+      setTimeout(() => setSuccessMessage(null), 3000);
       fetchEvents();
     } catch (err: any) {
-      alert(err.message);
+      setErrorMessage(err.message || 'Error adding/updating event');
+      setTimeout(() => setErrorMessage(null), 5000);
     } finally {
       setSubmitting(false);
     }
@@ -110,20 +118,48 @@ export const ManageEvents: React.FC = () => {
     setShowForm(false);
   };
 
-  const deleteEvent = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this event?")) return;
-    try {
-      const res = await fetch(`${API_URL}/admin/events/${id}`, { method: "DELETE" });
-      const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.error || "Failed to delete event");
-      fetchEvents();
-    } catch (err: any) {
-      alert(err.message);
-    }
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: 'danger' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    variant: 'warning'
+  });
+
+  const deleteEvent = (id: number) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Event',
+      message: 'Are you sure you want to delete this event? This action cannot be undone.',
+      variant: 'danger',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const res = await fetch(`${API_URL}/admin/events/${id}`, { method: "DELETE" });
+          const json = await res.json();
+          if (!res.ok || !json.ok) throw new Error(json.error || "Failed to delete event");
+          setSuccessMessage('Event deleted successfully!');
+          setTimeout(() => setSuccessMessage(null), 3000);
+          fetchEvents();
+        } catch (err: any) {
+          setErrorMessage(err.message || 'Failed to delete event');
+          setTimeout(() => setErrorMessage(null), 5000);
+        }
+      }
+    });
   };
 
   return (
     <div className={styles.container}>
+      {successMessage && <div className={styles.successAlert}>✓ {successMessage}</div>}
+      {errorMessage && <div className={styles.errorAlert}>⚠️ {errorMessage}</div>}
+      
       {/* Header Bar */}
       <div className={styles.headerBar}>
         <h2 className={styles.title}>Manage Events</h2>
@@ -246,6 +282,17 @@ export const ManageEvents: React.FC = () => {
           </table>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

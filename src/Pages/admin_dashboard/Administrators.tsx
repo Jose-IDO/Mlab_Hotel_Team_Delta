@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Administrators.module.css';
+import { ConfirmDialog } from '../../Components/Shared/ConfirmDialog';
 
 interface Role {
   name: string;
@@ -20,6 +21,8 @@ export const Administrators: React.FC = () => {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAdmins();
@@ -59,41 +62,70 @@ export const Administrators: React.FC = () => {
     }
   };
 
-  const handleDeactivate = async (adminId: string) => {
-    if (!confirm('Are you sure you want to deactivate this administrator?')) return;
-    
-    try {
-      const API_URL = (import.meta as any).env.VITE_API_URL as string;
-      const token = localStorage.getItem('hotel_token');
-      
-      if (!token) {
-        throw new Error('No authentication token found. Please log in again.');
-      }
-      
-      const response = await fetch(`${API_URL}/admin/users/${adminId}/deactivate`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: 'danger' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    variant: 'warning'
+  });
+
+  const handleDeactivate = (adminId: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Deactivate Administrator',
+      message: 'Are you sure you want to deactivate this administrator? They will lose access to the admin panel.',
+      variant: 'warning',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const API_URL = (import.meta as any).env.VITE_API_URL as string;
+          const token = localStorage.getItem('hotel_token');
+          
+          if (!token) {
+            throw new Error('No authentication token found. Please log in again.');
+          }
+          
+          const response = await fetch(`${API_URL}/admin/users/${adminId}/deactivate`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          const data = await response.json();
+          
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || 'Failed to deactivate administrator');
+          }
+
+          // Refresh the list
+                    setSuccessMessage('Administrator deactivated successfully!');
+                    setTimeout(() => setSuccessMessage(null), 3000);
+          fetchAdmins();
+        } catch (err: any) {
+          setErrorMessage(err.message || 'Failed to deactivate administrator');
+          setTimeout(() => setErrorMessage(null), 5000);
         }
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || 'Failed to deactivate administrator');
       }
-
-      // Refresh the list
-      fetchAdmins();
-    } catch (err: any) {
-      console.error('Error deactivating admin:', err);
-      alert(err.message || 'Failed to deactivate administrator');
-    }
+    });
   };
 
-  const handleActivate = async (adminId: string) => {
-    if (!confirm('Are you sure you want to activate this administrator?')) return;
+  const handleActivate = (adminId: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Activate Administrator',
+      message: 'Are you sure you want to activate this administrator? They will regain access to the admin panel.',
+      variant: 'info',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
     
     try {
       const API_URL = (import.meta as any).env.VITE_API_URL as string;
@@ -115,14 +147,18 @@ export const Administrators: React.FC = () => {
       
       if (!response.ok || !data.ok) {
         throw new Error(data.error || 'Failed to activate administrator');
+                setSuccessMessage('Administrator activated successfully!');
+                setTimeout(() => setSuccessMessage(null), 3000);
       }
 
       // Refresh the list
       fetchAdmins();
     } catch (err: any) {
-      console.error('Error activating admin:', err);
-      alert(err.message || 'Failed to activate administrator');
+      setErrorMessage(err.message || 'Failed to activate administrator');
+      setTimeout(() => setErrorMessage(null), 5000);
     }
+      }
+    });
   };
 
   const getRoleBadgeClass = (roleName: string): string => {
@@ -153,6 +189,9 @@ export const Administrators: React.FC = () => {
 
   return (
     <div className={styles.container}>
+        {successMessage && <div className={styles.successAlert}>✓ {successMessage}</div>}
+        {errorMessage && <div className={styles.errorAlert}>⚠️ {errorMessage}</div>}
+      
       <div className={styles.headerBar}>
         <h1 className={styles.title}>Administrators</h1>
         <button className={styles.addButton}>+ Add New</button>
@@ -268,6 +307,17 @@ export const Administrators: React.FC = () => {
           )}
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

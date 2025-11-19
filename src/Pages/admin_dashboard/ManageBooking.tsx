@@ -1,6 +1,7 @@
 import styles from "./ManageBooking.module.css";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -119,6 +120,8 @@ export const ManageBooking = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const loadBookings = async () => {
     if (!token) return;
@@ -189,42 +192,90 @@ export const ManageBooking = () => {
       });
       const data = await res.json();
       if (!res.ok || data.ok === false) throw new Error(data.error || "Failed to update status");
+      setSuccessMessage('Booking status updated successfully!');
+      setTimeout(() => setSuccessMessage(null), 3000);
       // Refresh list
       loadBookings();
     } catch (e) {
-      alert((e as any).message || "Failed to update booking");
+      setErrorMessage((e as any).message || "Failed to update booking");
+      setTimeout(() => setErrorMessage(null), 5000);
     }
   };
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: 'danger' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    variant: 'info'
+  });
+
   const handleApprove = (id: string) => {
-    if (confirm(`Approve booking ${id}?`)) {
-      updateStatus(id, "confirmed");
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Approve Booking',
+      message: `Are you sure you want to approve booking ${id}?`,
+      variant: 'info',
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        updateStatus(id, "confirmed");
+      }
+    });
   };
   const handleCancel = (id: string) => {
-    if (confirm(`Cancel booking ${id}?`)) {
-      updateStatus(id, "cancelled");
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Cancel Booking',
+      message: `Are you sure you want to cancel booking ${id}? This action may require notifying the guest.`,
+      variant: 'warning',
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        updateStatus(id, "cancelled");
+      }
+    });
   };
   const handleView = (id: string) => {
     // TODO: open details drawer/modal
     console.log("View", id);
   };
   const handleCheckin = (id: string) => {
-    if (confirm(`Check-in guest for booking ${id}?`)) {
-      // TODO: call API to change status from confirmed -> checked-in
-      console.log("Checked in", id);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Check-in Guest',
+      message: `Are you sure you want to check in the guest for booking ${id}?`,
+      variant: 'info',
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        // TODO: call API to change status from confirmed -> checked-in
+        console.log("Checked in", id);
+      }
+    });
   };
   const handleCheckout = (id: string) => {
-    if (confirm(`Checkout booking ${id}?`)) {
-      // TODO: call API to complete booking
-      console.log("Checked out", id);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Checkout Booking',
+      message: `Are you sure you want to checkout booking ${id}?`,
+      variant: 'info',
+      onConfirm: () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        // TODO: call API to complete booking
+        console.log("Checked out", id);
+      }
+    });
   };
 
   return (
     <div className={styles.container}>
+        {successMessage && <div className={styles.successAlert}>✓ {successMessage}</div>}
+        {errorMessage && <div className={styles.errorAlert}>⚠️ {errorMessage}</div>}
+      
       <div className={styles.headerBar}>
         <h1 className={styles.title}>Manage Bookings</h1>
         <div className={styles.actionsRow}>
@@ -285,6 +336,17 @@ export const ManageBooking = () => {
         onView={handleView}
         onCheckout={handleCheckout}
         onCheckin={handleCheckin}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
       />
     </div>
   );

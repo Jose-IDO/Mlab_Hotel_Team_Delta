@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./ManageRooms.module.css"
 import { RoomImageUpload } from "../../Components/RoomImageUpload/RoomImageUpload";
+import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
 
 export const ManageRooms: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -14,6 +15,21 @@ export const ManageRooms: React.FC = () => {
   const [filterType, setFilterType] = useState("all");
   const [filterBedType, setFilterBedType] = useState("all");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: 'danger' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    variant: 'warning'
+  });
   const [formData, setFormData] = useState({
     roomName: "",
     roomType: "",
@@ -25,9 +41,8 @@ export const ManageRooms: React.FC = () => {
     unitPrefix: "",
     startNumber: "1",
     amenities: [] as string[],
-    photos: [] as File[],
-    numberOfBeds: "1",        // NEW
-    roomSizeSqm: ""           // NEW
+    numberOfBeds: "1",
+    roomSizeSqm: ""
   });
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -90,15 +105,6 @@ export const ManageRooms: React.FC = () => {
     }));
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFormData(prev => ({
-        ...prev,
-        photos: [...prev.photos, ...Array.from(e.target.files!)]
-      }));
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const count = parseInt(formData.numberOfRooms || "0", 10);
@@ -136,11 +142,12 @@ export const ManageRooms: React.FC = () => {
       
       setShowForm(false);
       setEditingRoomId(null);
-      alert(`Room ${editingRoomId ? 'updated' : 'created'} successfully!`);
+      setSuccessMessage(`Room ${editingRoomId ? 'updated' : 'created'} successfully!`);
+      setTimeout(() => setSuccessMessage(null), 3000);
       fetchRooms(); // ← Refresh list
-    } catch (err) {
-      console.error(err);
-      alert('Error creating room. See console for details.');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Error creating/updating room');
+      setTimeout(() => setErrorMessage(null), 5000);
     }
   };
 
@@ -158,7 +165,6 @@ export const ManageRooms: React.FC = () => {
       unitPrefix: "",
       startNumber: "1",
       amenities: [] as string[],
-      photos: [] as File[],
       numberOfBeds: "1",
       roomSizeSqm: ""
     });
@@ -177,83 +183,100 @@ export const ManageRooms: React.FC = () => {
       unitPrefix: "",
       startNumber: "1",
       amenities: room.amenities || [],
-      photos: [],
       numberOfBeds: String(room.numberOfBeds || 1),
       roomSizeSqm: String(room.roomSizeSqm || 0)
     });
     setShowForm(true);
   };
 
-  const handleArchiveRoom = async (roomId: string) => {
-    if (!confirm('Are you sure you want to archive this room? It will be moved to the archived section.')) {
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}/admin/rooms/${roomId}/archive`, {
-        method: 'PATCH'
-      });
-      const data = await res.json();
-      
-      if (data.ok) {
-        alert('Room archived successfully!');
-        fetchRooms();
-        fetchArchivedRooms();
-      } else {
-        alert('Failed to archive room: ' + (data.error || 'Unknown error'));
+  const handleArchiveRoom = (roomId: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Archive Room',
+      message: 'Are you sure you want to archive this room? It will be moved to the archived section.',
+      variant: 'warning',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const res = await fetch(`${API_URL}/admin/rooms/${roomId}/archive`, {
+            method: 'PATCH'
+          });
+          const data = await res.json();
+          
+          if (data.ok) {
+            setSuccessMessage('Room archived successfully!');
+            setTimeout(() => setSuccessMessage(null), 3000);
+            fetchRooms();
+            fetchArchivedRooms();
+          }
+        } catch (err) {
+          console.error('Archive error:', err);
+          setErrorMessage('Failed to archive room');
+          setTimeout(() => setErrorMessage(null), 5000);
+        }
       }
-    } catch (err) {
-      console.error('Archive error:', err);
-      alert('Failed to archive room. Please try again.');
-    }
+    });
   };
 
-  const handleRestoreRoom = async (roomId: string) => {
-    if (!confirm('Are you sure you want to restore this room?')) {
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}/admin/rooms/${roomId}/restore`, {
-        method: 'PATCH'
-      });
-      const data = await res.json();
-      
-      if (data.ok) {
-        alert('Room restored successfully!');
-        fetchRooms();
-        fetchArchivedRooms();
-      } else {
-        alert('Failed to restore room: ' + (data.error || 'Unknown error'));
+  const handleRestoreRoom = (roomId: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Restore Room',
+      message: 'Are you sure you want to restore this room? It will be moved back to active rooms.',
+      variant: 'info',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const res = await fetch(`${API_URL}/admin/rooms/${roomId}/restore`, {
+            method: 'PATCH'
+          });
+          const data = await res.json();
+          
+          if (data.ok) {
+            setSuccessMessage('Room restored successfully!');
+            setTimeout(() => setSuccessMessage(null), 3000);
+            fetchRooms();
+            fetchArchivedRooms();
+          }
+        } catch (err) {
+          console.error('Restore error:', err);
+          setErrorMessage('Failed to restore room');
+          setTimeout(() => setErrorMessage(null), 5000);
+        }
       }
-    } catch (err) {
-      console.error('Restore error:', err);
-      alert('Failed to restore room. Please try again.');
-    }
+    });
   };
 
-  const handleDeleteRoom = async (roomId: string) => {
-    if (!confirm('⚠️ WARNING: This will permanently delete the room and all its units. This action cannot be undone. Are you absolutely sure?')) {
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}/admin/rooms/${roomId}`, {
-        method: 'DELETE'
-      });
-      const data = await res.json();
-      
-      if (data.ok) {
-        alert('Room permanently deleted!');
-        fetchRooms();
-        fetchArchivedRooms();
-      } else {
-        alert('Failed to delete room: ' + (data.error || 'Unknown error'));
+  const handleDeleteRoom = (roomId: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Room Permanently',
+      message: 'This will permanently delete the room and all its units. This action cannot be undone. Are you absolutely sure?',
+      variant: 'danger',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const res = await fetch(`${API_URL}/admin/rooms/${roomId}`, {
+            method: 'DELETE'
+          });
+          const data = await res.json();
+          
+          if (data.ok) {
+            setSuccessMessage('Room deleted successfully!');
+            setTimeout(() => setSuccessMessage(null), 3000);
+            fetchRooms();
+            fetchArchivedRooms();
+          } else {
+            setErrorMessage(data.error || 'Failed to delete room');
+            setTimeout(() => setErrorMessage(null), 5000);
+          }
+        } catch (err) {
+          console.error('Delete error:', err);
+          setErrorMessage('Failed to delete room');
+          setTimeout(() => setErrorMessage(null), 5000);
+        }
       }
-    } catch (err) {
-      console.error('Delete error:', err);
-      alert('Failed to delete room. Please try again.');
-    }
+    });
   };
 
   const handleManageImages = (room: any) => {
@@ -303,6 +326,9 @@ export const ManageRooms: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {successMessage && <div className={styles.successAlert}>✓ {successMessage}</div>}
+      {errorMessage && <div className={styles.errorAlert}>⚠️ {errorMessage}</div>}
+      
       <div className={styles.headerBar}>
         <h1 className={styles.title}>Manage Rooms</h1>
         <button className={styles.addButton} onClick={() => setShowForm(true)}>+ Add Room</button>
@@ -312,30 +338,20 @@ export const ManageRooms: React.FC = () => {
       {showForm && (
         <div className={styles.overlay}>
           <div className={styles.formContainer}>
-            <h2 className={styles.formTitle}>
-              {editingRoomId ? 'Edit Room' : 'Add New Room'}
-            </h2>
+            <div className={styles.formHeader}>
+              <h2 className={styles.formTitle}>
+                {editingRoomId ? 'Edit Room' : 'Add New Room'}
+              </h2>
+              <button 
+                className={styles.closeFormBtn} 
+                onClick={handleCancel}
+                type="button"
+              >
+                ×
+              </button>
+            </div>
             <form onSubmit={handleSubmit} className={styles.form}>
               
-              {/* Photo Upload */}
-              <div className={styles.formGroup}>
-                <label>Photos</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoUpload}
-                  className={styles.fileInput}
-                />
-                <div className={styles.photoPreview}>
-                  {formData.photos.map((photo, index) => (
-                    <div key={index} className={styles.photoItem}>
-                      <img src={URL.createObjectURL(photo)} alt={`Preview ${index}`} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {/* Room Name/Label */}
               <div className={styles.formGroup}>
                 <label>Room Name/Label</label>
@@ -382,7 +398,7 @@ export const ManageRooms: React.FC = () => {
 
               {/* Price */}
               <div className={styles.formGroup}>
-                <label>Price per Night (USD) *</label>
+                <label>Price per Night *</label>
                 <input
                   type="number"
                   name="price"
@@ -719,6 +735,17 @@ export const ManageRooms: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        confirmText={confirmDialog.variant === 'danger' ? 'Delete' : 'Confirm'}
+      />
     </div>
   );
 };
