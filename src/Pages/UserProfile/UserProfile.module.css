@@ -488,6 +488,13 @@
   font-weight: 600;
   color: #1a1a1a;
   margin-bottom: 0.25rem;
+.bookingRoomName {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #F93448;
+  margin-bottom: 0.25rem;
+}
+
 }
 
 .bookingRoom {
@@ -553,46 +560,6 @@
   font-weight: 600;
 }
 
-/* Book Again Button */
-.bookAgainContainer {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, margin-top 0.3s ease;
-  margin-top: 0;
-}
-
-.showBookAgain {
-  max-height: 100px;
-  margin-top: 1.5rem;
-}
-
-.bookAgainButton {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #F93448, #d62639);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(249, 52, 72, 0.3);
-}
-
-.bookAgainButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(249, 52, 72, 0.4);
-}
-
-.bookAgainIcon {
-  width: 20px;
-  height: 20px;
-}
 
 /* Animations */
 @keyframes fadeIn {

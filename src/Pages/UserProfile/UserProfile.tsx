@@ -12,6 +12,7 @@ interface Booking {
   bookingId?: string;
   hotelName: string;
   roomType: string;
+    roomName?: string;
   roomId?: string;
   checkIn: string;
   checkOut: string;
@@ -61,7 +62,6 @@ const UserProfile: React.FC = () => {
   // Bookings state
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
-  const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all'|'pending'|'confirmed'|'cancelled'>('all');
   const [dateFrom, setDateFrom] = useState<string>(''); // YYYY-MM-DD
   const [dateTo, setDateTo] = useState<string>('');     // YYYY-MM-DD
@@ -234,26 +234,6 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleBookAgain = (booking: Booking) => {
-    // Navigate to booking page with pre-filled data (excluding booking ID/reference)
-    navigate('/booking', {
-      state: {
-        roomId: booking.roomId,
-        roomType: booking.roomType,
-        hotelName: booking.hotelName,
-        // Don't pre-fill dates - let user select new dates
-        adults: booking.adults || booking.guests || 2,
-        children: booking.children || 0,
-        guestDetails: booking.guestDetails || {
-          firstName: user?.firstName || "",
-          lastName: user?.lastName || "",
-          email: user?.email || "",
-          phone: user?.phone || "",
-          country: "South Africa"
-        }
-      }
-    });
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -615,12 +595,13 @@ const UserProfile: React.FC = () => {
                           key={bookingIdentifier}
                           id={`booking-${bookingIdentifier}`}
                           className={`${styles.bookingCard} ${isHighlighted ? styles.highlightedBooking : ''}`}
-                          onMouseEnter={() => setHoveredBooking(bookingIdentifier || '')}
-                          onMouseLeave={() => setHoveredBooking(null)}
                         >
                         <div className={styles.bookingHeader}>
                           <div>
                             <h3 className={styles.bookingHotel}>{booking.hotelName}</h3>
+                                                         {booking.roomName && (
+                                                           <p className={styles.bookingRoomName}>{booking.roomName}</p>
+                                                         )}
                             <p className={styles.bookingRoom}>{booking.roomType}</p>
                           </div>
                           <span className={`${styles.bookingStatus} ${getStatusColor(booking.status)}`}>
@@ -657,19 +638,6 @@ const UserProfile: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Book Again Button - slides down on hover */}
-                        <div className={`${styles.bookAgainContainer} ${hoveredBooking === (booking.id || booking.bookingId) ? styles.showBookAgain : ''}`}>
-                          <button
-                            className={styles.bookAgainButton}
-                            onClick={() => handleBookAgain(booking)}
-                          >
-                            <svg className={styles.bookAgainIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                            </svg>
-                            Book Again
-                          </button>
-                        </div>
                       </div>
                     );
                     })}
