@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./LoggedInNavbar.module.css";
 import Logo from '../../assets/Logo.png';
 import SouthAfricaFlag from '../../assets/south-africa-svgrepo-com.svg';
+import { API_URL } from '../../config/api';
 
 interface Notification {
   id: number;
@@ -22,7 +23,6 @@ export const LoggedInNavbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchNotifications = async () => {
     if (!isAuthenticated || !user) {

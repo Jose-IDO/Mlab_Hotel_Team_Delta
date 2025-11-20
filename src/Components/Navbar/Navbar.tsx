@@ -6,6 +6,7 @@ import HomeIcon from "../../assets/home-icon-silhouette-svgrepo-com.svg";
 import { FaBell } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
 import { usePopia } from "../../contexts/PopiaContext";
+import { API_URL } from "../../config/api";
 
 interface Notification {
   id: number;
@@ -26,7 +27,6 @@ export const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const { isAccepted, setShowOverlay } = usePopia();
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleLoginClick = () => {
     if (!isAccepted) {
