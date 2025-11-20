@@ -2,8 +2,7 @@ import styles from "./ManageBooking.module.css";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_URL } from "../../config/api";
 
 type BookingStatus = "pending" | "confirmed" | "cancelled" | "checked-in";
 type Booking = {

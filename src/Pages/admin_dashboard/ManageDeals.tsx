@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./ManageDeals.module.css";
 import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
+import { API_URL } from "../../config/api";
 
 interface Deal {
   id: number;
@@ -41,7 +42,6 @@ export const ManageDeals: React.FC = () => {
     startDate: "",
     endDate: ""
   });
-  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetchDeals();

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Settings.module.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_URL } from '../../config/api';
 
 export const Settings: React.FC = () => {
   const { token } = useAuth();

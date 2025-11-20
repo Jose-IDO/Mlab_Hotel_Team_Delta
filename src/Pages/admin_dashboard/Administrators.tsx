@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Administrators.module.css';
 import { ConfirmDialog } from '../../Components/Shared/ConfirmDialog';
+import { API_URL } from '../../config/api';
 
 interface Role {
   name: string;
@@ -33,7 +34,6 @@ export const Administrators: React.FC = () => {
     setError(null);
     
     try {
-      const API_URL = (import.meta as any).env.VITE_API_URL as string;
       const token = localStorage.getItem('hotel_token');
       
       if (!token) {
@@ -128,7 +128,6 @@ export const Administrators: React.FC = () => {
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
     
     try {
-      const API_URL = (import.meta as any).env.VITE_API_URL as string;
       const token = localStorage.getItem('hotel_token');
       
       if (!token) {

@@ -6,8 +6,7 @@ import Button from "../../Components/Shared/Button";
 import Input from "../../Components/Shared/Input";
 import styles from "./BookingPage.module.css";
 import hotelImage from "../../assets/Santorini_7.jpg";   // ← Your image
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_URL } from "../../config/api";
 
 interface Guest {
   firstName: string;

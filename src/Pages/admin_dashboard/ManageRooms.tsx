@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./ManageRooms.module.css"
 import { RoomImageUpload } from "../../Components/RoomImageUpload/RoomImageUpload";
 import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
+import { API_URL } from "../../config/api";
 
 export const ManageRooms: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -44,7 +45,6 @@ export const ManageRooms: React.FC = () => {
     numberOfBeds: "1",
     roomSizeSqm: ""
   });
-  const API_URL = import.meta.env.VITE_API_URL;
 
   // Bed type defaults and constraints
   const bedTypeDefaults: Record<string, { defaultBeds: number; min: number; max: number }> = {

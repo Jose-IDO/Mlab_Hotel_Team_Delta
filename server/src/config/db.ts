@@ -10,6 +10,15 @@ const pool = new Pool({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
+  // Connection options to help with IPv6 issues
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  max: 20,
+});
+
+// Handle connection errors
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
 });
 
 export default pool;

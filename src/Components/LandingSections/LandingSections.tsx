@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./LandingSections.module.css";
 import { DestinationsSection } from "../DestinationsSection/DestinationsSection";
+import { API_URL } from "../../config/api";
 type Event = {
   id: number;
   title: string;
@@ -18,8 +19,6 @@ const LandingSections: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [hoveredLink, setHoveredLink] = useState<LinkType>(null);
   const [openModal, setOpenModal] = useState<LinkType>(null);
-
-  const API_URL = import.meta.env.VITE_API_URL; // e.g., http://localhost:3000
 
   const fetchEvents = async () => {
     setLoading(true);

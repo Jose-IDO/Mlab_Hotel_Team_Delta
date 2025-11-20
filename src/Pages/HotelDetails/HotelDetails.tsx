@@ -6,6 +6,7 @@ import FavoriteButton from "../../Components/Shared/FavoriteButton";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import ShareModal from "../../Components/Shared/ShareModal";
 import shareIcon from "../../assets/share-1-svgrepo-com.svg";
+import { API_URL } from "../../config/api";
 
 // Star rating component
 const STAR_SVG = ({ filled }: { filled: boolean }) => (
@@ -181,7 +182,6 @@ const HotelDetails: React.FC = () => {
 
   // Fetch hotel settings from API
   useEffect(() => {
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
     const fetchSettings = async () => {
       try {
         const res = await fetch(`${API_URL}/settings/public`);
@@ -199,7 +199,6 @@ const HotelDetails: React.FC = () => {
 
   // Fetch rooms from API and map to UI structure
   useEffect(() => {
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
     const fetchRooms = async () => {
       setLoading(true);
       setError(null);
@@ -267,7 +266,6 @@ const HotelDetails: React.FC = () => {
       return;
     }
 
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
     const fetchBookedDates = async () => {
       try {
         const res = await fetch(`${API_URL}/bookings/booked-dates?start=${checkIn}&end=${checkOut}`);

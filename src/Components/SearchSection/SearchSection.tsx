@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./SearchSection.module.css";
 import { usePopia } from "../../contexts/PopiaContext";
-
-const API_URL = (import.meta as any).env.VITE_API_URL as string;
+import { API_URL } from "../../config/api";
 
 const SearchSection: React.FC = () => {
   const navigate = useNavigate();

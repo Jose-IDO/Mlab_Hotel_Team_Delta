@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./ManageEvents.module.css";
 import { ConfirmDialog } from "../../Components/Shared/ConfirmDialog";
 import { EventImageUpload } from "../../Components/EventImageUpload/EventImageUpload";
+import { API_URL } from "../../config/api";
 
 type Event = {
   id: number;
@@ -27,7 +28,6 @@ export const ManageEvents: React.FC = () => {
   });
 
   const [submitting, setSubmitting] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL;
   const editingEvent = editingId ? events.find(e => e.id === editingId) : null;
 
   const fetchEvents = async () => {

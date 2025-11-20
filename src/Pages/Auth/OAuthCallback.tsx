@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './Auth.module.css';
+import { API_URL } from '../../config/api';
 
 export default function OAuthCallback() {
   const [searchParams] = useSearchParams();
@@ -37,7 +38,6 @@ export default function OAuthCallback() {
         console.log('Token stored in localStorage');
 
         // Fetch full user details
-        const API_URL = (import.meta as any).env.VITE_API_URL as string;
         console.log('Fetching user details from:', `${API_URL}/auth/me`);
         
         const response = await fetch(`${API_URL}/auth/me`, {

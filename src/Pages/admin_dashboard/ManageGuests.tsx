@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./ManageGuests.module.css";
 import { useAuth } from "../../contexts/AuthContext";
+import { API_URL } from "../../config/api";
 
 type GuestStatus = "Active" | "Blocked" | "Pending";
 
@@ -37,7 +38,6 @@ export const ManageGuests: React.FC = () => {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { token } = useAuth();
-  const API_URL = (import.meta as any).env.VITE_API_URL as string;
 
   useEffect(() => {
     const fetchUsers = async () => {

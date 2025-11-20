@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "./AuthContext";
+import { API_URL } from "../config/api";
 
 export type FavoriteItem = {
   id: string;           // "hotel" | room.id
@@ -20,7 +21,6 @@ type FavoritesContextValue = {
 const FavoritesContext = createContext<FavoritesContextValue | undefined>(undefined);
 
 const STORAGE_KEY = "hotel_favorites";
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

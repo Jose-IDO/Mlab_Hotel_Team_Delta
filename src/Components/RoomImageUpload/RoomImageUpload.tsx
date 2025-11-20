@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styles from './RoomImageUpload.module.css';
-
-const API_URL = (import.meta as any).env.VITE_API_URL as string;
+import { API_URL } from '../../config/api';
 
 interface Props {
   roomId: string;

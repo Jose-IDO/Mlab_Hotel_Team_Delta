@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { isEmail, isPhone, isStrongPassword } from '../../utils/validation';
 import styles from './Auth.module.css';
 import HomeIcon from '../../assets/home-icon-silhouette-svgrepo-com.svg';
+import { API_URL } from '../../config/api';
 
 const SignUp: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -174,7 +175,6 @@ const SignUp: React.FC = () => {
           <div className={styles.divider}>Or</div>
           <GoogleButton onClick={() => {
             try {
-              const API_URL = (import.meta as any).env.VITE_API_URL as string;
               console.log('Initiating Google OAuth, redirecting to:', `${API_URL}/auth/google`);
               window.location.href = `${API_URL}/auth/google`;
             } catch (err) {

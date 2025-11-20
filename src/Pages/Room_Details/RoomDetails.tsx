@@ -5,6 +5,7 @@ import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useAuth } from "../../contexts/AuthContext";
 import FavoriteButton from "../../Components/Shared/FavoriteButton";
 import { useFavorites } from "../../contexts/FavoritesContext";
+import { API_URL } from "../../config/api";
 import {
   Wifi, Wind, Tv, Wine, Palmtree, ConciergeBell, Waves,
   CircleSlash2, PawPrint, Clock, Volume2, AlertCircle,
@@ -142,7 +143,6 @@ const RoomDetails: React.FC = () => {
   // Fetch room
   useEffect(() => {
     if (!id) return;
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
 
     const run = async () => {
       setLoading(true);
@@ -179,7 +179,6 @@ const RoomDetails: React.FC = () => {
   // Fetch reviews
   useEffect(() => {
     if (!id) return;
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
 
     const fetchReviews = async () => {
       setReviewsLoading(true);
@@ -250,8 +249,6 @@ const RoomDetails: React.FC = () => {
 
     setSubmittingReview(true);
     setSubmitError(null);
-
-    const API_URL = (import.meta as any).env.VITE_API_URL as string;
 
     try {
       const res = await fetch(`${API_URL}/admin/rooms/${id}/reviews`, {

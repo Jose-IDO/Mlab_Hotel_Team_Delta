@@ -4,8 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import styles from "./UserProfile.module.css";
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_URL } from "../../config/api";
 
 interface Booking {
   id: string;

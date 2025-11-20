@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import styles from "./PaymentPage.module.css";
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_URL } from "../../config/api";
 
 const PaymentPage: React.FC = () => {
   const { state } = useLocation();

@@ -76,10 +76,9 @@ const EYE_SVG = () => (
 import hotelRoom1 from "../../assets/Hotel-Room-1.jpg";
 import hotelRoom2 from "../../assets/Hotel-Room-2.jpg";
 import hotelRoom3 from "../../assets/Hotel-Room-3.jpg";
+import { API_URL } from "../../config/api";
 
 const hotelImages = [hotelRoom1, hotelRoom2, hotelRoom3];
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const DealsSection: React.FC = () => {
   const { isAccepted } = usePopia();

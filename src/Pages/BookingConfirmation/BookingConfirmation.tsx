@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import styles from "./BookingConfirmation.module.css";
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_URL } from "../../config/api";
 
 interface BookingData {
   bookingId: string;
