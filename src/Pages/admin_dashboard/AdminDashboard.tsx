@@ -10,6 +10,7 @@ import { Settings } from './Settings';
 import { ManageGuests } from './ManageGuests';
 import { AvailabilityCalendar } from './AvailabilityCalendar';
 import { ManageEvents } from './manageEvents';
+import { SendPromotion } from './SendPromotion';
 
 export const AdminDashboard = () => {
   return (
@@ -67,6 +68,7 @@ export const AdminDashboard = () => {
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/calendar" element={<AvailabilityCalendar />} />
                     <Route path="/events" element={<ManageEvents />} />
+                    <Route path="/promotions" element={<SendPromotion />} />
                 </Routes>
             </div>
         </div>

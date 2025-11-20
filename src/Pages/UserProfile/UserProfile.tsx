@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useFavorites } from "../../contexts/FavoritesContext";
@@ -11,6 +11,7 @@ interface Booking {
   bookingId?: string;
   hotelName: string;
   roomType: string;
+    roomName?: string;
   roomId?: string;
   checkIn: string;
   checkOut: string;
@@ -34,10 +35,15 @@ interface Booking {
 const UserProfile: React.FC = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
   
+  // Get tab and highlight from URL params
+  const tabParam = searchParams.get('tab') as 'personal' | 'bookings' | 'favourites' | null;
+  const highlightBookingId = searchParams.get('highlight');
+  
   // Active tab state
-  const [activeTab, setActiveTab] = useState<'personal' | 'bookings' | 'favourites'>('personal');
+  const [activeTab, setActiveTab] = useState<'personal' | 'bookings' | 'favourites'>(tabParam || 'personal');
   
   // Personal details state
   const [isEditing, setIsEditing] = useState(false);
@@ -55,7 +61,6 @@ const UserProfile: React.FC = () => {
   // Bookings state
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
-  const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all'|'pending'|'confirmed'|'cancelled'>('all');
   const [dateFrom, setDateFrom] = useState<string>(''); // YYYY-MM-DD
   const [dateTo, setDateTo] = useState<string>('');     // YYYY-MM-DD
@@ -74,11 +79,29 @@ const UserProfile: React.FC = () => {
       return;
     }
     
+    // Update active tab from URL params
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+    
     // Fetch user bookings when bookings tab is active
     if (activeTab === 'bookings') {
       fetchBookings();
     }
-  }, [user, token, navigate, activeTab]);
+  }, [user, token, navigate, activeTab, tabParam]);
+
+  // Scroll to highlighted booking after bookings are loaded
+  useEffect(() => {
+    if (highlightBookingId && bookings.length > 0 && !loadingBookings) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`booking-${highlightBookingId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300); // Small delay to ensure rendering is complete
+      return () => clearTimeout(timer);
+    }
+  }, [highlightBookingId, bookings, loadingBookings]);
 
   const fetchBookings = async () => {
     try {
@@ -210,26 +233,6 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleBookAgain = (booking: Booking) => {
-    // Navigate to booking page with pre-filled data (excluding booking ID/reference)
-    navigate('/booking', {
-      state: {
-        roomId: booking.roomId,
-        roomType: booking.roomType,
-        hotelName: booking.hotelName,
-        // Don't pre-fill dates - let user select new dates
-        adults: booking.adults || booking.guests || 2,
-        children: booking.children || 0,
-        guestDetails: booking.guestDetails || {
-          firstName: user?.firstName || "",
-          lastName: user?.lastName || "",
-          email: user?.email || "",
-          phone: user?.phone || "",
-          country: "South Africa"
-        }
-      }
-    });
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -582,16 +585,22 @@ const UserProfile: React.FC = () => {
                   </div>
                 ) : (
                   <div className={styles.bookingsList}>
-                    {bookings.map((booking) => (
-                      <div 
-                        key={booking.id || booking.bookingId} 
-                        className={styles.bookingCard}
-                        onMouseEnter={() => setHoveredBooking(booking.id || booking.bookingId || '')}
-                        onMouseLeave={() => setHoveredBooking(null)}
-                      >
+                    {bookings.map((booking) => {
+                      const bookingIdentifier = booking.id || booking.bookingId;
+                      const isHighlighted = highlightBookingId && bookingIdentifier === highlightBookingId;
+                      
+                      return (
+                        <div 
+                          key={bookingIdentifier}
+                          id={`booking-${bookingIdentifier}`}
+                          className={`${styles.bookingCard} ${isHighlighted ? styles.highlightedBooking : ''}`}
+                        >
                         <div className={styles.bookingHeader}>
                           <div>
                             <h3 className={styles.bookingHotel}>{booking.hotelName}</h3>
+                                                         {booking.roomName && (
+                                                           <p className={styles.bookingRoomName}>{booking.roomName}</p>
+                                                         )}
                             <p className={styles.bookingRoom}>{booking.roomType}</p>
                           </div>
                           <span className={`${styles.bookingStatus} ${getStatusColor(booking.status)}`}>
@@ -628,21 +637,9 @@ const UserProfile: React.FC = () => {
                           )}
                         </div>
 
-                        {/* Book Again Button - slides down on hover */}
-                        <div className={`${styles.bookAgainContainer} ${hoveredBooking === (booking.id || booking.bookingId) ? styles.showBookAgain : ''}`}>
-                          <button
-                            className={styles.bookAgainButton}
-                            onClick={() => handleBookAgain(booking)}
-                          >
-                            <svg className={styles.bookAgainIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                            </svg>
-                            Book Again
-                          </button>
-                        </div>
                       </div>
-                    ))}
+                    );
+                    })}
                   </div>
                 )}
 

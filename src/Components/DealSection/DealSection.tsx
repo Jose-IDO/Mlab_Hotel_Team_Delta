@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./DealSection.module.css";
 import ShareModal from "../Shared/ShareModal";
 import shareIcon from "../../assets/share-1-svgrepo-com.svg";
@@ -82,6 +83,7 @@ const hotelImages = [hotelRoom1, hotelRoom2, hotelRoom3];
 
 const DealsSection: React.FC = () => {
   const { isAccepted } = usePopia();
+  const navigate = useNavigate();
   const [deals, setDeals] = useState<DisplayDeal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -173,6 +175,11 @@ const DealsSection: React.FC = () => {
     fetchDeals();
   }, []);
 
+  const handleCardClick = (roomId: string) => {
+    if (!isAccepted) return;
+    navigate(`/room-details/${roomId}`);
+  };
+
   const handleShare = (e: React.MouseEvent, dealId: string, dealName: string) => {
     e.stopPropagation();
     if (!isAccepted) return;
@@ -237,6 +244,7 @@ const DealsSection: React.FC = () => {
           <div 
             className={styles.card} 
             key={deal.id}
+            onClick={() => handleCardClick(deal.roomId)}
             style={{ 
               opacity: isAccepted ? 1 : 0.5, 
               cursor: isAccepted ? 'pointer' : 'not-allowed',
