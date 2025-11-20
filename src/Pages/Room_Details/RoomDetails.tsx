@@ -79,6 +79,13 @@ const RoomDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [room, setRoom] = useState<UiRoom | null>(null);
 
+  // Deal information
+  const [activeDeal, setActiveDeal] = useState<{
+    discountPercentage: number;
+    originalPrice: number;
+    discountedPrice: number;
+  } | null>(null);
+
   // Reviews
   const [reviews, setReviews] = useState<UiReview[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
@@ -139,7 +146,7 @@ const RoomDetails: React.FC = () => {
   // Scroll to top on room change
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
-  // Fetch room
+  // Fetch room and deal
   useEffect(() => {
     if (!id) return;
     const API_URL = (import.meta as any).env.VITE_API_URL as string;
@@ -148,6 +155,7 @@ const RoomDetails: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
+        // Fetch room details
         const res = await fetch(`${API_URL}/admin/rooms/${id}`);
         const json = await res.json();
         if (!res.ok || !json.ok) throw new Error(json.error || 'Failed to fetch room');
@@ -167,6 +175,25 @@ const RoomDetails: React.FC = () => {
         };
         setRoom(mapped);
         setSelectedImage(mapped.image);
+
+        // Fetch active deals for this room
+        try {
+          const dealsRes = await fetch(`${API_URL}/deals/active`);
+          const dealsJson = await dealsRes.json();
+          if (dealsRes.ok && dealsJson.ok) {
+            const roomDeal = dealsJson.data.find((deal: any) => deal.roomId === id);
+            if (roomDeal) {
+              setActiveDeal({
+                discountPercentage: roomDeal.discountPercentage,
+                originalPrice: roomDeal.originalPrice,
+                discountedPrice: roomDeal.discountedPrice
+              });
+            }
+          }
+        } catch (dealError) {
+          // Silently fail if deals can't be fetched
+          console.log('No active deals for this room');
+        }
       } catch (e: any) {
         setError(e.message || 'Failed to load room');
       } finally {
@@ -296,7 +323,7 @@ const RoomDetails: React.FC = () => {
       roomId: room.id || id,
       roomType: room.name,
       roomImage: room.image,
-      pricePerNight: room.price,
+      pricePerNight: activeDeal ? activeDeal.discountedPrice : room.price,
       checkIn,
       checkOut,
       guests: guests ? parseInt(guests) : undefined,
@@ -336,7 +363,30 @@ const RoomDetails: React.FC = () => {
             <div className={styles.infoSection}>
               <div className={styles.roomType}>
                 <h2>{room.name}</h2>
-                <p className={styles.price}>R {room.price.toLocaleString()} PN</p>
+                {activeDeal ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <p className={styles.price} style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em' }}>
+                        R {activeDeal.originalPrice.toLocaleString()}
+                      </p>
+                      <span style={{ 
+                        background: 'linear-gradient(135deg, #F93448, #d62639)', 
+                        color: 'white', 
+                        padding: '4px 8px', 
+                        borderRadius: '6px', 
+                        fontSize: '0.85em', 
+                        fontWeight: '600' 
+                      }}>
+                        {activeDeal.discountPercentage}% OFF
+                      </span>
+                    </div>
+                    <p className={styles.price} style={{ color: '#F93448', fontWeight: '700', fontSize: '1.3em' }}>
+                      R {activeDeal.discountedPrice.toLocaleString()}
+                    </p>
+                  </div>
+                ) : (
+                  <p className={styles.price}>R {room.price.toLocaleString()}</p>
+                )}
               </div>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <FavoriteButton
