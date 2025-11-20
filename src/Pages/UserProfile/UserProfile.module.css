@@ -458,6 +458,24 @@
   box-shadow: 0 4px 12px rgba(249, 52, 72, 0.1);
 }
 
+.highlightedBooking {
+  border-color: #F93448;
+  background: linear-gradient(135deg, rgba(249, 52, 72, 0.05) 0%, rgba(214, 38, 57, 0.05) 100%);
+  box-shadow: 0 8px 24px rgba(249, 52, 72, 0.2);
+  animation: highlightPulse 2s ease-in-out;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(249, 52, 72, 0.2);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 12px 32px rgba(249, 52, 72, 0.3);
+  }
+}
+
 .bookingHeader {
   display: flex;
   justify-content: space-between;

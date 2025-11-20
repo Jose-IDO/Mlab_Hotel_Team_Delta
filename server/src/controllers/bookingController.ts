@@ -13,9 +13,33 @@ export const bookingController = {
 
       const booking: any = (result as any).booking || result;
       const bookingId = booking?.id;
-      const roomNumber = booking?.roomNumber || "unknown";
 
-      await notificationRepository.create(userId, `New booking created for room ${roomNumber}`, bookingId);
+      // Get room name for notification
+      let roomName = "your room";
+      try {
+        if (booking?.roomId) {
+          const room = await roomRepository.findById(booking.roomId);
+          roomName = room?.roomName || "your room";
+        }
+      } catch (err) {
+        console.error('Failed to fetch room name:', err);
+      }
+
+      // Create notification for the user
+      try {
+        if (userId && bookingId) {
+          await notificationRepository.create(
+            String(userId), 
+            `New booking created for ${roomName}`, 
+            String(bookingId), 
+            'booking_confirmation'
+          );
+          console.log(`✅ Notification created for user ${userId}, booking ${bookingId}`);
+        }
+      } catch (notifError) {
+        console.error('Failed to create notification:', notifError);
+        // Don't fail the booking if notification fails
+      }
 
       const io = getIO();
       io.emit("newBooking", {
@@ -101,6 +125,15 @@ export const bookingController = {
       const cancelled = await bookingService.cancelBooking(id, userId);
       if (!cancelled)
         return res.status(404).json({ ok: false, error: 'Booking not found or cannot be cancelled' });
+      
+      // Delete notifications related to this booking
+      try {
+        await notificationRepository.deleteByBookingId(id);
+        console.log(`🗑️ Deleted notifications for cancelled booking ${id}`);
+      } catch (notifError) {
+        console.error('Failed to delete notifications:', notifError);
+      }
+      
       res.json({ ok: true, data: cancelled });
     } catch (e: any) {
       res.status(400).json({ ok: false, error: e.message });
@@ -122,6 +155,23 @@ export const bookingController = {
       const { status } = req.body as { status: 'pending' | 'confirmed' | 'cancelled' };
       const updated = await bookingService.updateStatus(id, status);
       if (!updated) return res.status(404).json({ ok: false, error: 'Not found' });
+      
+      // Notify user about status change
+      const booking = await bookingRepository.findById(id);
+      if (booking) {
+        const statusMessages: Record<string, string> = {
+          confirmed: `Your booking has been confirmed!`,
+          cancelled: `Your booking has been cancelled.`,
+          pending: `Your booking status has been updated to pending.`
+        };
+        await notificationRepository.create(
+          String(booking.userId),
+          statusMessages[status] || `Your booking status has been updated to ${status}.`,
+          String(id),
+          'booking_update'
+        );
+      }
+      
       res.json({ ok: true, data: updated });
     } catch (e: any) {
       res.status(400).json({ ok: false, error: e.message });

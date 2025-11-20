@@ -1,0 +1,175 @@
+.container {
+  padding: 20px;
+}
+
+.successAlert {
+  padding: 12px 16px;
+  background: rgba(212, 237, 218, 0.8);
+  border: 1px solid #155724;
+  border-radius: 8px;
+  color: #155724;
+  font-weight: 600;
+  margin-bottom: 16px;
+  animation: slideDown 0.3s ease;
+}
+
+.errorAlert {
+  padding: 12px 16px;
+  background: rgba(254, 226, 226, 0.8);
+  border: 1px solid #991b1b;
+  border-radius: 8px;
+  color: #991b1b;
+  font-weight: 600;
+  margin-bottom: 16px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.headerBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.10),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+.title {
+  color: #333;
+  font-size: 28px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 0;
+}
+
+.formSection {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  max-width: 800px;
+}
+
+.description {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 147, 233, 0.2);
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #0093E9;
+  box-shadow: 0 0 0 3px rgba(0, 147, 233, 0.1);
+}
+
+.charCount {
+  font-size: 12px;
+  color: #888;
+  text-align: right;
+}
+
+.exampleBox {
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 10px 0;
+}
+
+.exampleBox h4 {
+  margin: 0 0 12px 0;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.exampleBox ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.exampleBox li {
+  margin-bottom: 8px;
+}
+
+.sendButton {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  align-self: flex-start;
+}
+
+.sendButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.sendButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}

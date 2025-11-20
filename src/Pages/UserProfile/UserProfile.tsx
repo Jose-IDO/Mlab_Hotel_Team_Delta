@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { LoggedInNavbar } from "../../Components/LoggedInNavbar/LoggedInNavbar";
 import { useFavorites } from "../../contexts/FavoritesContext";
@@ -35,10 +35,15 @@ interface Booking {
 const UserProfile: React.FC = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { favorites, toggleFavorite } = useFavorites();
   
+  // Get tab and highlight from URL params
+  const tabParam = searchParams.get('tab') as 'personal' | 'bookings' | 'favourites' | null;
+  const highlightBookingId = searchParams.get('highlight');
+  
   // Active tab state
-  const [activeTab, setActiveTab] = useState<'personal' | 'bookings' | 'favourites'>('personal');
+  const [activeTab, setActiveTab] = useState<'personal' | 'bookings' | 'favourites'>(tabParam || 'personal');
   
   // Personal details state
   const [isEditing, setIsEditing] = useState(false);
@@ -75,11 +80,29 @@ const UserProfile: React.FC = () => {
       return;
     }
     
+    // Update active tab from URL params
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+    
     // Fetch user bookings when bookings tab is active
     if (activeTab === 'bookings') {
       fetchBookings();
     }
-  }, [user, token, navigate, activeTab]);
+  }, [user, token, navigate, activeTab, tabParam]);
+
+  // Scroll to highlighted booking after bookings are loaded
+  useEffect(() => {
+    if (highlightBookingId && bookings.length > 0 && !loadingBookings) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`booking-${highlightBookingId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300); // Small delay to ensure rendering is complete
+      return () => clearTimeout(timer);
+    }
+  }, [highlightBookingId, bookings, loadingBookings]);
 
   const fetchBookings = async () => {
     try {
@@ -583,13 +606,18 @@ const UserProfile: React.FC = () => {
                   </div>
                 ) : (
                   <div className={styles.bookingsList}>
-                    {bookings.map((booking) => (
-                      <div 
-                        key={booking.id || booking.bookingId} 
-                        className={styles.bookingCard}
-                        onMouseEnter={() => setHoveredBooking(booking.id || booking.bookingId || '')}
-                        onMouseLeave={() => setHoveredBooking(null)}
-                      >
+                    {bookings.map((booking) => {
+                      const bookingIdentifier = booking.id || booking.bookingId;
+                      const isHighlighted = highlightBookingId && bookingIdentifier === highlightBookingId;
+                      
+                      return (
+                        <div 
+                          key={bookingIdentifier}
+                          id={`booking-${bookingIdentifier}`}
+                          className={`${styles.bookingCard} ${isHighlighted ? styles.highlightedBooking : ''}`}
+                          onMouseEnter={() => setHoveredBooking(bookingIdentifier || '')}
+                          onMouseLeave={() => setHoveredBooking(null)}
+                        >
                         <div className={styles.bookingHeader}>
                           <div>
                             <h3 className={styles.bookingHotel}>{booking.hotelName}</h3>
@@ -643,7 +671,8 @@ const UserProfile: React.FC = () => {
                           </button>
                         </div>
                       </div>
-                    ))}
+                    );
+                    })}
                   </div>
                 )}
 

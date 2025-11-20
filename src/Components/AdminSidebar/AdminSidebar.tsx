@@ -33,16 +33,23 @@ export const AdminSidebar = () => {
           View Stats/Reports
         </Link>
       </li> */}
-      <li>
-        <Link to="/admin/calendar">
-          <span></span>
-          Availability Calendar
-        </Link>
-      </li>
+
       <li>
         <Link to="/admin/events">
           <span></span>
           Manage Events
+        </Link>
+      </li>
+      <li>
+        <Link to="/admin/promotions">
+          <span></span>
+          Send Promotions
+        </Link>
+      </li>      
+      <li>
+        <Link to="/admin/calendar">
+          <span></span>
+          Availability Calendar
         </Link>
       </li>
       <li>

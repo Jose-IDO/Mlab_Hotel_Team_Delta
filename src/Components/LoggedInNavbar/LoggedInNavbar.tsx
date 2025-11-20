@@ -1,12 +1,121 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import styles from "./LoggedInNavbar.module.css";
 import Logo from '../../assets/Logo.png';
 import SouthAfricaFlag from '../../assets/south-africa-svgrepo-com.svg';
 
+interface Notification {
+  id: number;
+  user_id: number;
+  message: string;
+  read: boolean;
+  created_at: string;
+  booking_id?: number;
+  type?: 'booking_confirmation' | 'booking_update' | 'promotion' | 'general';
+}
+
 export const LoggedInNavbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const fetchNotifications = async () => {
+    if (!isAuthenticated || !user) {
+      console.log('🔕 Not fetching notifications - not authenticated or no user');
+      return;
+    }
+    
+    const token = localStorage.getItem('hotel_token');
+    if (!token) {
+      console.log('🔕 No token found');
+      return;
+    }
+    
+    try {
+      console.log('🔔 Fetching notifications from:', `${API_URL}/notifications`);
+      const res = await fetch(`${API_URL}/notifications`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log('📬 Notification response status:', res.status);
+      
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.log('Not authenticated for notifications');
+        }
+        return;
+      }
+      
+      const json = await res.json();
+      console.log('📨 Received notifications:', json);
+      if (json.ok) {
+        setNotifications(json.data);
+        const unread = json.data.filter((n: Notification) => !n.read).length;
+        console.log(`🔔 Set ${json.data.length} notifications, ${unread} unread`);
+        setUnreadCount(unread);
+      }
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    }
+  };
+
+  const markAsRead = async (id: number) => {
+    try {
+      const token = localStorage.getItem('hotel_token');
+      await fetch(`${API_URL}/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setNotifications(prev => 
+        prev.map(n => n.id === id ? { ...n, read: true } : n)
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err);
+    }
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.read) {
+      markAsRead(notification.id);
+    }
+    
+    // Navigate based on notification type
+    if (notification.type === 'booking_confirmation' || notification.type === 'booking_update') {
+      if (notification.booking_id) {
+        navigate(`/profile?tab=bookings&highlight=${notification.booking_id}`);
+      }
+    }
+    
+    setShowNotifications(false);
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -52,6 +161,59 @@ export const LoggedInNavbar = () => {
       <div className={styles.profileSection}>
         {isAuthenticated ? (
           <>
+            <div className={styles.notificationWrapper} ref={notificationRef}>
+              <button 
+                className={styles.notificationBell}
+                onClick={() => setShowNotifications(!showNotifications)}
+                aria-label="Notifications"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                {unreadCount > 0 && (
+                  <span className={styles.notificationBadge}>{unreadCount > 9 ? '9+' : unreadCount}</span>
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div className={styles.notificationDropdown}>
+                  <div className={styles.notificationHeader}>
+                    <h3>Notifications</h3>
+                    {unreadCount > 0 && <span className={styles.unreadCount}>{unreadCount} new</span>}
+                  </div>
+                  <div className={styles.notificationList}>
+                    {notifications.length === 0 ? (
+                      <div className={styles.noNotifications}>No notifications yet</div>
+                    ) : (
+                      notifications.slice(0, 10).map(notification => (
+                        <div 
+                          key={notification.id}
+                          className={`${styles.notificationItem} ${!notification.read ? styles.unread : ''}`}
+                          onClick={() => handleNotificationClick(notification)}
+                        >
+                          <div className={styles.notificationContent}>
+                            <p className={styles.notificationMessage}>{notification.message}</p>
+                            <span className={styles.notificationTime}>
+                              {new Date(notification.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                          {!notification.read && <div className={styles.unreadDot}></div>}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {notifications.length > 0 && (
+                    <div className={styles.notificationFooter}>
+                      <button onClick={() => { navigate('/notifications'); setShowNotifications(false); }}>
+                        View all notifications
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className={styles.userInfo} onClick={() => navigate('/profile')} style={{cursor: 'pointer'}}>
               <div className={styles.profileIcon}>
                 <span className={styles.profileInitials}>

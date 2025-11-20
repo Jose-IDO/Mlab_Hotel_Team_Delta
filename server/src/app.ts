@@ -12,6 +12,8 @@ import dealRoutes from './routes/dealRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './middleware/logger';
 import eventRoutes from "./routes/eventRoutes";
+import notificationRoutes from './routes/NotificationRoute';
+import migrationRoutes from './routes/migrationRoutes';
 
 const app = express();
 
@@ -36,6 +38,8 @@ app.use('/bookings', bookingRoutes);
 app.use('/payments', paymentsRoutes);
 app.use('/settings', hotelSettingsRoutes);
 app.use("/admin/events", eventRoutes);
+app.use('/notifications', notificationRoutes);
+app.use('/admin/migrations', migrationRoutes);
 
 app.use(errorHandler);
 
