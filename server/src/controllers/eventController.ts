@@ -23,7 +23,9 @@ export const getAllEvents = async (req: Request, res: Response) => {
     const events = await eventRepository.findAll();
     res.json({ ok: true, data: events });
   } catch (error) {
-    res.status(500).json({ ok: false, error: (error as Error).message });
+    console.error('Error fetching events:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({ ok: false, error: errorMessage });
   }
 };
 

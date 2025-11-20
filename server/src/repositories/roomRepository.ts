@@ -20,7 +20,29 @@ function rowToRoom(row: any): Room {
 
 class RoomRepository {
   async findAll(status?: 'active' | 'archived'): Promise<Room[]> {
-    const statusFilter = status ? `WHERE r.status = $1` : '';
+    // Check if status column exists before filtering
+    let statusFilter = '';
+    let useStatusFilter = false;
+    
+    if (status) {
+      try {
+        // Check if status column exists
+        const checkColumn = await pool.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_name = 'rooms' AND column_name = 'status'
+        `);
+        
+        if (checkColumn.rows.length > 0) {
+          statusFilter = `WHERE r.status = $1`;
+          useStatusFilter = true;
+        }
+      } catch (err) {
+        // If check fails, just proceed without status filter
+        console.warn('Could not check for status column, proceeding without filter');
+      }
+    }
+    
     const sql = `
       SELECT r.*,
              COALESCE(
@@ -35,7 +57,8 @@ class RoomRepository {
       GROUP BY r.id
       ORDER BY r.created_at DESC;
     `;
-    const { rows } = status 
+    
+    const { rows } = useStatusFilter
       ? await pool.query(sql, [status])
       : await pool.query(sql);
     return rows.map(rowToRoom);

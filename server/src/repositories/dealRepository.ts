@@ -36,6 +36,22 @@ export const dealRepository = {
   },
 
   async getActiveDeals(): Promise<DealWithRoom[]> {
+    // Check if status column exists before filtering
+    let statusFilter = '';
+    try {
+      const checkColumn = await pool.query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'rooms' AND column_name = 'status'
+      `);
+      
+      if (checkColumn.rows.length > 0) {
+        statusFilter = `AND r.status = 'active'`;
+      }
+    } catch (err) {
+      console.warn('Could not check for status column in deals query, proceeding without filter');
+    }
+    
     const query = `
       SELECT 
         d.id, d.room_id, d.title, d.description, d.discount_percentage, 
@@ -46,7 +62,7 @@ export const dealRepository = {
       WHERE d.is_active = true 
         AND d.start_date <= NOW() 
         AND d.end_date >= NOW()
-        AND r.status = 'active'
+        ${statusFilter}
       ORDER BY d.created_at DESC
     `;
     const result = await pool.query(query);

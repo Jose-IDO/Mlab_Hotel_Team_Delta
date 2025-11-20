@@ -11,7 +11,9 @@ export class RoomController {
       const rooms = await roomService.getAllRooms(status);
       res.json({ ok: true, data: rooms });
     } catch (error) {
-      res.status(500).json({ ok: false, error: 'Failed to fetch rooms' });
+      console.error('Error fetching rooms:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch rooms';
+      res.status(500).json({ ok: false, error: errorMessage });
     }
   }
 

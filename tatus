@@ -1,0 +1,45 @@
+[1mdiff --git a/server/src/repositories/roomRepository.ts b/server/src/repositories/roomRepository.ts[m
+[1mindex ce20313..32a25c4 100644[m
+[1m--- a/server/src/repositories/roomRepository.ts[m
+[1m+++ b/server/src/repositories/roomRepository.ts[m
+[36m@@ -20,7 +20,29 @@[m [mfunction rowToRoom(row: any): Room {[m
+ [m
+ class RoomRepository {[m
+   async findAll(status?: 'active' | 'archived'): Promise<Room[]> {[m
+[31m-    const statusFilter = status ? `WHERE r.status = $1` : '';[m
+[32m+[m[32m    // Check if status column exists before filtering[m
+[32m+[m[32m    let statusFilter = '';[m
+[32m+[m[32m    let useStatusFilter = false;[m
+[32m+[m[41m    [m
+[32m+[m[32m    if (status) {[m
+[32m+[m[32m      try {[m
+[32m+[m[32m        // Check if status column exists[m
+[32m+[m[32m        const checkColumn = await pool.query(`[m
+[32m+[m[32m          SELECT column_name[m[41m [m
+[32m+[m[32m          FROM information_schema.columns[m[41m [m
+[32m+[m[32m          WHERE table_name = 'rooms' AND column_name = 'status'[m
+[32m+[m[32m        `);[m
+[32m+[m[41m        [m
+[32m+[m[32m        if (checkColumn.rows.length > 0) {[m
+[32m+[m[32m          statusFilter = `WHERE r.status = $1`;[m
+[32m+[m[32m          useStatusFilter = true;[m
+[32m+[m[32m        }[m
+[32m+[m[32m      } catch (err) {[m
+[32m+[m[32m        // If check fails, just proceed without status filter[m
+[32m+[m[32m        console.warn('Could not check for status column, proceeding without filter');[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m[41m    [m
+     const sql = `[m
+       SELECT r.*,[m
+              COALESCE([m
+[36m@@ -35,7 +57,8 @@[m [mclass RoomRepository {[m
+       GROUP BY r.id[m
+       ORDER BY r.created_at DESC;[m
+     `;[m
+[31m-    const { rows } = status [m
+[32m+[m[41m    [m
+[32m+[m[32m    const { rows } = useStatusFilter[m
+       ? await pool.query(sql, [status])[m
+       : await pool.query(sql);[m
+     return rows.map(rowToRoom);[m
