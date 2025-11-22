@@ -9,14 +9,8 @@ export default function OAuthCallback() {
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
-      console.log('OAuth callback triggered');
-      console.log('Search params:', window.location.search);
-      
       const token = searchParams.get('token');
       const error = searchParams.get('error');
-
-      console.log('Token:', token ? 'Present' : 'Missing');
-      console.log('Error:', error);
 
       if (error) {
         console.error('OAuth error:', error);
@@ -33,12 +27,7 @@ export default function OAuthCallback() {
       }
 
       try {
-        // Store token in localStorage
         localStorage.setItem('hotel_token', token);
-        console.log('Token stored in localStorage');
-
-        // Fetch full user details
-        console.log('Fetching user details from:', `${API_URL}/auth/me`);
         
         const response = await fetch(`${API_URL}/auth/me`, {
           headers: {
@@ -47,8 +36,6 @@ export default function OAuthCallback() {
           }
         });
 
-        console.log('User details response status:', response.status);
-
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Failed to fetch user details:', errorText);
@@ -56,38 +43,26 @@ export default function OAuthCallback() {
         }
 
         const data = await response.json();
-        console.log('User data received:', data);
         
         if (data.ok && data.data) {
-          // The user object is directly in data.data (not data.data.user)
           const user = data.data;
           
-          // Store user in localStorage
           localStorage.setItem('hotel_user', JSON.stringify(user));
-          console.log('User stored in localStorage');
 
-          // Check if user has admin roles
           const adminRoles = ['super_admin', 'hotel_manager'];
           const isAdmin = user.roles?.some((r: any) => adminRoles.includes(r.name));
-          console.log('Is admin:', isAdmin);
 
-          // Check for pending booking
           const pendingBooking = sessionStorage.getItem('pendingBooking');
           if (pendingBooking) {
-            console.log('Redirecting to booking with pending data');
             const bookingData = JSON.parse(pendingBooking);
             sessionStorage.removeItem('pendingBooking');
             navigate('/booking', { state: bookingData });
           } else if (isAdmin) {
-            console.log('Redirecting to admin dashboard');
             navigate('/admin');
           } else {
-            console.log('Redirecting to hotel details');
             navigate('/hotel-details');
           }
           
-          // Reload to update auth context
-          console.log('Reloading page to update auth context');
           setTimeout(() => {
             window.location.reload();
           }, 100);

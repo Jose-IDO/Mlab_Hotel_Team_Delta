@@ -35,8 +35,7 @@ export const ManageGuests: React.FC = () => {
   const [data, setData] = useState<Guest[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -121,7 +120,6 @@ export const ManageGuests: React.FC = () => {
 
   return (
     <div className={styles.container}>
-        {successMessage && <div className={styles.successAlert}>✓ {successMessage}</div>}
         {errorMessage && <div className={styles.errorAlert}>⚠️ {errorMessage}</div>}
       
       <div className={styles.headerBar}>

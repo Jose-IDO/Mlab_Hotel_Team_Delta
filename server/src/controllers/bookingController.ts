@@ -34,11 +34,9 @@ export const bookingController = {
             String(bookingId), 
             'booking_confirmation'
           );
-          console.log(`✅ Notification created for user ${userId}, booking ${bookingId}`);
         }
       } catch (notifError) {
         console.error('Failed to create notification:', notifError);
-        // Don't fail the booking if notification fails
       }
 
       const io = getIO();
@@ -130,7 +128,6 @@ export const bookingController = {
       // Delete notifications related to this booking
       try {
         await notificationRepository.deleteByBookingId(id);
-        console.log(`🗑️ Deleted notifications for cancelled booking ${id}`);
       } catch (notifError) {
         console.error('Failed to delete notifications:', notifError);
       }

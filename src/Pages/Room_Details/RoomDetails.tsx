@@ -192,7 +192,6 @@ const RoomDetails: React.FC = () => {
           }
         } catch (dealError) {
           // Silently fail if deals can't be fetched
-          console.log('No active deals for this room');
         }
       } catch (e: any) {
         setError(e.message || 'Failed to load room');

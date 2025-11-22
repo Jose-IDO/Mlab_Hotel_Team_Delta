@@ -240,8 +240,6 @@ export const ManageBooking = () => {
     });
   };
   const handleView = (id: string) => {
-    // TODO: open details drawer/modal
-    console.log("View", id);
   };
   const handleCheckin = (id: string) => {
     setConfirmDialog({
@@ -251,8 +249,6 @@ export const ManageBooking = () => {
       variant: 'info',
       onConfirm: () => {
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        // TODO: call API to change status from confirmed -> checked-in
-        console.log("Checked in", id);
       }
     });
   };
@@ -264,8 +260,6 @@ export const ManageBooking = () => {
       variant: 'info',
       onConfirm: () => {
         setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        // TODO: call API to complete booking
-        console.log("Checked out", id);
       }
     });
   };

@@ -24,9 +24,6 @@ const PaymentPage: React.FC = () => {
     totalPrice = 3600,
   } = state || {};
 
-  console.log('Payment page bookingId:', bookingId);
-
-  // Payment form state
   const [loading, setLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);

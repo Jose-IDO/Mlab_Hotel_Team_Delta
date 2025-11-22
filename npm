@@ -1,0 +1,9 @@
+
+> hotel_app@0.0.1 predeploy
+> npm run build
+
+
+> hotel_app@0.0.1 build
+> tsc -b && vite build
+
+Terminate batch job (Y/N)? 

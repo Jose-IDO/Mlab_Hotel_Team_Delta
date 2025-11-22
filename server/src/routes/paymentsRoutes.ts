@@ -54,15 +54,9 @@ router.post('/paystack/start', authenticate, async (req, res) => {
 
     // Persist reference on booking if not already set
     if (!booking.paymentReference || booking.paymentReference !== reference) {
-      const updated = await bookingRepository.updatePaymentReference(booking.id, reference);
-      if (updated) {
-        console.log('✅ Stored payment reference on booking', { bookingId: booking.id, reference });
-      } else {
-        console.warn('⚠️ Failed to store payment reference on booking', { bookingId: booking.id, reference });
-      }
+      await bookingRepository.updatePaymentReference(booking.id, reference);
     }
 
-    // Create payment record with grand total including tax
     const payment = await paymentRepository.create({
       bookingId: booking.id,
       userId: booking.userId,
@@ -71,10 +65,8 @@ router.post('/paystack/start', authenticate, async (req, res) => {
       paymentMethod: 'paystack',
       paymentReference: reference,
     });
-    console.log('💳 Created payment record', { paymentId: payment.id, reference, subtotal, taxRate, taxAmount, grandTotal });
 
     const callbackUrl = `${PUBLIC_BASE_URL}/booking-confirmation?ref=${encodeURIComponent(reference)}&reference=${encodeURIComponent(reference)}`;
-    console.log('🔗 Paystack callback URL:', callbackUrl);
 
     const initRes = await fetch('https://api.paystack.co/transaction/initialize', {
       method: 'POST',
@@ -136,7 +128,6 @@ router.post('/paystack/webhook', express.raw({ type: 'application/json' }), asyn
         paymentDate: new Date().toISOString(),
         gatewayResponse: event.data,
       });
-      console.log('✅ Payment marked as success via webhook', { reference });
 
       // Confirm booking
       await bookingService.confirmByPaymentRef(reference);
@@ -148,7 +139,6 @@ router.post('/paystack/webhook', express.raw({ type: 'application/json' }), asyn
   }
 });
 
-// GET /payments/paystack/verify?reference=...
 router.get('/paystack/verify', authenticate, async (req, res) => {
   try {
     const reference = (req.query.reference as string) || (req.query.ref as string);
@@ -180,7 +170,6 @@ router.get('/paystack/verify', authenticate, async (req, res) => {
         paymentDate: new Date().toISOString(),
         gatewayResponse: payload.data,
       });
-      console.log('✅ Payment marked as success via verify', { reference });
 
       // Confirm booking by reference (idempotent)
       const confirmed = await bookingService.confirmByPaymentRef(reference);

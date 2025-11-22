@@ -175,7 +175,6 @@ const SignUp: React.FC = () => {
           <div className={styles.divider}>Or</div>
           <GoogleButton onClick={() => {
             try {
-              console.log('Initiating Google OAuth, redirecting to:', `${API_URL}/auth/google`);
               window.location.href = `${API_URL}/auth/google`;
             } catch (err) {
               console.error('Google OAuth redirect error:', err);

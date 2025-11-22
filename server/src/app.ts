@@ -17,13 +17,11 @@ import migrationRoutes from './routes/migrationRoutes';
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 app.use(logger);
 
-// Routes
 app.get('/health', (_req, res) => {
   res.json({ ok: true, message: 'Server is running' });
 });

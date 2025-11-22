@@ -26,39 +26,29 @@ export const LoggedInNavbar = () => {
 
   const fetchNotifications = async () => {
     if (!isAuthenticated || !user) {
-      console.log('🔕 Not fetching notifications - not authenticated or no user');
       return;
     }
     
     const token = localStorage.getItem('hotel_token');
     if (!token) {
-      console.log('🔕 No token found');
       return;
     }
     
     try {
-      console.log('🔔 Fetching notifications from:', `${API_URL}/notifications`);
       const res = await fetch(`${API_URL}/notifications`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
-      console.log('📬 Notification response status:', res.status);
-      
       if (!res.ok) {
-        if (res.status === 401) {
-          console.log('Not authenticated for notifications');
-        }
         return;
       }
       
       const json = await res.json();
-      console.log('📨 Received notifications:', json);
       if (json.ok) {
         setNotifications(json.data);
         const unread = json.data.filter((n: Notification) => !n.read).length;
-        console.log(`🔔 Set ${json.data.length} notifications, ${unread} unread`);
         setUnreadCount(unread);
       }
     } catch (err) {
@@ -89,7 +79,6 @@ export const LoggedInNavbar = () => {
       markAsRead(notification.id);
     }
     
-    // Navigate based on notification type
     if (notification.type === 'booking_confirmation' || notification.type === 'booking_update') {
       if (notification.booking_id) {
         navigate(`/profile?tab=bookings&highlight=${notification.booking_id}`);
@@ -99,10 +88,10 @@ export const LoggedInNavbar = () => {
     setShowNotifications(false);
   };
 
-  useEffect(() => {
+      useEffect(() => {
     if (isAuthenticated && user) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
+      const interval = setInterval(fetchNotifications, 30000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, user]);
@@ -137,12 +126,6 @@ export const LoggedInNavbar = () => {
         <h2 className={styles.brandName}>Delta Hotels</h2>
       </div>
 
-      {/* Navigation Links
-      <div className={styles.navLinks}>
-        <button className={styles.navLink} onClick={handleBrowseRooms}>
-          Browse Rooms
-        </button>
-      </div> */}
 
       <div className={styles.searchBar}>
         <input 

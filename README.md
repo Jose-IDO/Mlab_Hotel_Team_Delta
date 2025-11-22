@@ -1,229 +1,246 @@
 # Delta Hotel Booking & Management System
 
-A comprehensive hotel booking and management web application built with React and TypeScript.  
-This dual-interface system allows customers to browse and book hotel rooms while providing administrators with complete hotel management capabilities.
+A comprehensive hotel booking and management web application built with React, TypeScript, Node.js, and PostgreSQL. This full-stack system allows customers to browse and book hotel rooms while providing administrators with complete hotel management capabilities.
 
 ## 🏨 Customer Interface Features
 
-- **Hero Section**: Rotating image carousel showcasing Santorini hotel locations with welcoming tagline
-- **Landing Page Navigation**: 
-  - Role-based navigation (different views for logged-in/out users)
-  - Home icon with red glow hover effect
-  - Rooms button navigates to public browsing page
-  - Sign In/Sign Up buttons for guest users
-- **Customer Dashboard (95% Complete)**: 
-  - Hotel rooms grid with star ratings, prices, and amenities
-  - Room details display with SVG icons (bedrooms, bathrooms, guest capacity)
-  - Weekend deals section with matching card styling
-  - Destinations section with location-based filtering
-  - Search functionality in navbar
-  - User authentication and protected routes
-  - Glass effect styling on hotel cards
-  - South African flag icon next to username
-  - Clickable hotel cards navigate to hotel details page
-- **Hotel Details Page**:
-  - Hotel information (name, address, location)
-  - Image gallery with main and thumbnail images
-  - Functional filtering system (Room Type, Price Range, Rating, Amenities)
-  - Real-time room filtering with immediate results
-  - 5 available rooms with detailed information
-  - Clickable room cards navigate to room details
-  - Results counter and "no results" message
-  - FAQ section with 12 expandable questions (2-column layout)
-  - Arrow toggle buttons with red glow effect
-  - View Map and Add to Favorites buttons
-- **Room Details Page**:
-  - Detailed room information and image gallery
-  - Room amenities, policies, and booking information
-  - Pricing and capacity details
-  - Book Now functionality
-  - Integrated with hotel details page
-- **Public Rooms Page**: Browse rooms without login, with Sign In/Sign Up prompts
-- **Authentication System**:
-  - Full-page login/signup forms with background image
-  - Role-based routing (admins → /admin, customers → /dashboard)
-  - Form validation (email format, password strength)
-  - Session persistence across page reloads
-- **Search Functionality**: Advanced search form with city, room type, dates, and guest count filters
-- **Deals Section**: "Deals For The Weekend" showcasing hotel packages with ratings, views, and pricing
-- **Amenities Showcase**: "Why Choose Us" section highlighting free coffee, WiFi, and air-conditioned rooms
-- **Responsive Navigation**: Mobile-friendly navbar with hamburger menu
-- **Modern UI**: Clean, responsive design with CSS modules and glass morphism effects
+- **Landing Page**: Hero section with rotating image carousel, search functionality, and deals showcase
+- **Room Browsing**: Browse available rooms with filtering, search, and detailed information
+- **Hotel Details**: View hotel information, room galleries, filtering system, and FAQ section
+- **Room Details**: Detailed room information, amenities, policies, and booking interface
+- **Booking System**: Complete booking flow with guest information, date selection, and payment integration
+- **Payment Processing**: Integrated Paystack payment gateway with tax calculation
+- **User Profile**: View and manage bookings, profile information, and booking history
+- **Notifications**: Real-time notification system for booking confirmations, updates, and promotions
+- **Authentication**: Email/password and Google OAuth authentication with role-based access
+- **Favorites**: Save favorite rooms and hotels
+- **Responsive Design**: Mobile-friendly interface with modern UI/UX
 
 ## 🛠️ Admin Dashboard Features
 
-- **Admin Navigation**:
-  - Dedicated admin navbar with home icon
-  - Home icon navigates back to landing page
-  - Admin profile display with logout functionality
-  - Protected admin-only routes
-- **Booking Management**: 
-  - View and manage pending bookings (approve/cancel)
-  - Track confirmed and checked-in bookings
-  - Process guest checkouts
-- **Room Management**:
-  - Add new rooms with detailed specifications
-  - Upload room photos
-  - Configure pricing, amenities, and availability
-  - Archive/restore room listings
-- **Administrator Management**: Manage admin user accounts
-- **Statistics & Reports**: View hotel performance data
-- **Role-Based Access**: Automatic redirect to admin dashboard on login
+- **Booking Management**: View, approve, cancel, and manage all bookings with status tracking
+- **Room Management**: Add, edit, archive, and restore rooms with image uploads
+- **Deal Management**: Create and manage promotional deals with status toggling
+- **Event Management**: Create and manage hotel events
+- **Guest Management**: View and manage guest accounts
+- **Administrator Management**: Manage admin user accounts and roles
+- **Promotional Notifications**: Send broadcast notifications to all users
+- **Hotel Settings**: Configure hotel information, tax rates, and public settings
+- **Statistics & Reports**: View booking and performance data
+- **Role-Based Access**: Secure admin-only routes with role verification
+
+## 🏗️ Technical Architecture
+
+### Frontend
+- **Framework**: React 19.1.1 with TypeScript 5.9.3
+- **Build Tool**: Vite 7.1.7
+- **Routing**: React Router DOM 7.9.4
+- **State Management**: React Context API
+- **Styling**: CSS Modules
+- **Real-time**: Socket.io client for live updates
+
+### Backend
+- **Runtime**: Node.js with Express.js
+- **Database**: PostgreSQL (hosted on Supabase)
+- **Authentication**: JWT tokens with Passport.js
+- **Payment Gateway**: Paystack integration
+- **File Storage**: Cloudinary for image uploads
+- **Real-time**: Socket.io server for live notifications
+- **API**: RESTful API with TypeScript
+
+### Database
+- PostgreSQL with UUID primary keys
+- Role-based access control (RBAC)
+- Booking management with status tracking
+- Payment tracking and references
+- Notification system
+- User favorites and preferences
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ and npm
+- PostgreSQL database (or Supabase account)
+- Cloudinary account (for image uploads)
+- Paystack account (for payments)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd mlcab-hotel
+   ```
+
+2. **Install frontend dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Install backend dependencies**
+   ```bash
+   cd server
+   npm install
+   ```
+
+4. **Set up environment variables**
+
+   Frontend `.env`:
+   ```
+   VITE_API_URL=http://localhost:4000
+   ```
+
+   Backend `.env`:
+   ```
+   DATABASE_URL=postgresql://user:password@host:port/database
+   JWT_SECRET=your-secret-key
+   PORT=4000
+   PUBLIC_BASE_URL=http://localhost:5173
+   CLOUDINARY_CLOUD_NAME=your-cloud-name
+   CLOUDINARY_API_KEY=your-api-key
+   CLOUDINARY_API_SECRET=your-api-secret
+   PAYSTACK_SECRET_KEY=your-paystack-secret
+   PAYSTACK_PUBLIC_KEY=your-paystack-public
+   ```
+
+5. **Run database migrations**
+   ```bash
+   cd server
+   npm run migrate
+   ```
+
+6. **Start the development servers**
+
+   Backend:
+   ```bash
+   cd server
+   npm run dev
+   ```
+
+   Frontend:
+   ```bash
+   npm run dev
+   ```
 
 ## 📁 Project Structure
 
 ```
 mlcab-hotel/
-├── src/
-│   ├── Components/
-│   │   ├── Navbar/                 # Landing page navigation
-│   │   ├── LoggedInNavbar/        # Customer dashboard navigation
-│   │   ├── AdminNavbar/           # Admin navigation with home icon
-│   │   ├── AdminSidebar/          # Admin sidebar menu
-│   │   ├── DealSection/           # Weekend deals display
-│   │   ├── HotelRoomsGrid/        # Hotel rooms grid with icons
-│   │   ├── DestinationsSection/   # Destinations display
-│   │   ├── DestinationCard/       # Individual destination card
-│   │   ├── SearchSection/         # Hotel search form
-│   │   ├── ProtectedRoute/        # Route protection component
-│   │   └── Shared/                # Shared components (Input, Button, etc.)
-│   ├── Pages/
-│   │   ├── Landing_Page/          # Customer homepage
-│   │   ├── Customer_Dashboard/    # Customer dashboard (90% complete)
-│   │   ├── Auth/                  # Authentication pages
-│   │   │   ├── SignIn.tsx         # Full-page login
-│   │   │   └── SignUp.tsx         # Full-page registration
-│   │   └── admin_dashboard/       # Admin management interface
-│   │       ├── AdminDashboard.tsx
-│   │       ├── ManageBooking.tsx
-│   │       ├── ManageAccom.tsx
-│   │       └── Administrators.tsx
-│   ├── assets/                    # Images, icons, and SVGs
-│   │   ├── LOGIN_CREDENTIALS.txt  # Login credentials documentation
-│   │   ├── CURRENT_STATUS.txt     # App status documentation
-│   │   └── [Various SVG icons]    # Bedroom, bathroom, guest, flag, home icons
-│   ├── contexts/                  # React contexts (AuthContext)
-│   ├── utils/                     # Utility functions (validation)
-│   ├── App.tsx                    # Main app with routing
-│   └── main.tsx                   # App entry point
-├── public/                        # Static assets
-├── package.json                   # Dependencies and scripts
-└── README.md                      # Project documentation
+├── src/                          # Frontend source code
+│   ├── Components/              # React components
+│   ├── Pages/                   # Page components
+│   ├── contexts/               # React contexts
+│   ├── config/                 # Configuration files
+│   └── utils/                  # Utility functions
+├── server/                      # Backend source code
+│   ├── src/
+│   │   ├── config/             # Database, auth, upload configs
+│   │   ├── controllers/        # Request handlers
+│   │   ├── routes/             # API routes
+│   │   ├── repositories/       # Database access layer
+│   │   ├── services/           # Business logic
+│   │   ├── middleware/         # Express middleware
+│   │   ├── types/              # TypeScript types
+│   │   └── sql/                # Database migrations
+│   └── package.json
+├── public/                      # Static assets
+└── README.md
 ```
 
-## 🚀 Getting Started
-
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-2. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-   The app runs on [http://localhost:5173](http://localhost:5173) (Vite default port).
-
-3. **Build for production**
-   ```bash
-   npm run build
-   ```
-
-4. **Preview production build**
-   ```bash
-   npm run preview
-   ```
-
-## 🔧 Current Development Status
+## 🔧 Features
 
 ### ✅ Completed Features
-- Complete UI/UX design for both customer and admin interfaces
-- Responsive design implementation
-- Form structures and data handling
-- Image carousel functionality
-- Admin dashboard routing and navigation with home icon
-- Room management forms with photo upload
-- Booking management tables and status tracking
-- **Full Authentication System**:
-  - Full-page login/signup forms with background image
-  - Role-based routing (admin → /admin, customer → /dashboard)
-  - Form validation (email, password strength)
-  - Session persistence
-  - Protected routes with ProtectedRoute component
-  - Public /rooms route for browsing without login
-- **Customer Dashboard (95% Complete)**:
-  - Hotel rooms grid with star ratings
-  - Room details with SVG icons (bedrooms, bathrooms, guests)
-  - Price per day display
-  - Amenity badges with hover effects
-  - Weekend deals section with matching card styling
-  - Destinations section with location images
-  - Search functionality in navbar
-  - South African flag icon next to username
-  - Clickable hotel cards navigate to hotel details
-- **Hotel Details Page (100% Complete)**:
-  - Hotel information display
-  - Image gallery with main and thumbnail images
-  - Functional filtering system (4 filters)
-  - Real-time room filtering
-  - 5 rooms with full details
-  - Clickable room cards
-  - FAQ section with 12 questions
-  - 2-column responsive layout
-- **Room Details Page (100% Complete)**:
-  - Room-specific information
-  - Image gallery
-  - Amenities and policies
-  - Booking information
-  - Book Now button
-- **Navigation System**:
-  - Landing page navbar with role-based display
-  - Customer dashboard navbar with auth state handling
-  - Admin navbar with home icon (red glow on hover)
-  - Delta Hotel logo clickable on all navbars
-  - Home icon navigation based on user role
-  - Underline hover effects on navbar items
-  - Fixed navbar positioning at top of page
-  - LoggedInNavbar used on hotel and room details pages
 
-### 🚧 In Development / TODO
-- Complete remaining 5% of customer dashboard:
-  - Booking functionality
-  - Cart functionality
-- **Backend Integration**: Connect forms to actual API endpoints
-- **Database Integration**: Connect to hotel booking database
-- **Payment Integration**: Add payment processing for bookings
-- **Real-time Updates**: Live booking status updates
-- **Map Integration**: Implement "View Map" functionality
-- **Favorites System**: Implement "Add to Favorites" functionality
+- **Full Authentication System**: Email/password and Google OAuth
+- **Role-Based Access Control**: Customer, admin, and super admin roles
+- **Room Management**: CRUD operations with image uploads
+- **Booking System**: Complete booking flow with payment integration
+- **Payment Processing**: Paystack integration with tax calculation
+- **Notification System**: Real-time notifications for bookings and promotions
+- **Admin Dashboard**: Complete admin interface for hotel management
+- **User Profile**: Profile management and booking history
+- **Deal Management**: Create and manage promotional deals
+- **Event Management**: Create and manage hotel events
+- **Search & Filtering**: Advanced search and filter capabilities
+- **Responsive Design**: Mobile-friendly interface
+- **Database Integration**: Full PostgreSQL integration
+- **Image Upload**: Cloudinary integration for room and event images
 
-### 🐛 Known Issues
-- Customer dashboard search not fully functional (UI complete)
-- Booking functionality not yet implemented
-- No data persistence (all data stored in localStorage only)
-- Admin forms only log to console (no API integration)
-- No backend server or database integration
+### 🚧 Future Enhancements
+
+- Email notifications
+- SMS notifications
+- Advanced analytics dashboard
+- Map integration
+- Multi-language support
+- Booking calendar view
+- Automated booking reminders
 
 ## 🛠️ Technologies Used
 
-- **Frontend**: React 19.1.1, TypeScript 5.9.3
-- **Build Tool**: Vite 7.1.7
-- **Routing**: React Router DOM 7.9.4
-- **Styling**: CSS Modules
-- **Development**: ESLint, TypeScript compiler
-- **Deployment**: GitHub Pages ready
+### Frontend
+- React 19.1.1
+- TypeScript 5.9.3
+- Vite 7.1.7
+- React Router DOM 7.9.4
+- Socket.io Client
 
-## 📝 Customization
+### Backend
+- Node.js
+- Express.js
+- TypeScript
+- PostgreSQL
+- Passport.js (JWT & OAuth)
+- Socket.io
+- Cloudinary SDK
+- Paystack API
 
-- **Hotel Images**: Replace images in `src/assets/` directory
-- **Deals Data**: Edit deals in `src/Components/DealSection/DealSection.tsx`
-- **Room Types**: Modify room types in `src/Pages/admin_dashboard/ManageAccom.tsx`
-- **Styling**: Update CSS modules in respective component folders
-- **Branding**: Update logo and colors in component CSS files
+## 📝 API Endpoints
+
+### Authentication
+- `POST /auth/register` - User registration
+- `POST /auth/login` - User login
+- `GET /auth/me` - Get current user
+- `GET /auth/google` - Google OAuth initiation
+- `GET /auth/google/callback` - Google OAuth callback
+
+### Bookings
+- `GET /bookings` - Get user bookings
+- `POST /bookings` - Create new booking
+- `PUT /bookings/:id` - Update booking
+- `DELETE /bookings/:id` - Cancel booking
+
+### Rooms
+- `GET /admin/rooms` - Get all rooms (admin)
+- `POST /admin/rooms` - Create room (admin)
+- `PUT /admin/rooms/:id` - Update room (admin)
+- `DELETE /admin/rooms/:id` - Delete room (admin)
+
+### Payments
+- `POST /payments/paystack/initialize` - Initialize payment
+- `POST /payments/paystack/webhook` - Payment webhook
+- `GET /payments/paystack/verify` - Verify payment
+
+### Notifications
+- `GET /notifications` - Get user notifications
+- `PUT /notifications/:id/read` - Mark as read
+- `POST /notifications/broadcast` - Send promotion (admin)
+
+## 🚀 Deployment
+
+### Backend (Railway)
+1. Connect GitHub repository
+2. Set environment variables
+3. Deploy automatically on push
+
+### Frontend (GitHub Pages)
+1. Build production bundle
+2. Deploy to GitHub Pages
+3. Update API URL in environment variables
 
 ## 🤝 Contributing
 
-This is a collaborative final project for the Mlab codetribe 2025 cohort (Team Delta).
+This is a collaborative project for the Mlab codetribe 2025 cohort (Team Delta).
 
 ## 📄 License
 

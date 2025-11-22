@@ -171,9 +171,6 @@ const BookingPage: React.FC = () => {
         }
       };
 
-      console.log('Submitting booking:', bookingPayload);
-
-      // Submit booking to backend (creates pending booking)
       const response = await fetch(`${API_URL}/bookings`, {
         method: 'POST',
         headers: {
@@ -193,13 +190,10 @@ const BookingPage: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log("Backend response:", result);
       
-      // Backend returns { ok: true, data: { booking, payment } }
       const bookingData = result.data?.booking || result.booking || result.data || result;
       const paymentInfo = result.data?.payment || result.payment;
 
-      // Prepare data for payment page
       const paymentData = {
         bookingId: bookingData.id,
         paymentReference: bookingData.paymentReference || paymentInfo?.reference,
@@ -213,11 +207,9 @@ const BookingPage: React.FC = () => {
         pricePerNight: initialPricePerNight,
         totalPrice,
         guest,
-        expiresAt: bookingData.expiresAt, // Show expiry timer on payment page
+        expiresAt: bookingData.expiresAt,
       };
 
-      console.log("Booking created successfully:", bookingData);
-      console.log("Payment data being sent:", paymentData);
       navigate('/payment', { state: paymentData });
     } catch (err) {
       console.error('Booking error:', err);

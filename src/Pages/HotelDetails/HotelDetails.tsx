@@ -103,7 +103,6 @@ const HotelDetails: React.FC = () => {
     // If guests are specified, we could filter based on maxGuests
     // For now, we'll just acknowledge them (could add to state if needed)
     if (guests) {
-      console.log(`Searching for rooms with capacity for ${guests} guests`);
     }
 
     // Scroll to rooms section if coming from search

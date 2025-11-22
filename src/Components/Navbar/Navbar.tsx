@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const notificationRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLLIElement>(null);
   const { user, logout, isAuthenticated } = useAuth();
   const { isAccepted, setShowOverlay } = usePopia();
   const navigate = useNavigate();
