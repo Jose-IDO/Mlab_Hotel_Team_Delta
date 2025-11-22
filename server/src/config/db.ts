@@ -70,9 +70,12 @@ pool.query('SELECT NOW()')
   .then(() => {
     console.log('✅ Database connection successful');
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.error('❌ Database connection failed:', err.message);
+    console.error('Error code:', err.code);
+    console.error('Error detail:', err.detail);
     console.error('💡 Check your database credentials and connection settings');
+    console.error('💡 Verify in Supabase Dashboard: Settings → Database → Connection string');
   });
 
 export default pool;
