@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { roomController } from '../controllers/roomController';
+import { upload } from '../config/upload';
 
 const router = Router();
 
@@ -13,5 +14,8 @@ router.patch('/:id/archive', roomController.archiveRoom.bind(roomController));
 router.patch('/:id/restore', roomController.restoreRoom.bind(roomController));
 router.delete('/:id', roomController.deleteRoom.bind(roomController));
 
+// Image upload routes
+router.post('/:id/images', upload.array('images', 10), roomController.uploadRoomImages.bind(roomController));
+router.delete('/:id/images', roomController.deleteRoomImage.bind(roomController));
 
 export default router;
