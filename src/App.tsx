@@ -36,10 +36,35 @@ function AppContent() {
     const searchParams = new URLSearchParams(window.location.search);
     const redirectPath = searchParams.get('/');
     if (redirectPath) {
-      const newPath = '/' + redirectPath.replace(/~and~/g, '&');
-      const newSearch = window.location.search.replace(/\/\?\/[^&]*/, '').replace(/^&/, '?');
-      if (newSearch === '?') newSearch = '';
-      window.history.replaceState({}, '', newPath + newSearch + window.location.hash);
+      // The redirect path may contain both the path and query params (separated by ~and~)
+      // Example: "auth/callback~and~token=abc123"
+      const parts = redirectPath.split('~and~');
+      const pathPart = parts[0];
+      const queryParts = parts.slice(1);
+      
+      // Reconstruct the path
+      const newPath = '/' + pathPart.replace(/~and~/g, '&');
+      
+      // Reconstruct query string from remaining parts
+      let newSearch = '';
+      if (queryParts.length > 0) {
+        newSearch = '?' + queryParts.join('&').replace(/~and~/g, '&');
+      }
+      
+      // Also preserve any other query params that might be in the URL
+      const otherParams = new URLSearchParams(window.location.search);
+      otherParams.delete('/');
+      const otherQuery = otherParams.toString();
+      if (otherQuery && !newSearch) {
+        newSearch = '?' + otherQuery;
+      } else if (otherQuery && newSearch) {
+        newSearch += '&' + otherQuery;
+      }
+      
+      // Only redirect if we're not already on the correct path
+      if (window.location.pathname !== newPath || window.location.search !== newSearch) {
+        window.history.replaceState({}, '', newPath + newSearch + window.location.hash);
+      }
     }
   }, []);
   

@@ -9,8 +9,14 @@ export default function OAuthCallback() {
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
-      const token = searchParams.get('token');
-      const error = searchParams.get('error');
+      // Also check window.location.search in case searchParams doesn't have it yet
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = searchParams.get('token') || urlParams.get('token');
+      const error = searchParams.get('error') || urlParams.get('error');
+
+      console.log('OAuth Callback - Token:', token ? 'Present' : 'Missing');
+      console.log('OAuth Callback - Error:', error);
+      console.log('OAuth Callback - Full URL:', window.location.href);
 
       if (error) {
         console.error('OAuth error:', error);
@@ -21,6 +27,8 @@ export default function OAuthCallback() {
 
       if (!token) {
         console.error('No token received from OAuth');
+        console.error('Search params:', Array.from(searchParams.entries()));
+        console.error('URL params:', Array.from(urlParams.entries()));
         alert('No authentication token received. Please try again.');
         navigate('/signin?error=no_token');
         return;
