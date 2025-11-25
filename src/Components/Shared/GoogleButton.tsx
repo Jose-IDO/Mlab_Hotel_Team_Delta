@@ -7,10 +7,19 @@ interface GoogleButtonProps {
 }
 
 const GoogleButton: React.FC<GoogleButtonProps> = ({ onClick }) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log('GoogleButton clicked!');
+    e.preventDefault();
+    e.stopPropagation();
+    if (onClick) {
+      onClick(e);
+    }
+  };
+
   return (
     <button 
       type="button"
-      onClick={onClick} 
+      onClick={handleClick} 
       className={styles.googleButton}
     >
       <FcGoogle size={22} />

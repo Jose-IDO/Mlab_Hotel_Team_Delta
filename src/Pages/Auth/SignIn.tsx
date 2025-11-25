@@ -116,8 +116,9 @@ const SignIn: React.FC = () => {
           </div>
 
           <div className={styles.divider}>Or</div>
-          <GoogleButton onClick={(e) => {
-            e?.preventDefault();
+          <GoogleButton onClick={() => {
+            console.log('SignIn: Google button onClick handler called');
+            console.log('API_URL:', API_URL);
             try {
               const googleAuthUrl = `${API_URL}/auth/google`;
               console.log('Redirecting to Google OAuth:', googleAuthUrl);
