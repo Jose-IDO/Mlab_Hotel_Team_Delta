@@ -239,7 +239,7 @@ export const ManageBooking = () => {
       }
     });
   };
-  const handleView = (id: string) => {
+  const handleView = (_id: string) => {
   };
   const handleCheckin = (id: string) => {
     setConfirmDialog({

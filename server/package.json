@@ -8,7 +8,8 @@
     "build": "tsc -p .",
     "deploy": "npm run build",
     "migrate": "ts-node src/scripts/migrate.ts",
-    "test:db": "ts-node src/scripts/testDb.ts"
+    "test:db": "ts-node src/scripts/testDb.ts",
+    "create:admin": "ts-node src/scripts/createAdmin.ts"
   },
   "dependencies": {
     "@types/passport": "^1.0.17",
