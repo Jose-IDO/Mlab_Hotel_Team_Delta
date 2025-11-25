@@ -9,14 +9,45 @@ export default function OAuthCallback() {
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
-      // Also check window.location.search in case searchParams doesn't have it yet
+      // Handle GitHub Pages redirect format: /?/auth/callback&token=...
+      let token: string | null = null;
+      let error: string | null = null;
+      
+      // First, check if we're in GitHub Pages redirect format
       const urlParams = new URLSearchParams(window.location.search);
-      const token = searchParams.get('token') || urlParams.get('token');
-      const error = searchParams.get('error') || urlParams.get('error');
+      const redirectPath = urlParams.get('/');
+      
+      if (redirectPath) {
+        // GitHub Pages format: "auth/callback~and~token=abc123" or "auth/callback&token=abc123"
+        const parts = redirectPath.split('~and~');
+        const queryString = parts.slice(1).join('&').replace(/~and~/g, '&');
+        
+        // Extract token from the query string
+        if (queryString) {
+          const queryParams = new URLSearchParams(queryString);
+          token = queryParams.get('token');
+          error = queryParams.get('error');
+        }
+        
+        // Also check if token is in the main URL params (after redirect processing)
+        if (!token) {
+          const mainParams = new URLSearchParams(window.location.search);
+          mainParams.delete('/');
+          token = mainParams.get('token');
+          error = mainParams.get('error') || error;
+        }
+      } else {
+        // Normal format: /auth/callback?token=...
+        token = searchParams.get('token') || urlParams.get('token');
+        error = searchParams.get('error') || urlParams.get('error');
+      }
 
       console.log('OAuth Callback - Token:', token ? 'Present' : 'Missing');
       console.log('OAuth Callback - Error:', error);
       console.log('OAuth Callback - Full URL:', window.location.href);
+      console.log('OAuth Callback - Redirect Path:', redirectPath);
+      console.log('OAuth Callback - Search Params:', Array.from(searchParams.entries()));
+      console.log('OAuth Callback - URL Params:', Array.from(urlParams.entries()));
 
       if (error) {
         console.error('OAuth error:', error);

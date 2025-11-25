@@ -36,6 +36,11 @@ function AppContent() {
     const searchParams = new URLSearchParams(window.location.search);
     const redirectPath = searchParams.get('/');
     if (redirectPath) {
+      // Skip if we're already on the callback route - let it handle the redirect format itself
+      if (redirectPath.includes('auth/callback')) {
+        return;
+      }
+      
       // The redirect path may contain both the path and query params (separated by ~and~)
       // Example: "auth/callback~and~token=abc123"
       const parts = redirectPath.split('~and~');
