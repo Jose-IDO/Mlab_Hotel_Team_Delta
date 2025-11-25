@@ -116,9 +116,12 @@ const SignIn: React.FC = () => {
           </div>
 
           <div className={styles.divider}>Or</div>
-          <GoogleButton onClick={() => {
+          <GoogleButton onClick={(e) => {
+            e?.preventDefault();
             try {
-              window.location.href = `${API_URL}/auth/google`;
+              const googleAuthUrl = `${API_URL}/auth/google`;
+              console.log('Redirecting to Google OAuth:', googleAuthUrl);
+              window.location.href = googleAuthUrl;
             } catch (err) {
               console.error('Google OAuth redirect error:', err);
               alert('Failed to initiate Google sign in. Please try again.');

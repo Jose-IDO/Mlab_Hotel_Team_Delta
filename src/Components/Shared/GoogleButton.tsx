@@ -3,12 +3,16 @@ import { FcGoogle } from 'react-icons/fc';
 import styles from './GoogleButton.module.css';
 
 interface GoogleButtonProps {
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const GoogleButton: React.FC<GoogleButtonProps> = ({ onClick }) => {
   return (
-    <button onClick={onClick} className={styles.googleButton}>
+    <button 
+      type="button"
+      onClick={onClick} 
+      className={styles.googleButton}
+    >
       <FcGoogle size={22} />
       <span className={styles.text}>Continue With Google</span>
     </button>
