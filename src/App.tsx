@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
@@ -29,6 +30,19 @@ import PopiaRouteGuard from './Components/Popia/PopiaRouteGuard';
 
 function AppContent() {
   const location = useLocation();
+  
+  // Handle GitHub Pages SPA routing (/?/path format from 404.html redirect)
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectPath = searchParams.get('/');
+    if (redirectPath) {
+      const newPath = '/' + redirectPath.replace(/~and~/g, '&');
+      const newSearch = window.location.search.replace(/\/\?\/[^&]*/, '').replace(/^&/, '?');
+      if (newSearch === '?') newSearch = '';
+      window.history.replaceState({}, '', newPath + newSearch + window.location.hash);
+    }
+  }, []);
+  
   // Only show the public Navbar on the landing page
   const showNavbar = location.pathname === '/';
 
