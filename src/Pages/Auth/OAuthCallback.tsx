@@ -66,7 +66,13 @@ export default function OAuthCallback() {
       }
 
       try {
+        console.log('=== Storing token in localStorage ===');
         localStorage.setItem('hotel_token', token);
+        console.log('Token stored successfully');
+        
+        console.log('=== Fetching user details from API ===');
+        console.log('API_URL:', API_URL);
+        console.log('Endpoint:', `${API_URL}/auth/me`);
         
         const response = await fetch(`${API_URL}/auth/me`, {
           headers: {
@@ -75,43 +81,63 @@ export default function OAuthCallback() {
           }
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Failed to fetch user details:', errorText);
-          throw new Error('Failed to fetch user details');
+          console.error('=== Failed to fetch user details ===');
+          console.error('Status:', response.status);
+          console.error('Error text:', errorText);
+          throw new Error(`Failed to fetch user details: ${response.status} ${errorText}`);
         }
 
         const data = await response.json();
+        console.log('=== User data received ===');
+        console.log('Response data:', data);
         
         if (data.ok && data.data) {
           const user = data.data;
+          console.log('User object:', user);
+          console.log('User roles:', user.roles);
           
           localStorage.setItem('hotel_user', JSON.stringify(user));
+          console.log('User stored in localStorage');
 
           const adminRoles = ['super_admin', 'hotel_manager'];
           const isAdmin = user.roles?.some((r: any) => adminRoles.includes(r.name));
+          console.log('Is admin:', isAdmin);
 
           const pendingBooking = sessionStorage.getItem('pendingBooking');
           if (pendingBooking) {
+            console.log('Pending booking found, redirecting to booking page');
             const bookingData = JSON.parse(pendingBooking);
             sessionStorage.removeItem('pendingBooking');
             navigate('/booking', { state: bookingData });
           } else if (isAdmin) {
+            console.log('Admin user, redirecting to /admin');
             navigate('/admin');
           } else {
+            console.log('Regular user, redirecting to /hotel-details');
             navigate('/hotel-details');
           }
           
+          console.log('=== OAuth callback complete, reloading page ===');
           setTimeout(() => {
             window.location.reload();
           }, 100);
         } else {
+          console.error('=== Invalid user data ===');
+          console.error('Response:', data);
           throw new Error('Invalid user data received');
         }
-      } catch (error) {
-        console.error('OAuth callback processing error:', error);
+      } catch (error: any) {
+        console.error('=== OAuth callback processing error ===');
+        console.error('Error:', error);
+        console.error('Error message:', error?.message);
+        console.error('Error stack:', error?.stack);
         localStorage.removeItem('hotel_token');
-        alert('Failed to complete sign in. Please try again.');
+        alert(`Failed to complete sign in: ${error?.message || 'Unknown error'}. Check console for details.`);
         navigate('/signin?error=callback_processing_failed');
       }
     };
