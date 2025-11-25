@@ -36,8 +36,32 @@ function AppContent() {
     const searchParams = new URLSearchParams(window.location.search);
     const redirectPath = searchParams.get('/');
     if (redirectPath) {
-      // Skip if we're already on the callback route - let it handle the redirect format itself
+      // If it's the callback route, we need to process it to extract the token
       if (redirectPath.includes('auth/callback')) {
+        console.log('=== GitHub Pages redirect detected for auth/callback ===');
+        console.log('Redirect path:', redirectPath);
+        // Extract the path and query params
+        const parts = redirectPath.split('~and~');
+        const pathPart = parts[0];
+        const queryParts = parts.slice(1);
+        
+        // Reconstruct the path
+        const newPath = '/' + pathPart.replace(/~and~/g, '&');
+        
+        // Reconstruct query string from remaining parts
+        let newSearch = '';
+        if (queryParts.length > 0) {
+          newSearch = '?' + queryParts.join('&').replace(/~and~/g, '&');
+        }
+        
+        console.log('Reconstructed path:', newPath);
+        console.log('Reconstructed search:', newSearch);
+        
+        // Update URL so React Router can match the route
+        if (window.location.pathname !== newPath || window.location.search !== newSearch) {
+          window.history.replaceState({}, '', newPath + newSearch + window.location.hash);
+          console.log('URL updated to:', window.location.href);
+        }
         return;
       }
       

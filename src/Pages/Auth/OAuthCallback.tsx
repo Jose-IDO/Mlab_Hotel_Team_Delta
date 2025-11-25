@@ -7,8 +7,16 @@ export default function OAuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  console.log('=== OAuthCallback Component Mounted ===');
+  console.log('Current URL:', window.location.href);
+  console.log('Pathname:', window.location.pathname);
+  console.log('Search:', window.location.search);
+  console.log('Hash:', window.location.hash);
+
   useEffect(() => {
+    console.log('=== OAuthCallback useEffect Running ===');
     const handleOAuthCallback = async () => {
+      console.log('=== handleOAuthCallback Started ===');
       // Handle GitHub Pages redirect format: /?/auth/callback&token=...
       let token: string | null = null;
       let error: string | null = null;
