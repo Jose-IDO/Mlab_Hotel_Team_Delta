@@ -116,48 +116,13 @@ const SignIn: React.FC = () => {
           </div>
 
           <div className={styles.divider}>Or</div>
-          <GoogleButton onClick={async () => {
+          <GoogleButton onClick={() => {
             console.log('SignIn: Google button onClick handler called');
             console.log('API_URL:', API_URL);
-            try {
-              const googleAuthUrl = `${API_URL}/auth/google`;
-              console.log('Testing Google OAuth endpoint:', googleAuthUrl);
-              
-              // First, test if the endpoint is accessible
-              const response = await fetch(googleAuthUrl, {
-                method: 'GET',
-                redirect: 'manual', // Don't follow redirects automatically
-                credentials: 'include'
-              });
-              
-              console.log('Response status:', response.status);
-              console.log('Response type:', response.type);
-              
-              // If it's a redirect (302/301), follow it manually
-              if (response.status === 302 || response.status === 301) {
-                const redirectUrl = response.headers.get('Location');
-                console.log('Redirect URL:', redirectUrl);
-                if (redirectUrl) {
-                  window.location.href = redirectUrl;
-                } else {
-                  // Fallback: try direct redirect
-                  window.location.href = googleAuthUrl;
-                }
-              } else if (response.ok) {
-                // If it's OK but not a redirect, something is wrong
-                console.error('Unexpected response:', response);
-                alert('Unexpected response from server. Check console for details.');
-              } else {
-                // Error response
-                const errorText = await response.text();
-                console.error('Error response:', response.status, errorText);
-                alert(`Failed to initiate Google sign in: ${response.status} ${errorText}`);
-              }
-            } catch (err: any) {
-              console.error('Google OAuth redirect error:', err);
-              console.error('Error details:', err.message, err.stack);
-              alert(`Failed to initiate Google sign in: ${err.message || 'Unknown error'}. Check console for details.`);
-            }
+            const googleAuthUrl = `${API_URL}/auth/google`;
+            console.log('Redirecting to Google OAuth:', googleAuthUrl);
+            // Direct redirect - browser will follow the 302 redirect from backend to Google
+            window.location.href = googleAuthUrl;
           }} />
         </div>
       </div>
