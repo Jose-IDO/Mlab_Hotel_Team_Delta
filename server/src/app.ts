@@ -21,6 +21,7 @@ const app = express();
 const allowedOrigins = [
   process.env.PUBLIC_BASE_URL || 'http://localhost:5173',
   'http://localhost:5173', // Keep for local dev
+  'https://mlab-hotel-deam-delta.vercel.app' // Production frontend URL
 ];
 
 app.use(cors({
