@@ -194,6 +194,11 @@ const BookingPage: React.FC = () => {
       const bookingData = result.data?.booking || result.booking || result.data || result;
       const paymentInfo = result.data?.payment || result.payment;
 
+      // Calculate grand total with tax for payment
+      const subtotal = totalPrice;
+      const taxAmount = (subtotal * taxRate) / 100;
+      const grandTotal = subtotal + taxAmount;
+
       const paymentData = {
         bookingId: bookingData.id,
         paymentReference: bookingData.paymentReference || paymentInfo?.reference,
@@ -205,7 +210,9 @@ const BookingPage: React.FC = () => {
         nights,
         guests,
         pricePerNight: initialPricePerNight,
-        totalPrice,
+        totalPrice: grandTotal, // Pass grand total (with tax) to payment page
+        subtotal: subtotal, // Also pass subtotal for display
+        taxAmount: taxAmount, // Pass tax amount for display
         guest,
         expiresAt: bookingData.expiresAt,
       };

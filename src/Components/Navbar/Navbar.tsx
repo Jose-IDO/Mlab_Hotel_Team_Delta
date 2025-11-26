@@ -150,9 +150,7 @@ export const Navbar: React.FC = () => {
             {isAuthenticated ? (
               <>
                 <li onClick={handleRoomsClick}>Rooms</li>
-                <li className={styles.homeIconWrapper} onClick={handleHomeClick}>
-                  <img src={HomeIcon} alt="Home" className={styles.homeIcon} />
-                </li>
+                {/* Home button removed when logged in as requested */}
 
                 {/* Notification Bell with Dropdown */}
                 <li className={styles.notificationWrapper} ref={notificationRef}>
@@ -205,7 +203,12 @@ export const Navbar: React.FC = () => {
                   </div>
                 </li>
 
-                <li>{user ? `${user.firstName} ${user.lastName}` : ""}</li>
+                <li 
+                  onClick={() => navigate('/profile')} 
+                  style={{ cursor: 'pointer' }}
+                >
+                  {user ? `${user.firstName} ${user.lastName}` : ""}
+                </li>
                 <li className={styles.redButton} onClick={handleLogout}>Logout</li>
               </>
             ) : (

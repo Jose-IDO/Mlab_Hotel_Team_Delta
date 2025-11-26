@@ -12,17 +12,28 @@ interface PopiaContextType {
 const PopiaContext = createContext<PopiaContextType | undefined>(undefined);
 
 export const PopiaProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAccepted, setIsAccepted] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(true); // Show on each visit
+  // Load acceptance status from localStorage
+  const [isAccepted, setIsAccepted] = useState(() => {
+    const stored = localStorage.getItem('popia_accepted');
+    return stored === 'true';
+  });
+  
+  // Only show overlay if not accepted
+  const [showOverlay, setShowOverlay] = useState(() => {
+    const stored = localStorage.getItem('popia_accepted');
+    return stored !== 'true';
+  });
 
   const acceptConsent = () => {
     setIsAccepted(true);
     setShowOverlay(false);
+    localStorage.setItem('popia_accepted', 'true');
   };
 
   const declineConsent = () => {
     setIsAccepted(false);
     setShowOverlay(false);
+    localStorage.setItem('popia_accepted', 'false');
   };
 
   return (

@@ -21,7 +21,9 @@ const PaymentPage: React.FC = () => {
     adults = 2,
     children = 0,
     pricePerNight = 1200,
-    totalPrice = 3600,
+    totalPrice = 3600, // This should be the subtotal (without tax)
+    subtotal: passedSubtotal,
+    taxAmount: passedTaxAmount,
   } = state || {};
 
   const [loading, setLoading] = useState(false);
@@ -56,8 +58,9 @@ const PaymentPage: React.FC = () => {
   }, []);
 
   // Calculate tax and grand total
-  const subtotal = totalPrice;
-  const taxAmount = (subtotal * taxRate) / 100;
+  // Use passed values if available (from booking page), otherwise calculate
+  const subtotal = passedSubtotal !== undefined ? passedSubtotal : totalPrice;
+  const taxAmount = passedTaxAmount !== undefined ? passedTaxAmount : (subtotal * taxRate) / 100;
   const grandTotal = subtotal + taxAmount;
 
   const formatDate = (date: string) => {
