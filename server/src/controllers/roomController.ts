@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { roomService } from '../services/roomService';
 import { validateRoomPayload } from '../utils/validators';
 import { RoomPayload } from '../types/room.types';
+import cloudinary from '../config/cloudinary';
+import { roomRepository } from '../repositories/roomRepository';
 
 export class RoomController {
   // Get all rooms, optionally filtered by status
@@ -153,6 +155,87 @@ export class RoomController {
     } catch (error) {
       console.error('Error adding room review:', error);
       res.status(500).json({ ok: false, error: 'Failed to add room review' });
+    }
+  }
+
+  // Upload room images to Cloudinary and save URLs in DB
+  async uploadImages(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const files = req.files as Express.Multer.File[] | undefined;
+
+      if (!files || files.length === 0) {
+        res.status(400).json({ ok: false, error: 'No images provided' });
+        return;
+      }
+
+      if (files.length > 10) {
+        res.status(400).json({ ok: false, error: 'Maximum 10 images per upload' });
+        return;
+      }
+
+      const uploadOne = (file: Express.Multer.File) =>
+        new Promise<string>((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: `rooms/${id}`,
+              resource_type: 'image',
+              overwrite: false,
+            },
+            (error, result) => {
+              if (error || !result) return reject(error || new Error('Upload failed'));
+              resolve(result.secure_url);
+            }
+          );
+          stream.end(file.buffer);
+        });
+
+      const urls = await Promise.all(files.map(uploadOne));
+
+      const updated = await roomRepository.addImages(id, urls);
+      if (!updated) {
+        res.status(404).json({ ok: false, error: 'Room not found' });
+        return;
+      }
+
+      res.status(201).json({ ok: true, data: { images: updated.images } });
+    } catch (error: any) {
+      res.status(500).json({ ok: false, error: error?.message || 'Failed to upload images' });
+    }
+  }
+
+  // Delete image reference from room (and optionally Cloudinary)
+  async deleteImage(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { imageUrl } = req.body as { imageUrl?: string };
+
+      if (!imageUrl) {
+        res.status(400).json({ ok: false, error: 'imageUrl is required' });
+        return;
+      }
+
+      // Remove from DB first
+      const updated = await roomRepository.removeImage(id, imageUrl);
+      if (!updated) {
+        res.status(404).json({ ok: false, error: 'Room not found' });
+        return;
+      }
+
+      // Best-effort Cloudinary delete using public_id derived from URL
+      try {
+        const match = imageUrl.match(/upload\/v\d+\/(.*)\.(jpg|jpeg|png|webp|gif)$/i);
+        if (match && match[1]) {
+          const publicId = match[1];
+          await cloudinary.uploader.destroy(publicId);
+        }
+      } catch {
+        // ignore cloudinary delete failure
+      }
+
+      res.json({ ok: true, data: { images: updated.images } });
+    } catch (error: any) {
+      res.status(500).json({ ok: false, error: error?.message || 'Failed to delete image' });
     }
   }
 }
