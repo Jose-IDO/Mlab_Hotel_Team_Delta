@@ -48,9 +48,19 @@ export const Navbar: React.FC = () => {
     setMenuOpen(false);
   };
   const handleHomeClick = () => {
-    const adminRoles = ["super_admin", "hotel_manager"];
-    const hasAdminRole = user?.roles?.some((r: any) => (typeof r === "string" ? r : r?.name) && adminRoles.includes(r));
-    navigate(hasAdminRole ? "/admin" : "/dashboard");
+    if (!isAuthenticated || !user) {
+      // Not logged in, stay on landing page (scroll to top or refresh)
+      window.scrollTo(0, 0);
+      return;
+    }
+    
+    const adminRoles = ["super_admin", "admin", "hotel_manager"];
+    const hasAdminRole = user?.roles?.some((r: any) => {
+      const roleName = typeof r === "string" ? r : r?.name;
+      return adminRoles.includes(roleName);
+    });
+    
+    navigate(hasAdminRole ? "/admin" : "/");
   };
   const handleRoomsClick = () => {
     if (!isAccepted) return;
