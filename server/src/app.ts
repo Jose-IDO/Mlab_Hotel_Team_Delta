@@ -18,7 +18,22 @@ import migrationRoutes from './routes/migrationRoutes';
 const app = express();
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  process.env.PUBLIC_BASE_URL || 'http://localhost:5173',
+  'http://localhost:5173', // Keep for local dev
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(passport.initialize());
 app.use(logger);
