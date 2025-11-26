@@ -189,7 +189,7 @@ export class BookingRepository {
        LEFT JOIN rooms r ON b.room_id = r.id
        ORDER BY b.created_at DESC`
     );
-    return rows.map(r => ({
+    return rows.map((r: any) => ({
       ...rowToBooking(r),
       guestName: r.guest_name,
       guestEmail: r.guest_email,
@@ -245,7 +245,7 @@ export class BookingRepository {
          AND $1 < check_out`,
       [startDate, endDate]
     );
-    return rows.map(r => ({
+    return rows.map((r: any) => ({
       roomId: r.room_id,
       checkIn: r.check_in,
       checkOut: r.check_out,
