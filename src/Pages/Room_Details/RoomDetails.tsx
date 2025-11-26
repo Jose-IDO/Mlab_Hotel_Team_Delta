@@ -30,12 +30,14 @@ type ApiRoom = {
   roomSizeSqm?: number;
   amenities?: string[];
   description?: string;
+  images?: string[];
 };
 
 type UiRoom = {
   id: string;
   name: string;
   image: string;
+  images?: string[];
   price: number;
   adults: number;
   kids: number;
@@ -164,6 +166,7 @@ const RoomDetails: React.FC = () => {
           id: r.id,
           name: r.roomName,
           image: pickImage(r.roomType, r.roomName),
+          images: Array.isArray((r as any).images) ? (r as any).images : undefined,
           price: Number(r.price) || 0,
           adults: r.maxGuests ?? 2,
           kids: 0,
@@ -174,7 +177,7 @@ const RoomDetails: React.FC = () => {
           description: r.description,
         };
         setRoom(mapped);
-        setSelectedImage(mapped.image);
+        setSelectedImage(mapped.images?.[0] || mapped.image);
 
         // Fetch active deals for this room
         try {
@@ -348,14 +351,13 @@ const RoomDetails: React.FC = () => {
           <>
             {/* Gallery */}
             <div className={styles.gallery}>
-              <div className={styles.mainImage} onClick={() => setSelectedImage(room.image)}>
-                <img src={room.image} alt={room.name} />
+              <div className={styles.mainImage} onClick={() => setSelectedImage(selectedImage || room.image)}>
+                <img src={selectedImage || room.image} alt={room.name} />
               </div>
               <div className={styles.sideImages}>
-                <img src={room1} alt="Room 1" onClick={() => setSelectedImage(room1)} />
-                <img src={room2} alt="Room 2" onClick={() => setSelectedImage(room2)} />
-                <img src={room3} alt="Room 3" onClick={() => setSelectedImage(room3)} />
-                <img src={room4} alt="Room 4" onClick={() => setSelectedImage(room4)} />
+                {(room.images && room.images.length > 0 ? room.images : [room1, room2, room3, room4]).slice(0,4).map((img, idx) => (
+                  <img key={idx} src={img} alt={`Room ${idx+1}`} onClick={() => setSelectedImage(img)} />
+                ))}
               </div>
             </div>
 
