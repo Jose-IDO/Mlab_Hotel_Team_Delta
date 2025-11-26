@@ -48,39 +48,53 @@ const BookingConfirmation: React.FC = () => {
             });
           } catch {}
 
-          // Fetch booking by payment reference
-          const response = await fetch(`${API_URL}/bookings/by-reference/${reference}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
+          // Fetch booking by payment reference - retry if needed
+          let booking = null;
+          let retries = 3;
+          while (retries > 0 && !booking) {
+            try {
+              const response = await fetch(`${API_URL}/bookings/by-reference/${reference}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
 
-          if (!response.ok) {
-            throw new Error('Failed to fetch booking details');
+              if (response.ok) {
+                const data = await response.json();
+                booking = data.booking || data.data || data;
+                break;
+              } else if (retries === 1) {
+                throw new Error('Failed to fetch booking details');
+              }
+            } catch (err) {
+              if (retries === 1) throw err;
+              // Wait 1 second before retry
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            retries--;
           }
 
-          const data = await response.json();
-          const booking = data.booking || data;
-
-          setBookingData({
-            bookingId: booking.id || booking.bookingId,
-            hotelName: booking.hotelName || "Delta Hotel",
-            roomType: booking.roomType || booking.room_type || "Room",
-            checkIn: booking.checkIn || booking.check_in,
-            checkOut: booking.checkOut || booking.check_out,
-            nights: booking.nights || calculateNights(booking.check_in, booking.check_out),
-            totalPrice: booking.totalPrice || booking.total_price,
-            guest: {
-              firstName: booking.firstName || user?.firstName || "",
-              lastName: booking.lastName || user?.lastName || "",
-              email: booking.email || user?.email || "",
-              country: booking.country || "",
-              phone: booking.phone || user?.phone || ""
-            },
-            paymentMethod: "Paystack",
-            cardholderName: `${user?.firstName || ""} ${user?.lastName || ""}`,
-            paymentReference: reference
-          });
+          if (booking) {
+            setBookingData({
+              bookingId: booking.id || booking.bookingId,
+              hotelName: booking.hotelName || "Delta Hotel",
+              roomType: booking.roomType || booking.room_type || "Room",
+              checkIn: booking.checkIn || booking.check_in,
+              checkOut: booking.checkOut || booking.check_out,
+              nights: booking.nights || calculateNights(booking.check_in || booking.checkIn, booking.check_out || booking.checkOut),
+              totalPrice: booking.totalPrice || booking.total_price,
+              guest: {
+                firstName: booking.firstName || user?.firstName || "",
+                lastName: booking.lastName || user?.lastName || "",
+                email: booking.email || user?.email || "",
+                country: booking.country || "",
+                phone: booking.phone || user?.phone || ""
+              },
+              paymentMethod: "Paystack",
+              cardholderName: `${user?.firstName || ""} ${user?.lastName || ""}`,
+              paymentReference: reference
+            });
+          }
         } else if (state) {
           // Use data from navigation state (direct navigation from payment page)
           setBookingData({
@@ -99,14 +113,21 @@ const BookingConfirmation: React.FC = () => {
           throw new Error('No booking information available');
         }
 
+        // Always set loading to false after a delay to show the confirmation
         setTimeout(() => setIsLoading(false), 1200);
       } catch (err: any) {
+        console.error('Booking confirmation error:', err);
         setError(err.message || 'Failed to load booking details');
         setIsLoading(false);
       }
     };
 
-    fetchBookingDetails();
+    if (token) {
+      fetchBookingDetails();
+    } else {
+      setIsLoading(false);
+      setError('You must be logged in to view booking confirmation');
+    }
   }, [location.search, state, token, user]);
 
   const calculateNights = (checkIn: string, checkOut: string) => {

@@ -25,12 +25,21 @@ export const bookingController = {
         console.error('Failed to fetch room name:', err);
       }
 
-      // Create notification for the user
+      // Create notification for the user based on booking status
       try {
         if (userId && bookingId) {
+          const bookingStatus = booking?.status || 'pending';
+          let notificationMessage: string;
+          
+          if (bookingStatus === 'pending') {
+            notificationMessage = `Your booking for ${roomName} has been made and is pending approval.`;
+          } else {
+            notificationMessage = `Your booking for ${roomName} is complete and confirmed!`;
+          }
+          
           await notificationRepository.create(
             String(userId), 
-            `New booking created for ${roomName}`, 
+            notificationMessage, 
             String(bookingId), 
             'booking_confirmation'
           );
@@ -157,10 +166,21 @@ export const bookingController = {
       // Notify user about status change
       const booking = await bookingRepository.findById(id);
       if (booking) {
+        // Get room name for notification
+        let roomName = "your room";
+        try {
+          if (booking.roomId) {
+            const room = await roomRepository.findById(booking.roomId);
+            roomName = room?.roomName || "your room";
+          }
+        } catch (err) {
+          console.error('Failed to fetch room name:', err);
+        }
+        
         const statusMessages: Record<string, string> = {
-          confirmed: `Your booking has been confirmed!`,
-          cancelled: `Your booking has been cancelled.`,
-          pending: `Your booking status has been updated to pending.`
+          confirmed: `Your booking for ${roomName} has been approved and confirmed!`,
+          cancelled: `Your booking for ${roomName} has been cancelled.`,
+          pending: `Your booking for ${roomName} status has been updated to pending approval.`
         };
         await notificationRepository.create(
           String(booking.userId),

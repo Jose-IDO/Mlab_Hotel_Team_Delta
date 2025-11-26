@@ -203,7 +203,16 @@ export const LoggedInNavbar = () => {
                   {user?.firstName?.charAt(0).toUpperCase()}{user?.lastName?.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <span className={styles.userName}>{user ? `${user.firstName} ${user.lastName}` : 'User'}</span>
+              <span 
+                className={styles.userName}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/profile');
+                }}
+                style={{cursor: 'pointer'}}
+              >
+                {user ? `${user.firstName} ${user.lastName}` : 'User'}
+              </span>
               <img src={SouthAfricaFlag} alt="South Africa" className={styles.flagIcon} />
             </div>
             <button className={styles.logoutBtn} onClick={handleLogout}>
